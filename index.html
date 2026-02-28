@@ -1,1292 +1,397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Abyss Spearfishing Gear</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-
-  <style>
-    /* THEME (from your index.css, simplified) */
-    :root {
-      --background: #060a10;
-      --foreground: #e7f7f5;
-      --card: #0d1620;
-      --card-foreground: #e7f7f5;
-      --primary: #00d8d6;
-      --primary-foreground: #060a10;
-      --secondary: #151f2b;
-      --secondary-foreground: #e7f7f5;
-      --muted: #121926;
-      --muted-foreground: #8a9bb3;
-      --border: #1b2533;
-      --radius: 4px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #0b1724 0, #04070c 55%, #020309 100%);
-      color: var(--foreground);
-      min-height: 100vh;
-    }
-
-    h1, h2, h3 {
-      font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-      margin: 0;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    .page {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 24px 16px 48px;
-    }
-
-    /* NAVBAR */
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(231, 247, 245, 0.7);
-      font-size: 14px;
-    }
-
-    .nav-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.16);
-      background: radial-gradient(circle at top left, rgba(0,216,214,0.25), transparent 55%);
-      color: inherit;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .nav-back span.icon {
-      font-size: 14px;
-    }
-
-    .logo {
-      font-size: 18px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--foreground);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .cart-btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.24);
-      background: rgba(3, 14, 26, 0.9);
-      color: inherit;
-      font-size: 13px;
-    }
-
-    .cart-count {
-      min-width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: var(--primary);
-      color: var(--primary-foreground);
-      font-size: 11px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-    }
-
-    /* LANDING */
-    .landing {
-      display: none;
-      min-height: calc(100vh - 96px);
-      display: none;
-    }
-
-    .landing.active {
-      display: flex;
-    }
-
-    .landing-inner {
-      position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-      gap: 32px;
-      padding: 32px 24px;
-      border-radius: 24px;
-      background:
-        radial-gradient(circle at top left, rgba(0,216,214,0.25), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(0,102,255,0.18), transparent 55%),
-        linear-gradient(135deg, rgba(7,18,32,0.95), rgba(3,10,20,0.98));
-      border: 1px solid rgba(231, 247, 245, 0.18);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.55);
-      overflow: hidden;
-    }
-
-    @media (max-width: 800px) {
-      .landing-inner {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 24px 18px 20px;
-      }
-    }
-
-    .landing-copy-eyebrow {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(231, 247, 245, 0.7);
-      margin-bottom: 12px;
-    }
-
-    .landing-title {
-      font-size: clamp(30px, 5vw, 40px);
-      line-height: 1.1;
-      margin-bottom: 12px;
-    }
-
-    .landing-subtitle {
-      font-size: 14px;
-      color: rgba(231, 247, 245, 0.78);
-      max-width: 420px;
-      margin-bottom: 20px;
-    }
-
-    .landing-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .btn-primary {
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(120deg, #00d8d6, #18a0ff);
-      color: #041014;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-outline {
-      padding: 9px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.28);
-      background: transparent;
-      color: rgba(231, 247, 245, 0.86);
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .landing-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 12px;
-      font-size: 11px;
-      color: rgba(231, 247, 245, 0.6);
-    }
-
-    .landing-meta-item {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.16);
-      background: rgba(4, 14, 24, 0.75);
-    }
-
-    .landing-visual {
-      position: relative;
-      min-height: 220px;
-      border-radius: 18px;
-      background-image: url("https://images.unsplash.com/photo-1612538498939-1e998d296d0c?q=80&w=1200&auto=format&fit=crop");
-      background-size: cover;
-      background-position: center;
-      overflow: hidden;
-      border: 1px solid rgba(231, 247, 245, 0.18);
-    }
-
-    .landing-visual-overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top, rgba(0,0,0,0.3), rgba(0,0,0,0.85));
-    }
-
-    .landing-visual-content {
-      position: relative;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 16px 18px 18px;
-      gap: 8px;
-      color: rgba(231, 247, 245, 0.95);
-    }
-
-    .landing-depth {
-      font-size: 11px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(231, 247, 245, 0.7);
-    }
-
-    .landing-quote {
-      font-size: 13px;
-      max-width: 260px;
-      color: rgba(231, 247, 245, 0.86);
-    }
-
-    .landing-avatar {
-      font-size: 11px;
-      color: rgba(231, 247, 245, 0.75);
-    }
-
-    .category-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .category-pill {
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.24);
-      background: rgba(5, 18, 30, 0.92);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(231, 247, 245, 0.8);
-    }
-
-    .category-pill span {
-      font-size: 12px;
-      opacity: 0.8;
-    }
-
-    /* PRODUCTS PAGE */
-    .products {
-      display: none;
-    }
-
-    .products.active {
-      display: block;
-    }
-
-    .products-header {
-      margin-bottom: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .products-title {
-      font-size: 24px;
-    }
-
-    .products-subtitle {
-      font-size: 13px;
-      color: rgba(231, 247, 245, 0.7);
-    }
-
-    .category-filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .category-chip {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.22);
-      background: rgba(9, 19, 32, 0.92);
-      font-size: 11px;
-      color: rgba(231, 247, 245, 0.75);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .category-chip.active {
-      background: linear-gradient(120deg, #00d8d6, #18a0ff);
-      color: #041014;
-      border-color: transparent;
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    @media (max-width: 960px) {
-      .products-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 640px) {
-      .products-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .product-card {
-      background: linear-gradient(145deg, #050b13, #0e1823);
-      border-radius: 18px;
-      border: 1px solid rgba(231, 247, 245, 0.18);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
-
-    .product-img-wrap {
-      position: relative;
-      padding-top: 66%;
-      overflow: hidden;
-    }
-
-    .product-img-wrap img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: saturate(1.1);
-      transform: scale(1.02);
-    }
-
-    .product-card-body {
-      padding: 10px 12px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .product-category {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: rgba(231, 247, 245, 0.7);
-    }
-
-    .product-name {
-      font-size: 14px;
-    }
-
-    .product-price {
-      font-size: 13px;
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .product-quick {
-      font-size: 11px;
-      color: rgba(231, 247, 245, 0.7);
-    }
-
-    .empty-state {
-      margin-top: 32px;
-      text-align: center;
-      font-size: 14px;
-      color: rgba(231, 247, 245, 0.75);
-    }
-
-    .reset-link {
-      margin-top: 6px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--primary);
-      cursor: pointer;
-    }
-
-    /* CART SHEET */
-    .cart-sheet-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      display: none;
-      align-items: stretch;
-      justify-content: flex-end;
-      z-index: 40;
-    }
-
-    .cart-sheet-backdrop.active {
-      display: flex;
-    }
-
-    .cart-sheet {
-      width: min(360px, 100%);
-      background: #050a10;
-      border-left: 1px solid rgba(231, 247, 245, 0.18);
-      display: flex;
-      flex-direction: column;
-      max-height: 100vh;
-    }
-
-    .cart-sheet-header {
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid rgba(231, 247, 245, 0.16);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .cart-sheet-title {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .cart-close-btn {
-      border: none;
-      background: transparent;
-      color: rgba(231, 247, 245, 0.7);
-      font-size: 18px;
-    }
-
-    .cart-sheet-body {
-      padding: 12px 16px 80px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .cart-empty {
-      font-size: 14px;
-      color: rgba(231, 247, 245, 0.75);
-    }
-
-    .cart-start-btn {
-      margin-top: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.28);
-      background: transparent;
-      color: rgba(231, 247, 245, 0.9);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-
-    .cart-item {
-      border-radius: 12px;
-      border: 1px solid rgba(231, 247, 245, 0.16);
-      background: #070f18;
-      padding: 10px 10px 10px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-
-    .cart-item-name {
-      font-weight: 500;
-    }
-
-    .cart-item-price {
-      font-size: 12px;
-      color: rgba(231, 247, 245, 0.8);
-    }
-
-    .cart-qty-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .qty-btn {
-      width: 20px;
-      height: 20px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.28);
-      background: transparent;
-      color: rgba(231, 247, 245, 0.9);
-      font-size: 13px;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cart-item-qty {
-      font-size: 12px;
-      color: rgba(231, 247, 245, 0.85);
-    }
-
-    .cart-remove {
-      border: none;
-      background: transparent;
-      color: rgba(231, 247, 245, 0.6);
-      font-size: 12px;
-      margin-left: auto;
-      padding: 0 0 0 6px;
-    }
-
-    .cart-sheet-footer {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: min(360px, 100%);
-      background: #050a10;
-      border-top: 1px solid rgba(231, 247, 245, 0.16);
-      padding: 10px 16px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 50;
-    }
-
-    .cart-total-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: rgba(231, 247, 245, 0.85);
-    }
-
-    .checkout-btn {
-      padding: 9px 16px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(120deg, #00d8d6, #18a0ff);
-      color: #041014;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* PRODUCT DIALOG */
-    .dialog-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 30;
-      padding: 16px;
-    }
-
-    .dialog-backdrop.active {
-      display: flex;
-    }
-
-    .dialog {
-      max-width: 720px;
-      width: 100%;
-      background: #050b13;
-      border-radius: 18px;
-      border: 1px solid rgba(231, 247, 245, 0.2);
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    }
-
-    @media (max-width: 720px) {
-      .dialog {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .dialog-img-wrap {
-      position: relative;
-      background: #02050a;
-    }
-
-    .dialog-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .dialog-body {
-      padding: 16px 16px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .dialog-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .badge-premium {
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #041014;
-      background: linear-gradient(120deg, #00d8d6, #18a0ff);
-      border-radius: 999px;
-      padding: 4px 10px;
-      display: inline-flex;
-    }
-
-    .dialog-category {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(231, 247, 245, 0.7);
-    }
-
-    .dialog-title {
-      font-size: 18px;
-      margin-top: 4px;
-    }
-
-    .dialog-price {
-      font-size: 16px;
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .dialog-text {
-      font-size: 13px;
-      color: rgba(231, 247, 245, 0.8);
-      margin-top: 6px;
-    }
-
-    .dialog-features {
-      margin-top: 6px;
-      font-size: 12px;
-      color: rgba(231, 247, 245, 0.85);
-    }
-
-    .dialog-features li {
-      margin-bottom: 2px;
-    }
-
-    .dialog-actions {
-      margin-top: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .btn-secondary {
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.3);
-      background: transparent;
-      color: rgba(231, 247, 245, 0.9);
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #050b13;
-      border-radius: 999px;
-      border: 1px solid rgba(231, 247, 245, 0.24);
-      padding: 8px 14px;
-      font-size: 13px;
-      color: rgba(231, 247, 245, 0.9);
-      display: none;
-      z-index: 60;
-    }
-
-    .toast.show {
-      display: inline-flex;
-      animation: fadeUp 3s ease-out forwards;
-    }
-
-    @keyframes fadeUp {
-      0% { opacity: 0; transform: translate(-50%, 6px); }
-      10% { opacity: 1; transform: translate(-50%, 0); }
-      80% { opacity: 1; transform: translate(-50%, 0); }
-      100% { opacity: 0; transform: translate(-50%, 6px); }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Abyss Spearfishing Catalogue</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#060a10;
+--card:#0d1620;
+--primary:#00d8d6;
+--text:#e7f7f5;
+--border:#1b2533;
+}
+
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Inter, sans-serif;
+background:radial-gradient(circle at top,#0b1724,#020309);
+color:var(--text);
+}
+
+.page{
+max-width:1100px;
+margin:auto;
+padding:20px;
+}
+
+h1,h2,h3{font-family:"Playfair Display",serif;margin:0}
+
+button{cursor:pointer;font-family:inherit}
+
+/* NAV */
+.nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.logo{
+letter-spacing:.2em;
+text-transform:uppercase;
+}
+
+.cart-btn{
+background:var(--card);
+border:1px solid var(--border);
+padding:6px 14px;
+border-radius:999px;
+color:var(--text);
+}
+
+/* LANDING */
+.landing{display:none}
+.landing.active{display:block}
+
+.category-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:16px;
+margin-top:30px;
+}
+
+.category-card{
+background:linear-gradient(135deg,#0a1420,#050b13);
+border:1px solid var(--border);
+padding:30px 20px;
+text-align:center;
+border-radius:18px;
+font-weight:600;
+letter-spacing:.1em;
+text-transform:uppercase;
+transition:.2s;
+}
+
+.category-card:hover{
+transform:translateY(-5px);
+border-color:var(--primary);
+}
+
+/* PRODUCTS */
+.products{display:none}
+.products.active{display:block}
+
+.filter-row{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:20px;
+}
+
+.filter-btn{
+background:#091320;
+border:1px solid var(--border);
+padding:6px 10px;
+border-radius:999px;
+font-size:12px;
+color:var(--text);
+}
+
+.filter-btn.active{
+background:var(--primary);
+color:#041014;
+border:none;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:16px;
+}
+
+.card{
+background:#0a1420;
+border:1px solid var(--border);
+border-radius:16px;
+overflow:hidden;
+cursor:pointer;
+}
+
+.card img{
+width:100%;
+height:170px;
+object-fit:cover;
+}
+
+.card-body{
+padding:12px;
+}
+
+.price{
+color:var(--primary);
+font-weight:600;
+}
+
+/* SIMPLE DIALOG */
+.dialog{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+
+.dialog.active{display:flex}
+
+.dialog-box{
+background:#050b13;
+border-radius:18px;
+max-width:500px;
+width:100%;
+padding:20px;
+}
+
+.dialog-box img{
+width:100%;
+border-radius:12px;
+margin-bottom:10px;
+}
+</style>
 </head>
+
 <body>
+<div class="page">
 
-  <div class="page">
-    <!-- NAVBAR -->
-    <header class="nav">
-      <div class="nav-left">
-        <button class="nav-back" id="backBtn">
-          <span class="icon">←</span>
-          <span>Back</span>
-        </button>
-      </div>
-      <div class="logo">Abyss</div>
-      <div class="nav-right">
-        <button class="cart-btn" id="cartBtn">
-          <span>🛒 Gear Bag</span>
-          <span class="cart-count" id="cartCount">0</span>
-        </button>
-      </div>
-    </header>
+<header class="nav">
+<div class="logo">Abyss</div>
+<button class="cart-btn">Mock Catalogue</button>
+</header>
 
-    <!-- LANDING PAGE -->
-    <main class="landing active" id="landingPage">
-      <div class="landing-inner">
-        <section>
-          <div class="landing-copy-eyebrow">Curated for Freedivers</div>
-          <h1 class="landing-title">Deep-water spearfishing gear without the guesswork.</h1>
-          <p class="landing-subtitle">
-            Build your dream kit from battle-tested spearguns, wetsuits, fins, and more—handpicked for serious reef and bluewater hunters.
-          </p>
-          <div class="landing-actions">
-            <button class="btn-primary" id="browseAllBtn">
-              Browse all gear
-              <span>→</span>
-            </button>
-            <button class="btn-outline" id="skipToProductsBtn">Skip intro</button>
-          </div>
-          <div class="landing-meta">
-            <div class="landing-meta-item">Mock shop. No payments.</div>
-            <div class="landing-meta-item">Spearguns, wetsuits, fins & more.</div>
-          </div>
-          <div class="category-pills" id="landingCategories"></div>
-        </section>
+<!-- LANDING -->
+<section class="landing active" id="landing">
+<h1>Select Your Gear Category</h1>
 
-        <aside class="landing-visual">
-          <div class="landing-visual-overlay"></div>
-          <div class="landing-visual-content">
-            <div class="landing-depth">-24 M • Reef edge</div>
-            <div class="landing-quote">
-              “Everything in this kit has seen real water. Start with a proven setup and tune it to your style.”
-            </div>
-            <div class="landing-avatar">Abyss field team</div>
-          </div>
-        </aside>
-      </div>
-    </main>
+<div class="category-grid" id="categoryGrid"></div>
+</section>
 
-    <!-- PRODUCTS PAGE -->
-    <main class="products" id="productsPage">
-      <header class="products-header">
-        <div>
-          <h2 class="products-title">Spearfishing Kit Builder</h2>
-          <p class="products-subtitle">Filter by category, quick-view gear, and build your mock “bag” before you hit the water.</p>
-        </div>
-      </header>
+<!-- PRODUCTS -->
+<section class="products" id="products">
+<h2>Gear Catalogue</h2>
+<div class="filter-row" id="filters"></div>
+<div class="grid" id="productGrid"></div>
+</section>
 
-      <div class="category-filter-row" id="categoryFilters"></div>
+</div>
 
-      <section class="products-grid" id="productsGrid"></section>
+<!-- DIALOG -->
+<div class="dialog" id="dialog">
+<div class="dialog-box">
+<img id="dialogImg">
+<h3 id="dialogTitle"></h3>
+<p class="price" id="dialogPrice"></p>
+<p>Premium quality spearfishing equipment built for serious divers.</p>
+<br>
+<button onclick="closeDialog()">Close</button>
+</div>
+</div>
 
-      <div class="empty-state" id="emptyState" style="display:none;">
-        Deep waters. No gear found.
-        <div class="reset-link" id="resetFilters">Reset filters</div>
-      </div>
-    </main>
-  </div>
+<script>
 
-  <!-- CART SHEET -->
-  <div class="cart-sheet-backdrop" id="cartSheetBackdrop">
-    <div class="cart-sheet">
-      <div class="cart-sheet-header">
-        <div class="cart-sheet-title">Your Gear Bag</div>
-        <button class="cart-close-btn" id="cartCloseBtn">✕</button>
-      </div>
-      <div class="cart-sheet-body">
-        <div id="cartEmpty" class="cart-empty">
-          Your bag is empty. Ready for the hunt?
-          <br />
-          <button class="cart-start-btn" id="cartStartBtn">Start browsing</button>
-        </div>
-        <div id="cartItemsContainer" style="display:none;"></div>
-      </div>
-    </div>
-    <div class="cart-sheet-footer">
-      <div class="cart-total-row">
-        <span>Total</span>
-        <span id="cartTotal">₱0.00</span>
-      </div>
-      <button class="checkout-btn" id="checkoutBtn">Checkout</button>
-    </div>
-  </div>
+/* =========================
+   DATA
+========================= */
 
-  <!-- PRODUCT DIALOG -->
-  <div class="dialog-backdrop" id="dialogBackdrop">
-    <div class="dialog">
-      <div class="dialog-img-wrap">
-        <img id="dialogImg" src="" alt="" />
-      </div>
-      <div class="dialog-body">
-        <div class="dialog-header-row">
-          <div>
-            <div class="badge-premium">Premium</div>
-            <div class="dialog-category" id="dialogCategory"></div>
-            <h3 class="dialog-title" id="dialogTitle"></h3>
-          </div>
-          <div class="dialog-price" id="dialogPrice"></div>
-        </div>
+const CATEGORIES = [
+"Spearguns",
+"Gloves",
+"Snorkels",
+"Fins",
+"Misc"
+];
 
-        <p class="dialog-text" id="dialogDescription">
-          Designed for professional divers and spearfishing enthusiasts who demand precision and reliability in deep waters.
-        </p>
-        <ul class="dialog-features">
-          <li>Reinforced construction</li>
-          <li>Low-profile design</li>
-          <li>Saltwater resistant</li>
-          <li>2-Year warranty</li>
-        </ul>
+const PRODUCTS = [
+{
+id:"s1",
+name:"Carbon Elite 110",
+price:545,
+category:"Spearguns",
+image:"https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800"
+},
+{
+id:"s2",
+name:"Wood Roller Gun",
+price:720,
+category:"Spearguns",
+image:"https://images.unsplash.com/photo-1616423641454-ee09083e9573?q=80&w=800"
+},
+{
+id:"g1",
+name:"Reinforced Dive Gloves",
+price:45,
+category:"Gloves",
+image:"https://images.unsplash.com/photo-1604335399105-a0c6f8a9c5f5?q=80&w=800"
+},
+{
+id:"sn1",
+name:"Low Drag Snorkel",
+price:35,
+category:"Snorkels",
+image:"https://images.unsplash.com/photo-1582967788600-4740236a2818?q=80&w=800"
+},
+{
+id:"f1",
+name:"Carbon Long Fins",
+price:420,
+category:"Fins",
+image:"https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=800"
+},
+{
+id:"m1",
+name:"Float Line Set",
+price:60,
+category:"Misc",
+image:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=800"
+}
+];
 
-        <div class="dialog-actions">
-          <button class="btn-primary" id="dialogAddBtn">Add to Gear Bag</button>
-          <button class="btn-secondary" id="dialogCloseBtn">Wishlist</button>
-        </div>
-      </div>
-    </div>
-  </div>
+/* =========================
+   STATE
+========================= */
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+let selectedCategory = null;
 
-  <script>
-    // DATA (from mockProducts.ts)
-    const CATEGORIES = [
-      "Spearguns",
-      "Wetsuits",
-      "Fins & Blades",
-      "Masks & Snorkels",
-      "Weights & Belts",
-      "Safety & Buoys"
-    ];
+/* =========================
+   INIT
+========================= */
 
-    const PRODUCTS = [
-      {
-        id: "s1",
-        name: "Carbon Elite 110",
-        price: 545.00,
-        category: "Spearguns",
-        image: "https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "s2",
-        name: "Wooden Roller Gun",
-        price: 720.00,
-        category: "Spearguns",
-        image: "https://images.unsplash.com/photo-1616423641454-ee09083e9573?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "w1",
-        name: "Camo Stealth 5mm",
-        price: 385.00,
-        category: "Wetsuits",
-        image: "https://images.unsplash.com/photo-1582967788600-4740236a2818?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "w2",
-        name: "Open Cell Competition",
-        price: 450.00,
-        category: "Wetsuits",
-        image: "https://images.unsplash.com/photo-1590422114704-586bc194689d?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "f1",
-        name: "Carbon Fiber Long Fins",
-        price: 420.00,
-        category: "Fins & Blades",
-        image: "https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "f2",
-        name: "Polymer Training Fins",
-        price: 125.00,
-        category: "Fins & Blades",
-        image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "mask1",
-        name: "Low Volume Stealth Mask",
-        price: 85.00,
-        category: "Masks & Snorkels",
-        image: "https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: "b1",
-        name: "High-Vis Torpedo Buoy",
-        price: 65.00,
-        category: "Safety & Buoys",
-        image: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=800&auto=format&fit=crop"
-      }
-    ];
+const landing = document.getElementById("landing");
+const products = document.getElementById("products");
+const categoryGrid = document.getElementById("categoryGrid");
+const filters = document.getElementById("filters");
+const productGrid = document.getElementById("productGrid");
 
-    // STATE
-    let selectedCategory = null;
-    let cart = [];
-    let currentProduct = null;
+/* =========================
+   FUNCTIONS
+========================= */
 
-    // ELEMENTS
-    const landingPage = document.getElementById("landingPage");
-    const productsPage = document.getElementById("productsPage");
-    const landingCategoriesEl = document.getElementById("landingCategories");
-    const categoryFiltersEl = document.getElementById("categoryFilters");
-    const productsGridEl = document.getElementById("productsGrid");
-    const emptyStateEl = document.getElementById("emptyState");
-    const resetFiltersEl = document.getElementById("resetFilters");
-    const backBtn = document.getElementById("backBtn");
-    const browseAllBtn = document.getElementById("browseAllBtn");
-    const skipToProductsBtn = document.getElementById("skipToProductsBtn");
-    const cartBtn = document.getElementById("cartBtn");
-    const cartCountEl = document.getElementById("cartCount");
-    const cartSheetBackdrop = document.getElementById("cartSheetBackdrop");
-    const cartCloseBtn = document.getElementById("cartCloseBtn");
-    const cartStartBtn = document.getElementById("cartStartBtn");
-    const cartItemsContainer = document.getElementById("cartItemsContainer");
-    const cartEmpty = document.getElementById("cartEmpty");
-    const cartTotalEl = document.getElementById("cartTotal");
-    const checkoutBtn = document.getElementById("checkoutBtn");
-    const dialogBackdrop = document.getElementById("dialogBackdrop");
-    const dialogImg = document.getElementById("dialogImg");
-    const dialogCategory = document.getElementById("dialogCategory");
-    const dialogTitle = document.getElementById("dialogTitle");
-    const dialogPrice = document.getElementById("dialogPrice");
-    const dialogAddBtn = document.getElementById("dialogAddBtn");
-    const dialogCloseBtn = document.getElementById("dialogCloseBtn");
-    const toastEl = document.getElementById("toast");
+function showProducts(){
+landing.classList.remove("active");
+products.classList.add("active");
+}
 
-    // HELPERS
-    function formatPrice(value) {
-      return "₱" + value.toFixed(2);
-    }
+function renderCategories(){
+CATEGORIES.forEach(cat=>{
+const div=document.createElement("div");
+div.className="category-card";
+div.textContent=cat;
+div.onclick=()=>{
+selectedCategory=cat;
+updateURL();
+showProducts();
+renderFilters();
+renderProducts();
+};
+categoryGrid.appendChild(div);
+});
+}
 
-    function showToast(message) {
-      toastEl.textContent = message;
-      toastEl.classList.add("show");
-      setTimeout(() => {
-        toastEl.classList.remove("show");
-      }, 2800);
-    }
+function renderFilters(){
+filters.innerHTML="";
 
-    function setView(view) {
-      if (view === "landing") {
-        landingPage.classList.add("active");
-        productsPage.classList.remove("active");
-      } else {
-        landingPage.classList.remove("active");
-        productsPage.classList.add("active");
-      }
-    }
+const allBtn=document.createElement("button");
+allBtn.textContent="All";
+allBtn.className="filter-btn"+(!selectedCategory?" active":"");
+allBtn.onclick=()=>{
+selectedCategory=null;
+updateURL();
+renderFilters();
+renderProducts();
+};
+filters.appendChild(allBtn);
 
-    function applyCategoryFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      const category = params.get("category");
-      selectedCategory = category;
-    }
+CATEGORIES.forEach(cat=>{
+const btn=document.createElement("button");
+btn.textContent=cat;
+btn.className="filter-btn"+(selectedCategory===cat?" active":"");
+btn.onclick=()=>{
+selectedCategory=cat;
+updateURL();
+renderFilters();
+renderProducts();
+};
+filters.appendChild(btn);
+});
+}
 
-    function updateUrl() {
-      const params = new URLSearchParams(window.location.search);
-      if (selectedCategory) {
-        params.set("category", selectedCategory);
-      } else {
-        params.delete("category");
-      }
-      const newUrl = window.location.pathname + "?" + params.toString();
-      window.history.replaceState({}, "", newUrl);
-    }
+function renderProducts(){
+productGrid.innerHTML="";
+let list=PRODUCTS;
+if(selectedCategory){
+list=PRODUCTS.filter(p=>p.category===selectedCategory);
+}
 
-    function renderCategories() {
-      // Landing chips (read-only)
-      landingCategoriesEl.innerHTML = "";
-      CATEGORIES.forEach(cat => {
-        const pill = document.createElement("div");
-        pill.className = "category-pill";
-        pill.innerHTML = \`<span>●</span> \${cat}\`;
-        pill.addEventListener("click", () => {
-          selectedCategory = cat;
-          updateUrl();
-          setView("products");
-          renderFilters();
-          renderProducts();
-        });
-        landingCategoriesEl.appendChild(pill);
-      });
+list.forEach(p=>{
+const card=document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<img src="${p.image}">
+<div class="card-body">
+<div>${p.name}</div>
+<div class="price">₱${p.price.toFixed(2)}</div>
+</div>
+`;
+card.onclick=()=>openDialog(p);
+productGrid.appendChild(card);
+});
+}
 
-      // Filter chips (click to set active)
-      renderFilters();
-    }
+function openDialog(product){
+document.getElementById("dialog").classList.add("active");
+document.getElementById("dialogImg").src=product.image;
+document.getElementById("dialogTitle").textContent=product.name;
+document.getElementById("dialogPrice").textContent="₱"+product.price.toFixed(2);
+}
 
-    function renderFilters() {
-      categoryFiltersEl.innerHTML = "";
+function closeDialog(){
+document.getElementById("dialog").classList.remove("active");
+}
 
-      const allChip = document.createElement("button");
-      allChip.className = "category-chip" + (!selectedCategory ? " active" : "");
-      allChip.textContent = "All Gear";
-      allChip.addEventListener("click", () => {
-        selectedCategory = null;
-        updateUrl();
-        renderFilters();
-        renderProducts();
-      });
-      categoryFiltersEl.appendChild(allChip);
+function updateURL(){
+if(selectedCategory){
+history.replaceState(null,null,"?category="+encodeURIComponent(selectedCategory));
+}else{
+history.replaceState(null,null,window.location.pathname);
+}
+}
 
-      CATEGORIES.forEach(cat => {
-        const chip = document.createElement("button");
-        chip.className = "category-chip" + (selectedCategory === cat ? " active" : "");
-        chip.textContent = cat;
-        chip.addEventListener("click", () => {
-          selectedCategory = cat;
-          updateUrl();
-          renderFilters();
-          renderProducts();
-        });
-        categoryFiltersEl.appendChild(chip);
-      });
-    }
+function loadFromURL(){
+const params=new URLSearchParams(window.location.search);
+const cat=params.get("category");
+if(cat && CATEGORIES.includes(cat)){
+selectedCategory=cat;
+showProducts();
+renderFilters();
+renderProducts();
+}
+}
 
-    function filteredProducts() {
-      if (!selectedCategory) return PRODUCTS;
-      return PRODUCTS.filter(p => p.category === selectedCategory);
-    }
+/* =========================
+   START
+========================= */
 
-    function renderProducts() {
-      const items = filteredProducts();
-      productsGridEl.innerHTML = "";
+renderCategories();
+renderFilters();
+renderProducts();
+loadFromURL();
 
-      if (items.length === 0) {
-        emptyStateEl.style.display = "block";
-        return;
-      }
-      emptyStateEl.style.display = "none";
-
-      items.forEach(p => {
-        const card = document.createElement("article");
-        card.className = "product-card";
-        card.innerHTML = \`
-          <div class="product-img-wrap">
-            <img src="\${p.image}" alt="\${p.name}" loading="lazy" />
-          </div>
-          <div class="product-card-body">
-            <div class="product-category">\${p.category}</div>
-            <div class="product-name">\${p.name}</div>
-            <div class="product-price">\${formatPrice(p.price)}</div>
-            <div class="product-quick">Quick view</div>
-          </div>
-        \`;
-        card.addEventListener("click", () => openDialog(p));
-        productsGridEl.appendChild(card);
-      });
-    }
-
-    function renderCart() {
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      cartCountEl.textContent = count;
-      cartTotalEl.textContent = formatPrice(total);
-
-      if (cart.length === 0) {
-        cartEmpty.style.display = "block";
-        cartItemsContainer.style.display = "none";
-        cartItemsContainer.innerHTML = "";
-        return;
-      }
-
-      cartEmpty.style.display = "none";
-      cartItemsContainer.style.display = "block";
-      cartItemsContainer.innerHTML = "";
-
-      cart.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "cart-item";
-        div.innerHTML = \`
-          <div>
-            <div class="cart-item-name">\${item.name}</div>
-            <div class="cart-item-price">\${formatPrice(item.price)} each</div>
-            <div class="cart-qty-row">
-              <button class="qty-btn" data-id="\${item.id}" data-delta="-1">-</button>
-              <span class="cart-item-qty">\${item.quantity}</span>
-              <button class="qty-btn" data-id="\${item.id}" data-delta="1">+</button>
-              <button class="cart-remove" data-id="\${item.id}">Remove</button>
-            </div>
-          </div>
-        \`;
-        cartItemsContainer.appendChild(div);
-      });
-
-      // Bind qty and remove buttons
-      cartItemsContainer.querySelectorAll(".qty-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-id");
-          const delta = parseInt(btn.getAttribute("data-delta"), 10);
-          updateQuantity(id, delta);
-        });
-      });
-
-      cartItemsContainer.querySelectorAll(".cart-remove").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-id");
-          removeFromCart(id);
-        });
-      });
-    }
-
-    function addToCart(product) {
-      const existing = cart.find(item => item.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        cart.push({ ...product, quantity: 1 });
-      }
-      renderCart();
-      showToast(\`\${product.name} has been added to your gear bag.\`);
-    }
-
-    function removeFromCart(id) {
-      cart = cart.filter(item => item.id !== id);
-      renderCart();
-    }
-
-    function updateQuantity(id, delta) {
-      cart = cart.map(item => {
-        if (item.id === id) {
-          const next = Math.max(1, item.quantity + delta);
-          return { ...item, quantity: next };
-        }
-        return item;
-      });
-      renderCart();
-    }
-
-    function openDialog(product) {
-      currentProduct = product;
-      dialogImg.src = product.image;
-      dialogImg.alt = product.name;
-      dialogCategory.textContent = product.category;
-      dialogTitle.textContent = product.name;
-      dialogPrice.textContent = formatPrice(product.price);
-      dialogBackdrop.classList.add("active");
-    }
-
-    function closeDialog() {
-      dialogBackdrop.classList.remove("active");
-      currentProduct = null;
-    }
-
-    // EVENTS
-    backBtn.addEventListener("click", () => {
-      setView("landing");
-      selectedCategory = null;
-      updateUrl();
-      renderFilters();
-      renderProducts();
-    });
-
-    browseAllBtn.addEventListener("click", () => {
-      setView("products");
-      selectedCategory = null;
-      updateUrl();
-      renderFilters();
-      renderProducts();
-    });
-
-    skipToProductsBtn.addEventListener("click", () => {
-      setView("products");
-      updateUrl();
-      renderFilters();
-      renderProducts();
-    });
-
-    cartBtn.addEventListener("click", () => {
-      cartSheetBackdrop.classList.add("active");
-    });
-
-    cartCloseBtn.addEventListener("click", () => {
-      cartSheetBackdrop.classList.remove("active");
-    });
-
-    cartStartBtn.addEventListener("click", () => {
-      cartSheetBackdrop.classList.remove("active");
-      setView("products");
-    });
-
-    cartSheetBackdrop.addEventListener("click", (e) => {
-      if (e.target === cartSheetBackdrop) {
-        cartSheetBackdrop.classList.remove("active");
-      }
-    });
-
-    checkoutBtn.addEventListener("click", () => {
-      showToast("Order placed. This is a mockup, no payment processed.");
-    });
-
-    dialogAddBtn.addEventListener("click", () => {
-      if (currentProduct) {
-        addToCart(currentProduct);
-        closeDialog();
-      }
-    });
-
-    dialogCloseBtn.addEventListener("click", () => {
-      closeDialog();
-      showToast("Wishlist is just for show in this mockup.");
-    });
-
-    dialogBackdrop.addEventListener("click", (e) => {
-      if (e.target === dialogBackdrop) {
-        closeDialog();
-      }
-    });
-
-    resetFiltersEl.addEventListener("click", () => {
-      selectedCategory = null;
-      updateUrl();
-      renderFilters();
-      renderProducts();
-    });
-
-    // INITIALIZE
-    applyCategoryFromQuery();
-    renderCategories();
-    renderProducts();
-    renderCart();
-  </script>
+</script>
 </body>
 </html>
