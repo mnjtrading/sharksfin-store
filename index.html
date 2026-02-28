@@ -159,10 +159,12 @@ h1 {
   border: 1px solid var(--border-soft);
   overflow: hidden;
   transition: 0.3s ease;
+  cursor: pointer;
 }
 
 .product-card:hover {
   transform: translateY(-6px);
+  border-color: rgba(24,160,255,0.5);
 }
 
 .product-card img {
@@ -178,6 +180,12 @@ h1 {
 .product-name {
   font-size:14px;
   margin-bottom:6px;
+}
+
+.product-price {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .product-category {
@@ -198,6 +206,102 @@ h1 {
   text-transform:uppercase;
   font-size:12px;
 }
+
+.product-spotlight {
+  margin-top: 30px;
+  border-radius: 22px;
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(145deg,#071220,#0c1b2c);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  display: none;
+  grid-template-columns: 1fr 1.1fr;
+  overflow: hidden;
+}
+
+.product-spotlight.open {
+  display: grid;
+}
+
+.product-spotlight img {
+  width: 100%;
+  height: 100%;
+  max-height: 460px;
+  object-fit: cover;
+}
+
+.product-spotlight-content {
+  padding: 28px;
+}
+
+.spotlight-category {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.spotlight-name {
+  margin: 10px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(25px,4vw,34px);
+}
+
+.spotlight-price {
+  color: var(--accent);
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.spotlight-details {
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.spotlight-actions {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-cart-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: rgba(9,19,32,0.95);
+  color: var(--text-main);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cart-feedback {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.close-spotlight {
+  margin-top: 24px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-main);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+@media(max-width:800px){
+  .product-spotlight{
+    grid-template-columns: 1fr;
+  }
+
+  .product-spotlight img{
+    max-height: 250px;
+  }
+}
 </style>
 </head>
 <body>
@@ -206,7 +310,7 @@ h1 {
 <section id="welcome">
   <div class="welcome-card">
     <div>
-      <img src="mnj-logo.png" class="logo" alt="MNJ Logo">
+      <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">
         Select a category below to explore our curated distribution catalogue.
@@ -237,32 +341,87 @@ h1 {
 
   <div class="product-grid" id="products">
 
-    <div class="product-card" data-category="Spearguns">
-      <img src="speargun1.jpg">
+    <div class="product-card" data-category="Spearguns" data-name="Carbon Elite Gun" data-price="$649" data-details="A high-performance speargun with carbon barrel construction, balanced recoil control, and a precision trigger for serious freedivers." onclick="showProductSpotlight(this)">
+      <img src="images/item.png" alt="Carbon Elite Gun">
       <div class="product-card-body">
         <div class="product-category">Spearguns</div>
         <div class="product-name">Carbon Elite Gun</div>
+        <div class="product-price">$649</div>
       </div>
     </div>
 
-    <div class="product-card" data-category="Gloves">
-      <img src="gloves1.jpg">
+    <div class="product-card" data-category="Gloves" data-name="Reinforced Dive Gloves" data-price="$69" data-details="5mm neoprene gloves with reinforced palms for secure grip and thermal protection in colder waters." onclick="showProductSpotlight(this)">
+      <img src="images/item2.png" alt="Reinforced Dive Gloves">
       <div class="product-card-body">
         <div class="product-category">Gloves</div>
         <div class="product-name">Reinforced Dive Gloves</div>
+        <div class="product-price">$69</div>
       </div>
     </div>
 
-    <div class="product-card" data-category="Fins">
-      <img src="fins1.jpg">
+    <div class="product-card" data-category="Fins" data-name="Carbon Blade Fins" data-price="$329" data-details="Lightweight long-blade fins designed for deep dives, giving efficient propulsion with reduced fatigue." onclick="showProductSpotlight(this)">
+      <img src="images/item3.png" alt="Carbon Blade Fins">
       <div class="product-card-body">
         <div class="product-category">Fins</div>
         <div class="product-name">Carbon Blade Fins</div>
+        <div class="product-price">$329</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Snorkels" data-name="Hydro Flow Snorkel" data-price="$55" data-details="Semi-dry snorkel with anti-splash top and soft silicone mouthpiece for all-day comfort." onclick="showProductSpotlight(this)">
+      <img src="images/item4.png" alt="Hydro Flow Snorkel">
+      <div class="product-card-body">
+        <div class="product-category">Snorkels</div>
+        <div class="product-name">Hydro Flow Snorkel</div>
+        <div class="product-price">$55</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Misc" data-name="Dive Utility Bag" data-price="$89" data-details="Water-resistant gear bag with ventilated mesh panels and heavy-duty zippers to carry your full kit." onclick="showProductSpotlight(this)">
+      <img src="images/item2.png" alt="Dive Utility Bag">
+      <div class="product-card-body">
+        <div class="product-category">Misc</div>
+        <div class="product-name">Dive Utility Bag</div>
+        <div class="product-price">$89</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Spearguns" data-name="Phantom Pro Speargun" data-price="$719" data-details="Built for blue-water precision, this gun features a streamline profile, stainless shaft, and smooth loading path." onclick="showProductSpotlight(this)">
+      <img src="images/item.png" alt="Phantom Pro Speargun">
+      <div class="product-card-body">
+        <div class="product-category">Spearguns</div>
+        <div class="product-name">Phantom Pro Speargun</div>
+        <div class="product-price">$719</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Gloves" data-name="Thermal Grip Gloves" data-price="$74" data-details="Textured palm panels and flexible neoprene sleeves keep your hands warm while improving control underwater." onclick="showProductSpotlight(this)">
+      <img src="images/item3.png" alt="Thermal Grip Gloves">
+      <div class="product-card-body">
+        <div class="product-category">Gloves</div>
+        <div class="product-name">Thermal Grip Gloves</div>
+        <div class="product-price">$74</div>
       </div>
     </div>
 
   </div>
+
+<div class="product-spotlight" id="productSpotlight">
+  <img id="spotlightImage" src="" alt="Selected product image">
+  <div class="product-spotlight-content">
+    <div class="spotlight-category" id="spotlightCategory"></div>
+    <div class="spotlight-name" id="spotlightName"></div>
+    <div class="spotlight-price" id="spotlightPrice"></div>
+    <div class="spotlight-details" id="spotlightDetails"></div>
+    <div class="spotlight-actions">
+      <button class="add-cart-btn" onclick="promptAddToShoppingList()">🛒 Add to Shopping List</button>
+      <div class="cart-feedback" id="cartFeedback">Select this item if you'd like to add it.</div>
+    </div>
+    <button class="close-spotlight" onclick="closeProductSpotlight()">Close</button>
+  </div>
+</div>
 </section>
+
 
 <script>
 function openCategory(category){
@@ -287,13 +446,51 @@ function goBack(){
   document.getElementById("catalogue").style.display="none";
   document.getElementById("welcome").style.display="flex";
 }
+
+const shoppingList = [];
+let selectedProduct = null;
+
+function showProductSpotlight(card){
+  const spotlight = document.getElementById("productSpotlight");
+  document.getElementById("spotlightImage").src = card.querySelector("img").src;
+  document.getElementById("spotlightCategory").textContent = card.dataset.category;
+  document.getElementById("spotlightName").textContent = card.dataset.name;
+  document.getElementById("spotlightPrice").textContent = card.dataset.price;
+  document.getElementById("spotlightDetails").textContent = card.dataset.details;
+  document.getElementById("cartFeedback").textContent = "Select this item if you'd like to add it.";
+  selectedProduct = {
+    name: card.dataset.name,
+    price: card.dataset.price,
+    category: card.dataset.category
+  };
+  spotlight.classList.add("open");
+  spotlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function promptAddToShoppingList(){
+  if(!selectedProduct) return;
+
+  const shouldAdd = window.confirm(`Add ${selectedProduct.name} (${selectedProduct.price}) to your shopping list?`);
+  const feedback = document.getElementById("cartFeedback");
+
+  if(shouldAdd){
+    shoppingList.push(selectedProduct);
+    feedback.textContent = `${selectedProduct.name} added. Shopping list items: ${shoppingList.length}.`;
+  }else{
+    feedback.textContent = `No problem — ${selectedProduct.name} was not added.`;
+  }
+}
+
+function closeProductSpotlight(){
+  document.getElementById("productSpotlight").classList.remove("open");
+}
   /* ===== MOBILE HERO SLIDESHOW ===== */
 
 const slides = [
-  "item.png",
-  "item2.png",
-  "item3.png",
-  "item4.png"
+  "images/item.png",
+  "images/item2.png",
+  "images/item3.png",
+  "images/item4.png"
 ];
 
 let currentSlide = 0;
