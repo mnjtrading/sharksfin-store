@@ -2,370 +2,203 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Abyss Catalogue</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<title>MNJ Distribution Catalogue</title>
 
 <style>
-:root{
---bg:#060a10;
---card:#0d1620;
---primary:#00d8d6;
---text:#e7f7f5;
---border:#1b2533;
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #333;
 }
 
-*{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:Inter, sans-serif;
-background:radial-gradient(circle at top,#0b1724,#020309);
-color:var(--text);
-overflow-x:hidden;
+/* ===== ONBOARDING SCREEN ===== */
+#welcomeScreen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(to bottom, #2ea3cc, #0f6e8c);
+    color: white;
+    transition: 0.6s ease;
 }
 
-h1,h2,h3{font-family:"Playfair Display",serif;margin:0}
-
-button{cursor:pointer;font-family:inherit}
-
-/* =========================
-   INTRO SCREEN
-========================= */
-
-.intro{
-position:fixed;
-inset:0;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-background:radial-gradient(circle at top,#0b1724,#020309);
-z-index:10;
-transition:opacity .5s ease, visibility .5s;
+#welcomeScreen img {
+    width: 220px; /* resized logo */
+    margin-bottom: 20px;
 }
 
-.intro.hidden{
-opacity:0;
-visibility:hidden;
+#welcomeScreen h1 {
+    margin-bottom: 30px;
+    font-size: 28px;
 }
 
-.intro h1{
-font-size:28px;
-margin-bottom:30px;
-max-width:500px;
+.category-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 180px);
+    gap: 15px;
 }
 
-.button-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:16px;
-width:90%;
-max-width:700px;
-margin-bottom:25px;
+.category-buttons button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    color: #0f6e8c;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
 }
 
-.category-btn{
-background:linear-gradient(135deg,#0a1420,#050b13);
-border:1px solid var(--border);
-padding:18px;
-border-radius:16px;
-text-transform:uppercase;
-letter-spacing:.1em;
-font-weight:600;
-transition:.2s;
+.category-buttons button:hover {
+    background: #dff3fa;
+    transform: translateY(-3px);
 }
 
-.category-btn:hover{
-transform:translateY(-4px);
-border-color:var(--primary);
+.skip-btn {
+    margin-top: 20px;
+    background: transparent;
+    color: white;
+    border: 1px solid white;
 }
 
-.skip-btn{
-background:none;
-border:none;
-color:var(--primary);
-font-weight:600;
-letter-spacing:.1em;
+/* ===== CATALOGUE ===== */
+#catalogue {
+    display: none;
+    padding: 40px;
 }
 
-/* =========================
-   PRODUCT PAGE
-========================= */
-
-.main{
-max-width:1100px;
-margin:auto;
-padding:30px 20px;
-opacity:0;
-transition:opacity .6s ease;
+.catalogue-header {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-.main.active{
-opacity:1;
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
 }
 
-.filter-row{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin-bottom:20px;
+.product-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: 0.3s ease;
 }
 
-.filter-btn{
-background:#091320;
-border:1px solid var(--border);
-padding:6px 12px;
-border-radius:999px;
-font-size:12px;
-color:var(--text);
+.product-card:hover {
+    transform: translateY(-5px);
 }
 
-.filter-btn.active{
-background:var(--primary);
-color:#041014;
-border:none;
+.product-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:18px;
-}
-
-.card{
-background:#0a1420;
-border:1px solid var(--border);
-border-radius:16px;
-overflow:hidden;
-cursor:pointer;
-transition:.2s;
-}
-
-.card:hover{
-transform:translateY(-4px);
-}
-
-.card img{
-width:100%;
-height:170px;
-object-fit:cover;
-}
-
-.card-body{
-padding:12px;
-}
-
-.price{
-color:var(--primary);
-font-weight:600;
-}
-
-/* =========================
-   DIALOG
-========================= */
-
-.dialog{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-align-items:center;
-justify-content:center;
-padding:20px;
-}
-
-.dialog.active{display:flex}
-
-.dialog-box{
-background:#050b13;
-border-radius:18px;
-max-width:500px;
-width:100%;
-padding:20px;
-}
-
-.dialog-box img{
-width:100%;
-border-radius:12px;
-margin-bottom:10px;
+/* Back Button */
+.back-btn {
+    margin-bottom: 20px;
+    padding: 8px 15px;
+    border: none;
+    background: #0f6e8c;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
 }
 </style>
 </head>
-
 <body>
 
-<!-- INTRO SCREEN -->
-<div class="intro" id="intro">
-<h1>What products would you like to see or browse?</h1>
+<!-- ===== WELCOME SCREEN ===== -->
+<div id="welcomeScreen">
+    <img src="mnj-logo.png" alt="MNJ Logo">
+    <h1>Welcome! How may I help you today?</h1>
 
-<div class="button-grid" id="categoryButtons"></div>
+    <div class="category-buttons">
+        <button onclick="filterCategory('Spearguns')">Spearguns</button>
+        <button onclick="filterCategory('Gloves')">Gloves</button>
+        <button onclick="filterCategory('Snorkels')">Snorkels</button>
+        <button onclick="filterCategory('Fins')">Fins</button>
+        <button onclick="filterCategory('Misc')">Misc</button>
+        <button onclick="filterCategory('All')">View All</button>
+    </div>
 
-<button class="skip-btn" onclick="skipIntro()">Skip & View All Products →</button>
+    <button class="skip-btn" onclick="filterCategory('All')">
+        Skip & View All Products
+    </button>
 </div>
 
-<!-- MAIN CATALOGUE -->
-<div class="main" id="mainContent">
-<h2>Catalogue</h2>
-<div class="filter-row" id="filters"></div>
-<div class="grid" id="productGrid"></div>
-</div>
+<!-- ===== CATALOGUE SECTION ===== -->
+<div id="catalogue">
+    <button class="back-btn" onclick="goBack()">← Back</button>
 
-<!-- PRODUCT DIALOG -->
-<div class="dialog" id="dialog">
-<div class="dialog-box">
-<img id="dialogImg">
-<h3 id="dialogTitle"></h3>
-<p class="price" id="dialogPrice"></p>
-<p>Premium quality spearfishing equipment built for serious divers.</p>
-<br>
-<button onclick="closeDialog()">Close</button>
-</div>
+    <div class="catalogue-header">
+        <h2 id="categoryTitle">All Products</h2>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+
+        <!-- Example Products -->
+        <div class="product-card" data-category="Spearguns">
+            <img src="speargun1.jpg" alt="">
+            <h4>Carbon Speargun</h4>
+        </div>
+
+        <div class="product-card" data-category="Gloves">
+            <img src="gloves1.jpg" alt="">
+            <h4>Diving Gloves</h4>
+        </div>
+
+        <div class="product-card" data-category="Snorkels">
+            <img src="snorkel1.jpg" alt="">
+            <h4>Pro Snorkel</h4>
+        </div>
+
+        <div class="product-card" data-category="Fins">
+            <img src="fins1.jpg" alt="">
+            <h4>Carbon Fins</h4>
+        </div>
+
+        <div class="product-card" data-category="Misc">
+            <img src="misc1.jpg" alt="">
+            <h4>Gear Bag</h4>
+        </div>
+
+    </div>
 </div>
 
 <script>
+function filterCategory(category) {
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("catalogue").style.display = "block";
 
-/* =========================
-   DATA
-========================= */
+    const products = document.querySelectorAll(".product-card");
+    const title = document.getElementById("categoryTitle");
 
-const CATEGORIES = [
-"Spearguns",
-"Gloves",
-"Snorkels",
-"Fins",
-"Wetsuits",
-"Misc"
-];
-
-const PRODUCTS = [
-{ id:"1", name:"Carbon Elite 110", price:545, category:"Spearguns", image:"https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800"},
-{ id:"2", name:"Roller Gun Pro", price:720, category:"Spearguns", image:"https://images.unsplash.com/photo-1616423641454-ee09083e9573?q=80&w=800"},
-{ id:"3", name:"Dive Gloves Pro", price:45, category:"Gloves", image:"https://images.unsplash.com/photo-1604335399105-a0c6f8a9c5f5?q=80&w=800"},
-{ id:"4", name:"Low Drag Snorkel", price:35, category:"Snorkels", image:"https://images.unsplash.com/photo-1582967788600-4740236a2818?q=80&w=800"},
-{ id:"5", name:"Carbon Long Fins", price:420, category:"Fins", image:"https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=800"},
-{ id:"6", name:"Stealth Wetsuit 5mm", price:380, category:"Wetsuits", image:"https://images.unsplash.com/photo-1590422114704-586bc194689d?q=80&w=800"},
-{ id:"7", name:"Float Line Kit", price:60, category:"Misc", image:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=800"}
-];
-
-/* =========================
-   ELEMENTS
-========================= */
-
-const intro = document.getElementById("intro");
-const main = document.getElementById("mainContent");
-const categoryButtons = document.getElementById("categoryButtons");
-const filters = document.getElementById("filters");
-const productGrid = document.getElementById("productGrid");
-
-let selectedCategory = null;
-
-/* =========================
-   INTRO LOGIC
-========================= */
-
-function createIntroButtons(){
-CATEGORIES.forEach(cat=>{
-const btn=document.createElement("button");
-btn.className="category-btn";
-btn.textContent=cat;
-btn.onclick=()=>selectCategory(cat);
-categoryButtons.appendChild(btn);
-});
+    if (category === "All") {
+        title.textContent = "All Products";
+        products.forEach(product => product.style.display = "block");
+    } else {
+        title.textContent = category;
+        products.forEach(product => {
+            product.style.display =
+                product.dataset.category === category ? "block" : "none";
+        });
+    }
 }
 
-function selectCategory(cat){
-selectedCategory=cat;
-startSite();
+function goBack() {
+    document.getElementById("catalogue").style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
 }
-
-function skipIntro(){
-selectedCategory=null;
-startSite();
-}
-
-function startSite(){
-intro.classList.add("hidden");
-main.classList.add("active");
-renderFilters();
-renderProducts();
-}
-
-/* =========================
-   CATALOGUE
-========================= */
-
-function renderFilters(){
-filters.innerHTML="";
-
-const allBtn=document.createElement("button");
-allBtn.textContent="All";
-allBtn.className="filter-btn"+(!selectedCategory?" active":"");
-allBtn.onclick=()=>{
-selectedCategory=null;
-renderFilters();
-renderProducts();
-};
-filters.appendChild(allBtn);
-
-CATEGORIES.forEach(cat=>{
-const btn=document.createElement("button");
-btn.textContent=cat;
-btn.className="filter-btn"+(selectedCategory===cat?" active":"");
-btn.onclick=()=>{
-selectedCategory=cat;
-renderFilters();
-renderProducts();
-};
-filters.appendChild(btn);
-});
-}
-
-function renderProducts(){
-productGrid.innerHTML="";
-let list=PRODUCTS;
-if(selectedCategory){
-list=PRODUCTS.filter(p=>p.category===selectedCategory);
-}
-
-list.forEach(p=>{
-const card=document.createElement("div");
-card.className="card";
-card.innerHTML=`
-<img src="${p.image}">
-<div class="card-body">
-<div>${p.name}</div>
-<div class="price">₱${p.price.toFixed(2)}</div>
-</div>
-`;
-card.onclick=()=>openDialog(p);
-productGrid.appendChild(card);
-});
-}
-
-/* =========================
-   DIALOG
-========================= */
-
-function openDialog(product){
-document.getElementById("dialog").classList.add("active");
-document.getElementById("dialogImg").src=product.image;
-document.getElementById("dialogTitle").textContent=product.name;
-document.getElementById("dialogPrice").textContent="₱"+product.price.toFixed(2);
-}
-
-function closeDialog(){
-document.getElementById("dialog").classList.remove("active");
-}
-
-/* =========================
-   START
-========================= */
-
-createIntroButtons();
-
 </script>
+
 </body>
 </html>
