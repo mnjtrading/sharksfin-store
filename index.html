@@ -117,12 +117,13 @@ h1 {
 /* Visual Side */
 .visual {
   border-radius: 22px;
-  background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop");
   background-size: cover;
   background-position: center;
   border: 1px solid var(--border-soft);
   position: relative;
   overflow: hidden;
+  transition: background-image 0.8s ease-in-out;
+  touch-action: pan-y;
 }
 
 .visual::after {
