@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Abyss Spearfishing Catalogue</title>
+<title>Abyss Catalogue</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -17,87 +17,107 @@
 }
 
 *{box-sizing:border-box}
+
 body{
 margin:0;
 font-family:Inter, sans-serif;
 background:radial-gradient(circle at top,#0b1724,#020309);
 color:var(--text);
-}
-
-.page{
-max-width:1100px;
-margin:auto;
-padding:20px;
+overflow-x:hidden;
 }
 
 h1,h2,h3{font-family:"Playfair Display",serif;margin:0}
 
 button{cursor:pointer;font-family:inherit}
 
-/* NAV */
-.nav{
+/* =========================
+   INTRO SCREEN
+========================= */
+
+.intro{
+position:fixed;
+inset:0;
 display:flex;
-justify-content:space-between;
+flex-direction:column;
 align-items:center;
-margin-bottom:20px;
+justify-content:center;
+text-align:center;
+background:radial-gradient(circle at top,#0b1724,#020309);
+z-index:10;
+transition:opacity .5s ease, visibility .5s;
 }
 
-.logo{
-letter-spacing:.2em;
-text-transform:uppercase;
+.intro.hidden{
+opacity:0;
+visibility:hidden;
 }
 
-.cart-btn{
-background:var(--card);
-border:1px solid var(--border);
-padding:6px 14px;
-border-radius:999px;
-color:var(--text);
+.intro h1{
+font-size:28px;
+margin-bottom:30px;
+max-width:500px;
 }
 
-/* LANDING */
-.landing{display:none}
-.landing.active{display:block}
-
-.category-grid{
+.button-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 gap:16px;
-margin-top:30px;
+width:90%;
+max-width:700px;
+margin-bottom:25px;
 }
 
-.category-card{
+.category-btn{
 background:linear-gradient(135deg,#0a1420,#050b13);
 border:1px solid var(--border);
-padding:30px 20px;
-text-align:center;
-border-radius:18px;
-font-weight:600;
-letter-spacing:.1em;
+padding:18px;
+border-radius:16px;
 text-transform:uppercase;
+letter-spacing:.1em;
+font-weight:600;
 transition:.2s;
 }
 
-.category-card:hover{
-transform:translateY(-5px);
+.category-btn:hover{
+transform:translateY(-4px);
 border-color:var(--primary);
 }
 
-/* PRODUCTS */
-.products{display:none}
-.products.active{display:block}
+.skip-btn{
+background:none;
+border:none;
+color:var(--primary);
+font-weight:600;
+letter-spacing:.1em;
+}
+
+/* =========================
+   PRODUCT PAGE
+========================= */
+
+.main{
+max-width:1100px;
+margin:auto;
+padding:30px 20px;
+opacity:0;
+transition:opacity .6s ease;
+}
+
+.main.active{
+opacity:1;
+}
 
 .filter-row{
 display:flex;
 flex-wrap:wrap;
-gap:8px;
+gap:10px;
 margin-bottom:20px;
 }
 
 .filter-btn{
 background:#091320;
 border:1px solid var(--border);
-padding:6px 10px;
+padding:6px 12px;
 border-radius:999px;
 font-size:12px;
 color:var(--text);
@@ -112,7 +132,7 @@ border:none;
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:16px;
+gap:18px;
 }
 
 .card{
@@ -121,6 +141,11 @@ border:1px solid var(--border);
 border-radius:16px;
 overflow:hidden;
 cursor:pointer;
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-4px);
 }
 
 .card img{
@@ -138,7 +163,10 @@ color:var(--primary);
 font-weight:600;
 }
 
-/* SIMPLE DIALOG */
+/* =========================
+   DIALOG
+========================= */
+
 .dialog{
 position:fixed;
 inset:0;
@@ -168,30 +196,24 @@ margin-bottom:10px;
 </head>
 
 <body>
-<div class="page">
 
-<header class="nav">
-<div class="logo">Abyss</div>
-<button class="cart-btn">Mock Catalogue</button>
-</header>
+<!-- INTRO SCREEN -->
+<div class="intro" id="intro">
+<h1>What products would you like to see or browse?</h1>
 
-<!-- LANDING -->
-<section class="landing active" id="landing">
-<h1>Select Your Gear Category</h1>
+<div class="button-grid" id="categoryButtons"></div>
 
-<div class="category-grid" id="categoryGrid"></div>
-</section>
-
-<!-- PRODUCTS -->
-<section class="products" id="products">
-<h2>Gear Catalogue</h2>
-<div class="filter-row" id="filters"></div>
-<div class="grid" id="productGrid"></div>
-</section>
-
+<button class="skip-btn" onclick="skipIntro()">Skip & View All Products →</button>
 </div>
 
-<!-- DIALOG -->
+<!-- MAIN CATALOGUE -->
+<div class="main" id="mainContent">
+<h2>Catalogue</h2>
+<div class="filter-row" id="filters"></div>
+<div class="grid" id="productGrid"></div>
+</div>
+
+<!-- PRODUCT DIALOG -->
 <div class="dialog" id="dialog">
 <div class="dialog-box">
 <img id="dialogImg">
@@ -214,94 +236,66 @@ const CATEGORIES = [
 "Gloves",
 "Snorkels",
 "Fins",
+"Wetsuits",
 "Misc"
 ];
 
 const PRODUCTS = [
-{
-id:"s1",
-name:"Carbon Elite 110",
-price:545,
-category:"Spearguns",
-image:"https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800"
-},
-{
-id:"s2",
-name:"Wood Roller Gun",
-price:720,
-category:"Spearguns",
-image:"https://images.unsplash.com/photo-1616423641454-ee09083e9573?q=80&w=800"
-},
-{
-id:"g1",
-name:"Reinforced Dive Gloves",
-price:45,
-category:"Gloves",
-image:"https://images.unsplash.com/photo-1604335399105-a0c6f8a9c5f5?q=80&w=800"
-},
-{
-id:"sn1",
-name:"Low Drag Snorkel",
-price:35,
-category:"Snorkels",
-image:"https://images.unsplash.com/photo-1582967788600-4740236a2818?q=80&w=800"
-},
-{
-id:"f1",
-name:"Carbon Long Fins",
-price:420,
-category:"Fins",
-image:"https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=800"
-},
-{
-id:"m1",
-name:"Float Line Set",
-price:60,
-category:"Misc",
-image:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=800"
-}
+{ id:"1", name:"Carbon Elite 110", price:545, category:"Spearguns", image:"https://images.unsplash.com/photo-1544551763-47a0160c9e5d?q=80&w=800"},
+{ id:"2", name:"Roller Gun Pro", price:720, category:"Spearguns", image:"https://images.unsplash.com/photo-1616423641454-ee09083e9573?q=80&w=800"},
+{ id:"3", name:"Dive Gloves Pro", price:45, category:"Gloves", image:"https://images.unsplash.com/photo-1604335399105-a0c6f8a9c5f5?q=80&w=800"},
+{ id:"4", name:"Low Drag Snorkel", price:35, category:"Snorkels", image:"https://images.unsplash.com/photo-1582967788600-4740236a2818?q=80&w=800"},
+{ id:"5", name:"Carbon Long Fins", price:420, category:"Fins", image:"https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=800"},
+{ id:"6", name:"Stealth Wetsuit 5mm", price:380, category:"Wetsuits", image:"https://images.unsplash.com/photo-1590422114704-586bc194689d?q=80&w=800"},
+{ id:"7", name:"Float Line Kit", price:60, category:"Misc", image:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=800"}
 ];
 
 /* =========================
-   STATE
+   ELEMENTS
 ========================= */
+
+const intro = document.getElementById("intro");
+const main = document.getElementById("mainContent");
+const categoryButtons = document.getElementById("categoryButtons");
+const filters = document.getElementById("filters");
+const productGrid = document.getElementById("productGrid");
 
 let selectedCategory = null;
 
 /* =========================
-   INIT
+   INTRO LOGIC
 ========================= */
 
-const landing = document.getElementById("landing");
-const products = document.getElementById("products");
-const categoryGrid = document.getElementById("categoryGrid");
-const filters = document.getElementById("filters");
-const productGrid = document.getElementById("productGrid");
-
-/* =========================
-   FUNCTIONS
-========================= */
-
-function showProducts(){
-landing.classList.remove("active");
-products.classList.add("active");
-}
-
-function renderCategories(){
+function createIntroButtons(){
 CATEGORIES.forEach(cat=>{
-const div=document.createElement("div");
-div.className="category-card";
-div.textContent=cat;
-div.onclick=()=>{
-selectedCategory=cat;
-updateURL();
-showProducts();
-renderFilters();
-renderProducts();
-};
-categoryGrid.appendChild(div);
+const btn=document.createElement("button");
+btn.className="category-btn";
+btn.textContent=cat;
+btn.onclick=()=>selectCategory(cat);
+categoryButtons.appendChild(btn);
 });
 }
+
+function selectCategory(cat){
+selectedCategory=cat;
+startSite();
+}
+
+function skipIntro(){
+selectedCategory=null;
+startSite();
+}
+
+function startSite(){
+intro.classList.add("hidden");
+main.classList.add("active");
+renderFilters();
+renderProducts();
+}
+
+/* =========================
+   CATALOGUE
+========================= */
 
 function renderFilters(){
 filters.innerHTML="";
@@ -311,7 +305,6 @@ allBtn.textContent="All";
 allBtn.className="filter-btn"+(!selectedCategory?" active":"");
 allBtn.onclick=()=>{
 selectedCategory=null;
-updateURL();
 renderFilters();
 renderProducts();
 };
@@ -323,7 +316,6 @@ btn.textContent=cat;
 btn.className="filter-btn"+(selectedCategory===cat?" active":"");
 btn.onclick=()=>{
 selectedCategory=cat;
-updateURL();
 renderFilters();
 renderProducts();
 };
@@ -353,6 +345,10 @@ productGrid.appendChild(card);
 });
 }
 
+/* =========================
+   DIALOG
+========================= */
+
 function openDialog(product){
 document.getElementById("dialog").classList.add("active");
 document.getElementById("dialogImg").src=product.image;
@@ -364,33 +360,11 @@ function closeDialog(){
 document.getElementById("dialog").classList.remove("active");
 }
 
-function updateURL(){
-if(selectedCategory){
-history.replaceState(null,null,"?category="+encodeURIComponent(selectedCategory));
-}else{
-history.replaceState(null,null,window.location.pathname);
-}
-}
-
-function loadFromURL(){
-const params=new URLSearchParams(window.location.search);
-const cat=params.get("category");
-if(cat && CATEGORIES.includes(cat)){
-selectedCategory=cat;
-showProducts();
-renderFilters();
-renderProducts();
-}
-}
-
 /* =========================
    START
 ========================= */
 
-renderCategories();
-renderFilters();
-renderProducts();
-loadFromURL();
+createIntroButtons();
 
 </script>
 </body>
