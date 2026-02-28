@@ -287,6 +287,62 @@ function goBack(){
   document.getElementById("catalogue").style.display="none";
   document.getElementById("welcome").style.display="flex";
 }
+  /* ===== MOBILE HERO SLIDESHOW ===== */
+
+const slides = [
+  "item.jpg",
+  "item2.jpg",
+  "item3.jpg",
+  "item4.jpg"
+];
+
+let currentSlide = 0;
+const visual = document.querySelector(".visual");
+
+// show first image
+function showSlide(index){
+  visual.style.backgroundImage = `url(${slides[index]})`;
+}
+
+showSlide(currentSlide);
+
+// ===== AUTO LOOP =====
+let slideInterval = setInterval(nextSlide, 4000);
+
+function nextSlide(){
+  currentSlide = (currentSlide + 1) % slides.length;
+  showSlide(currentSlide);
+}
+
+function prevSlide(){
+  currentSlide =
+    (currentSlide - 1 + slides.length) % slides.length;
+  showSlide(currentSlide);
+}
+
+/* ===== MOBILE SWIPE SUPPORT ===== */
+
+let startX = 0;
+let endX = 0;
+
+visual.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  clearInterval(slideInterval); // pause auto-slide while swiping
+});
+
+visual.addEventListener("touchend", e => {
+  endX = e.changedTouches[0].clientX;
+
+  if(startX - endX > 50){
+    nextSlide(); // swipe left
+  }
+  else if(endX - startX > 50){
+    prevSlide(); // swipe right
+  }
+
+  // restart autoplay
+  slideInterval = setInterval(nextSlide, 4000);
+});
 </script>
 
 </body>
