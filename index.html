@@ -3,200 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MNJ Distribution Catalogue</title>
+<title>MNJ Distribution</title>
+
+<!-- Premium Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
+:root {
+  --bg-dark: #04070c;
+  --card-dark: #0c141d;
+  --border-soft: rgba(255,255,255,0.12);
+  --text-main: #e9f2f2;
+  --text-muted: rgba(233,242,242,0.65);
+  --accent: #00d8d6;
+  --accent-gradient: linear-gradient(120deg,#00d8d6,#18a0ff);
+}
+
+* { box-sizing: border-box; }
+
 body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
-    color: #333;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at top, #0b1724 0%, #04070c 60%);
+  color: var(--text-main);
+  min-height: 100vh;
 }
 
-/* ===== ONBOARDING SCREEN ===== */
-#welcomeScreen {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: linear-gradient(to bottom, #2ea3cc, #0f6e8c);
-    color: white;
-    transition: 0.6s ease;
+/* ===== LANDING ===== */
+#welcome {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-#welcomeScreen img {
-    width: 220px; /* resized logo */
-    margin-bottom: 20px;
+.welcome-card {
+  width: 100%;
+  max-width: 980px;
+  border-radius: 28px;
+  padding: 50px 40px;
+  background:
+    radial-gradient(circle at top left, rgba(0,216,214,0.25), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(0,102,255,0.18), transparent 55%),
+    linear-gradient(145deg,#071220,#030a14);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
 }
 
-#welcomeScreen h1 {
-    margin-bottom: 30px;
-    font-size: 28px;
+@media(max-width:900px){
+  .welcome-card{
+    grid-template-columns:1fr;
+    padding:40px 25px;
+  }
+}
+
+.logo {
+  width: 180px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px,4vw,42px);
+  margin: 0 0 12px 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  max-width: 420px;
+  margin-bottom: 28px;
 }
 
 .category-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 180px);
-    gap: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .category-buttons button {
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: white;
-    color: #0f6e8c;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s ease;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: rgba(9,19,32,0.95);
+  color: var(--text-main);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: 0.3s ease;
 }
 
 .category-buttons button:hover {
-    background: #dff3fa;
-    transform: translateY(-3px);
+  background: var(--accent-gradient);
+  color: #041014;
+  border-color: transparent;
+  transform: translateY(-2px);
 }
 
 .skip-btn {
-    margin-top: 20px;
-    background: transparent;
-    color: white;
-    border: 1px solid white;
+  margin-top: 18px;
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-/* ===== CATALOGUE ===== */
+/* Visual Side */
+.visual {
+  border-radius: 22px;
+  background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.visual::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75), transparent 60%);
+}
+
+/* ===== PRODUCTS ===== */
 #catalogue {
-    display: none;
-    padding: 40px;
+  display: none;
+  padding: 60px 40px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.catalogue-header {
-    text-align: center;
-    margin-bottom: 30px;
+.catalogue-title {
+  font-family:'Playfair Display', serif;
+  font-size: 32px;
+  margin-bottom: 30px;
 }
 
 .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  gap: 20px;
 }
 
 .product-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    text-align: center;
-    transition: 0.3s ease;
+  background: linear-gradient(145deg,#050b13,#0e1823);
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  overflow: hidden;
+  transition: 0.3s ease;
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-6px);
 }
 
 .product-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 6px;
+  width:100%;
+  height:180px;
+  object-fit:cover;
 }
 
-/* Back Button */
+.product-card-body {
+  padding:14px;
+}
+
+.product-name {
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.product-category {
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+
 .back-btn {
-    margin-bottom: 20px;
-    padding: 8px 15px;
-    border: none;
-    background: #0f6e8c;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
+  margin-bottom: 30px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-main);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  font-size:12px;
 }
 </style>
 </head>
 <body>
 
-<!-- ===== WELCOME SCREEN ===== -->
-<div id="welcomeScreen">
-    <img src="mnj-logo.png" alt="MNJ Logo">
-    <h1>Welcome! How may I help you today?</h1>
+<!-- LANDING -->
+<section id="welcome">
+  <div class="welcome-card">
+    <div>
+      <img src="mnj-logo.png" class="logo" alt="MNJ Logo">
+      <h1>Welcome. How may we assist you today?</h1>
+      <p class="subtitle">
+        Select a category below to explore our curated distribution catalogue.
+      </p>
 
-    <div class="category-buttons">
-        <button onclick="filterCategory('Spearguns')">Spearguns</button>
-        <button onclick="filterCategory('Gloves')">Gloves</button>
-        <button onclick="filterCategory('Snorkels')">Snorkels</button>
-        <button onclick="filterCategory('Fins')">Fins</button>
-        <button onclick="filterCategory('Misc')">Misc</button>
-        <button onclick="filterCategory('All')">View All</button>
+      <div class="category-buttons">
+        <button onclick="openCategory('Spearguns')">Spearguns</button>
+        <button onclick="openCategory('Gloves')">Gloves</button>
+        <button onclick="openCategory('Snorkels')">Snorkels</button>
+        <button onclick="openCategory('Fins')">Fins</button>
+        <button onclick="openCategory('Misc')">Misc</button>
+        <button onclick="openCategory('All')">View All</button>
+      </div>
+
+      <button class="skip-btn" onclick="openCategory('All')">
+        Skip & View Full Catalogue
+      </button>
     </div>
 
-    <button class="skip-btn" onclick="filterCategory('All')">
-        Skip & View All Products
-    </button>
-</div>
+    <div class="visual"></div>
+  </div>
+</section>
 
-<!-- ===== CATALOGUE SECTION ===== -->
-<div id="catalogue">
-    <button class="back-btn" onclick="goBack()">← Back</button>
+<!-- CATALOGUE -->
+<section id="catalogue">
+  <button class="back-btn" onclick="goBack()">← Back</button>
+  <div class="catalogue-title" id="catTitle">All Products</div>
 
-    <div class="catalogue-header">
-        <h2 id="categoryTitle">All Products</h2>
+  <div class="product-grid" id="products">
+
+    <div class="product-card" data-category="Spearguns">
+      <img src="speargun1.jpg">
+      <div class="product-card-body">
+        <div class="product-category">Spearguns</div>
+        <div class="product-name">Carbon Elite Gun</div>
+      </div>
     </div>
 
-    <div class="product-grid" id="productGrid">
-
-        <!-- Example Products -->
-        <div class="product-card" data-category="Spearguns">
-            <img src="speargun1.jpg" alt="">
-            <h4>Carbon Speargun</h4>
-        </div>
-
-        <div class="product-card" data-category="Gloves">
-            <img src="gloves1.jpg" alt="">
-            <h4>Diving Gloves</h4>
-        </div>
-
-        <div class="product-card" data-category="Snorkels">
-            <img src="snorkel1.jpg" alt="">
-            <h4>Pro Snorkel</h4>
-        </div>
-
-        <div class="product-card" data-category="Fins">
-            <img src="fins1.jpg" alt="">
-            <h4>Carbon Fins</h4>
-        </div>
-
-        <div class="product-card" data-category="Misc">
-            <img src="misc1.jpg" alt="">
-            <h4>Gear Bag</h4>
-        </div>
-
+    <div class="product-card" data-category="Gloves">
+      <img src="gloves1.jpg">
+      <div class="product-card-body">
+        <div class="product-category">Gloves</div>
+        <div class="product-name">Reinforced Dive Gloves</div>
+      </div>
     </div>
-</div>
+
+    <div class="product-card" data-category="Fins">
+      <img src="fins1.jpg">
+      <div class="product-card-body">
+        <div class="product-category">Fins</div>
+        <div class="product-name">Carbon Blade Fins</div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
 <script>
-function filterCategory(category) {
-    document.getElementById("welcomeScreen").style.display = "none";
-    document.getElementById("catalogue").style.display = "block";
+function openCategory(category){
+  document.getElementById("welcome").style.display="none";
+  document.getElementById("catalogue").style.display="block";
 
-    const products = document.querySelectorAll(".product-card");
-    const title = document.getElementById("categoryTitle");
+  const title=document.getElementById("catTitle");
+  const products=document.querySelectorAll(".product-card");
 
-    if (category === "All") {
-        title.textContent = "All Products";
-        products.forEach(product => product.style.display = "block");
-    } else {
-        title.textContent = category;
-        products.forEach(product => {
-            product.style.display =
-                product.dataset.category === category ? "block" : "none";
-        });
-    }
+  if(category==="All"){
+    title.textContent="All Products";
+    products.forEach(p=>p.style.display="block");
+  }else{
+    title.textContent=category;
+    products.forEach(p=>{
+      p.style.display=p.dataset.category===category?"block":"none";
+    });
+  }
 }
 
-function goBack() {
-    document.getElementById("catalogue").style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
+function goBack(){
+  document.getElementById("catalogue").style.display="none";
+  document.getElementById("welcome").style.display="flex";
 }
 </script>
 
