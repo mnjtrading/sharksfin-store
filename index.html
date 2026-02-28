@@ -95,6 +95,7 @@ h1 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: 0.3s ease;
+  cursor: pointer;
 }
 
 .category-buttons button:hover {
@@ -112,6 +113,7 @@ h1 {
   font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 /* Visual Side */
@@ -159,10 +161,13 @@ h1 {
   border: 1px solid var(--border-soft);
   overflow: hidden;
   transition: 0.3s ease;
+  cursor: pointer;
 }
 
 .product-card:hover {
   transform: translateY(-6px);
+  border-color: rgba(0,216,214,0.7);
+  box-shadow: 0 18px 30px rgba(0,0,0,0.4);
 }
 
 .product-card img {
@@ -178,6 +183,12 @@ h1 {
 .product-name {
   font-size:14px;
   margin-bottom:6px;
+}
+
+.product-price {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .product-category {
@@ -197,6 +208,88 @@ h1 {
   letter-spacing:0.14em;
   text-transform:uppercase;
   font-size:12px;
+  cursor: pointer;
+}
+
+.product-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 7, 12, 0.82);
+  padding: 18px;
+  z-index: 999;
+}
+
+.product-modal.active {
+  display: flex;
+}
+
+.product-modal-content {
+  width: min(920px, 100%);
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(165deg,#0d1824,#030a13);
+  border: 1px solid var(--border-soft);
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+}
+
+@media(max-width: 860px) {
+  .product-modal-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-image {
+  height: 100%;
+  min-height: 280px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.modal-details {
+  padding: 28px;
+}
+
+.modal-category {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.modal-name {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  font-family: 'Playfair Display', serif;
+}
+
+.modal-price {
+  color: var(--accent);
+  font-weight: 700;
+  margin: 16px 0;
+  font-size: 18px;
+}
+
+.modal-description {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.close-modal-btn {
+  border: 1px solid var(--border-soft);
+  background: rgba(9,19,32,0.95);
+  color: var(--text-main);
+  border-radius: 999px;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -237,32 +330,93 @@ h1 {
 
   <div class="product-grid" id="products">
 
-    <div class="product-card" data-category="Spearguns">
-      <img src="speargun1.jpg">
+    <div class="product-card" data-category="Spearguns" data-price="$489" data-description="High-modulus carbon barrel speargun tuned for precision and low recoil in bluewater and reef dives." data-image="item.png">
+      <img src="item.png" alt="Carbon Elite Gun">
       <div class="product-card-body">
         <div class="product-category">Spearguns</div>
         <div class="product-name">Carbon Elite Gun</div>
+        <div class="product-price">$489</div>
       </div>
     </div>
 
-    <div class="product-card" data-category="Gloves">
-      <img src="gloves1.jpg">
+    <div class="product-card" data-category="Gloves" data-price="$65" data-description="Reinforced palms and ergonomic neoprene fit keep your grip secure and hands warm on long sessions." data-image="item2.png">
+      <img src="item2.png" alt="Reinforced Dive Gloves">
       <div class="product-card-body">
         <div class="product-category">Gloves</div>
         <div class="product-name">Reinforced Dive Gloves</div>
+        <div class="product-price">$65</div>
       </div>
     </div>
 
-    <div class="product-card" data-category="Fins">
-      <img src="fins1.jpg">
+    <div class="product-card" data-category="Fins" data-price="$219" data-description="Responsive carbon blades with comfortable foot pockets designed for efficient propulsion and reduced fatigue." data-image="item3.png">
+      <img src="item3.png" alt="Carbon Blade Fins">
       <div class="product-card-body">
         <div class="product-category">Fins</div>
         <div class="product-name">Carbon Blade Fins</div>
+        <div class="product-price">$219</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Snorkels" data-price="$44" data-description="Low-volume soft snorkel with anti-splash profile for steady surface breathing in changing conditions." data-image="item4.png">
+      <img src="item4.png" alt="Hydro Stream Snorkel">
+      <div class="product-card-body">
+        <div class="product-category">Snorkels</div>
+        <div class="product-name">Hydro Stream Snorkel</div>
+        <div class="product-price">$44</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Spearguns" data-price="$369" data-description="Compact reef-ready speargun built for quick tracking and dependable shaft speed in tighter spaces." data-image="item.png">
+      <img src="item.png" alt="Reef Hunter Pro">
+      <div class="product-card-body">
+        <div class="product-category">Spearguns</div>
+        <div class="product-name">Reef Hunter Pro</div>
+        <div class="product-price">$369</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Fins" data-price="$139" data-description="Flexible composite fins delivering smooth kick cycles and all-day comfort for recreational dives." data-image="item3.png">
+      <img src="item3.png" alt="Aqua Sprint Fins">
+      <div class="product-card-body">
+        <div class="product-category">Fins</div>
+        <div class="product-name">Aqua Sprint Fins</div>
+        <div class="product-price">$139</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Misc" data-price="$89" data-description="Precision-balanced dive knife with corrosion-resistant steel and secure quick-release sheath." data-image="item2.png">
+      <img src="item2.png" alt="Tide Cut Dive Knife">
+      <div class="product-card-body">
+        <div class="product-category">Misc</div>
+        <div class="product-name">Tide Cut Dive Knife</div>
+        <div class="product-price">$89</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Gloves" data-price="$72" data-description="Thermal-lined gloves for cold-water entries with textured grip zones for rigging and loading." data-image="item4.png">
+      <img src="item4.png" alt="Arctic Grip Gloves">
+      <div class="product-card-body">
+        <div class="product-category">Gloves</div>
+        <div class="product-name">Arctic Grip Gloves</div>
+        <div class="product-price">$72</div>
       </div>
     </div>
 
   </div>
 </section>
+
+<div class="product-modal" id="productModal">
+  <div class="product-modal-content">
+    <img class="modal-image" id="modalImage" src="" alt="Selected product image">
+    <div class="modal-details">
+      <div class="modal-category" id="modalCategory"></div>
+      <h2 class="modal-name" id="modalName"></h2>
+      <div class="modal-price" id="modalPrice"></div>
+      <p class="modal-description" id="modalDescription"></p>
+      <button class="close-modal-btn" onclick="closeProductModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 <script>
 function openCategory(category){
@@ -284,10 +438,50 @@ function openCategory(category){
 }
 
 function goBack(){
+  closeProductModal();
   document.getElementById("catalogue").style.display="none";
   document.getElementById("welcome").style.display="flex";
 }
-  /* ===== MOBILE HERO SLIDESHOW ===== */
+
+const modal=document.getElementById("productModal");
+const modalImage=document.getElementById("modalImage");
+const modalCategory=document.getElementById("modalCategory");
+const modalName=document.getElementById("modalName");
+const modalPrice=document.getElementById("modalPrice");
+const modalDescription=document.getElementById("modalDescription");
+
+function openProductModal(card){
+  const name = card.querySelector(".product-name").textContent;
+
+  modalImage.src = card.dataset.image;
+  modalCategory.textContent = card.dataset.category;
+  modalName.textContent = name;
+  modalPrice.textContent = card.dataset.price;
+  modalDescription.textContent = card.dataset.description;
+  modal.classList.add("active");
+}
+
+function closeProductModal(){
+  modal.classList.remove("active");
+}
+
+modal.addEventListener("click", (e)=>{
+  if(e.target===modal){
+    closeProductModal();
+  }
+});
+
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){
+    closeProductModal();
+  }
+});
+
+document.querySelectorAll(".product-card").forEach(card=>{
+  card.addEventListener("click", ()=>openProductModal(card));
+});
+
+/* ===== MOBILE HERO SLIDESHOW ===== */
 
 const slides = [
   "item.png",
