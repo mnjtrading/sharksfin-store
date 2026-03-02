@@ -121,6 +121,78 @@ h1 {
 .visual {
   border-radius: 22px;
   min-height: 260px;
+  border: 1px solid var(--border-soft);
+  position: relative;
+  overflow: hidden;
+  background: #08111e;
+}
+
+.visual-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.visual-slide.active {
+  opacity: 1;
+}
+
+.visual-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 14px;
+  background: linear-gradient(to top, rgba(3,10,16,0.9), rgba(3,10,16,0.25));
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 2;
+}
+
+.visual-copy {
+  min-width: 0;
+}
+
+.visual-kicker {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(233,242,242,0.75);
+}
+
+.visual-title {
+  margin-top: 6px;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.visual-subtitle {
+  margin-top: 4px;
+  color: rgba(233,242,242,0.82);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.visual-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.visual-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: rgba(3,10,16,0.84);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
   background: url('images/item.png') center/cover;
   border: 1px solid var(--border-soft);
 }
@@ -169,6 +241,24 @@ h1 {
   opacity: 0.18;
   pointer-events: none;
   transform: scale(0.98);
+}
+
+.product-grid.dimmed .product-card.active-card {
+  opacity: 1;
+  transform: none;
+  border-color: rgba(24,160,255,0.75);
+}
+
+.product-card img {
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+
+.product-card-body { padding:14px; }
+.product-name { font-size:14px; margin-bottom:6px; }
+.product-price { font-size: 13px; color: var(--accent); font-weight: 600; }
+.product-category { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }
 }
 
 .product-grid.dimmed .product-card.active-card {
@@ -272,6 +362,40 @@ h1 {
   padding: 10px 16px;
   background: rgba(9,19,32,0.95);
 }
+
+.cart-feedback {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.close-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: rgba(4,10,16,0.8);
+  color: var(--text-main);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media(max-width:860px){
+  .product-modal-content { grid-template-columns: 1fr; }
+  #catalogue { padding: 24px 14px 36px; }
+  .catalogue-title { font-size: 28px; }
+  .back-btn { margin-bottom: 18px; }
+
+  .visual-title {
+    font-size: 20px;
+  }
+
+  .visual-subtitle {
+    font-size: 12px;
 
 .cart-feedback {
   margin-top: 12px;
@@ -417,6 +541,18 @@ h1 {
       <button class="skip-btn" onclick="openCategory('All')">Skip & View Full Catalogue</button>
     </div>
 
+    <div class="visual" id="visualHero">
+      <div class="visual-slide active" id="slideImage"></div>
+      <div class="visual-overlay">
+        <div class="visual-copy">
+          <div class="visual-kicker">Featured Product</div>
+          <div class="visual-title" id="slideTitle">Carbon Elite Gun</div>
+          <div class="visual-subtitle" id="slideSubtitle">Engineered for precision, speed, and all-day dive comfort.</div>
+        </div>
+        <div class="visual-controls">
+          <button type="button" aria-label="Previous slide" onclick="prevHeroSlide()">‹</button>
+          <button type="button" aria-label="Next slide" onclick="nextHeroSlide()">›</button>
+        </div>
     <div class="visual" id="visualPanel">
       <div class="visual-content">
         <div class="visual-kicker" id="visualKicker">Featured Product</div>
@@ -527,6 +663,44 @@ const shoppingList = [];
 let selectedCard = null;
 let selectedProduct = null;
 
+const heroSlides = [
+  { image: "images/item.png", title: "Carbon Elite Gun", subtitle: "Engineered for precision, speed, and all-day dive comfort." },
+  { image: "images/item2.png", title: "Reinforced Dive Gloves", subtitle: "Secure grip and thermal comfort for colder dives." },
+  { image: "images/item3.png", title: "Carbon Blade Fins", subtitle: "Lightweight blades for power and reduced fatigue." },
+  { image: "images/item4.png", title: "Hydro Flow Snorkel", subtitle: "Semi-dry airflow with all-day comfort." }
+];
+
+let heroIndex = 0;
+let heroTimer = null;
+
+function renderHeroSlide(){
+  const slide = heroSlides[heroIndex];
+  document.getElementById("slideImage").style.backgroundImage = `url('${slide.image}')`;
+  document.getElementById("slideTitle").textContent = slide.title;
+  document.getElementById("slideSubtitle").textContent = slide.subtitle;
+}
+
+function nextHeroSlide(){
+  heroIndex = (heroIndex + 1) % heroSlides.length;
+  renderHeroSlide();
+  restartHeroTimer();
+}
+
+function prevHeroSlide(){
+  heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
+  renderHeroSlide();
+  restartHeroTimer();
+}
+
+function restartHeroTimer(){
+  clearInterval(heroTimer);
+  heroTimer = setInterval(() => {
+    heroIndex = (heroIndex + 1) % heroSlides.length;
+    renderHeroSlide();
+  }, 4500);
+}
+
+
 function openCategory(category){
   document.getElementById("welcome").style.display = "none";
   document.getElementById("catalogue").style.display = "block";
@@ -587,6 +761,31 @@ function closeProductModal(){
   selectedCard = null;
 }
 
+
+  document.getElementById("modalImage").src = card.querySelector("img").src;
+  document.getElementById("modalCategory").textContent = card.dataset.category;
+  document.getElementById("modalName").textContent = card.dataset.name;
+  document.getElementById("modalPrice").textContent = card.dataset.price;
+  document.getElementById("modalDescription").textContent = card.dataset.details;
+  document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
+
+  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
+  card.classList.add("active-card");
+  grid.classList.add("dimmed");
+  modal.classList.add("active");
+}
+
+function closeProductModal(){
+  const modal = document.getElementById("productModal");
+  const grid = document.getElementById("products");
+
+  modal.classList.remove("active");
+  grid.classList.remove("dimmed");
+
+  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
+  selectedCard = null;
+}
+
 function handleOverlayClick(event){
   const popup = document.querySelector(".product-modal-content");
   if(!popup.contains(event.target)){
@@ -596,6 +795,14 @@ function handleOverlayClick(event){
 
 function addToCartFromModal(){
   if(!selectedProduct) return;
+
+  shoppingList.push(selectedProduct);
+  document.getElementById("cartFeedback").textContent =
+    `${selectedProduct.name} added. Cart items: ${shoppingList.length}.`;
+}
+
+renderHeroSlide();
+restartHeroTimer();
 
   shoppingList.push(selectedProduct);
   document.getElementById("cartFeedback").textContent =
