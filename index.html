@@ -360,7 +360,7 @@ h1 {
 
 <section id="welcome">
   <div class="welcome-card">
-    <div>
+    <div class="welcome-copy">
       <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">Select a category below to explore our curated distribution catalogue.</p>
@@ -396,6 +396,10 @@ h1 {
 
 <section id="catalogue">
   <button class="back-btn" onclick="goBack()">← Back</button>
+  <div class="mobile-toolbar">
+    <button class="toolbar-btn" onclick="goBack()">← Back</button>
+    <button class="toolbar-btn" onclick="toggleShoppingDrawer()">Shopping List</button>
+  </div>
   <div class="catalogue-title" id="catTitle">All Products</div>
 
   <div class="product-grid" id="products">
@@ -618,6 +622,8 @@ window.addEventListener("keydown", (event) => {
     closeProductModal();
   }
 });
+
+history.replaceState({ view: "welcome" }, "", "#welcome");
 </script>
 
 </body>
