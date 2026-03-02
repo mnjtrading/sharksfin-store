@@ -125,6 +125,12 @@ h1 {
   border-color: rgba(24,160,255,0.5);
 }
 
+.category-buttons button {
+  padding: 9px 16px;
+  background: rgba(9,19,32,0.95);
+  transition: 0.25s ease;
+}
+
 .category-buttons button:hover {
   background: var(--accent-gradient);
   color: #041014;
@@ -290,7 +296,7 @@ h1 {
 }
 
 .product-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-5px);
   border-color: rgba(24,160,255,0.5);
   box-shadow: 0 16px 34px rgba(0,0,0,0.28);
 }
@@ -431,7 +437,7 @@ h1 {
 
 <section id="welcome" class="page-section active" aria-label="Welcome">
   <div class="welcome-card">
-    <div>
+    <div class="welcome-copy">
       <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">Select a category below to explore our curated distribution catalogue.</p>
@@ -731,6 +737,8 @@ window.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("keydown", (event) => {
   if(event.key === "Escape") closeProductModal();
 });
+
+history.replaceState({ view: "welcome" }, "", "#welcome");
 </script>
 
 </body>
