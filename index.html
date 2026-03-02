@@ -1,441 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MNJ Distribution</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MNJ Distribution</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg-dark: #04070c;
-  --border-soft: rgba(255,255,255,0.12);
-  --text-main: #e9f2f2;
-  --text-muted: rgba(233,242,242,0.65);
-  --accent: #00d8d6;
-  --accent-gradient: linear-gradient(120deg,#00d8d6,#18a0ff);
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: radial-gradient(circle at top, #0b1724 0%, #04070c 60%);
-  color: var(--text-main);
-  min-height: 100vh;
-}
-
-.page-section {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 280ms ease, transform 280ms ease;
-}
-
-.page-section.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#welcome {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.welcome-card {
-  width: 100%;
-  max-width: 980px;
-  border-radius: 28px;
-  padding: 40px 34px;
-  background:
-    radial-gradient(circle at top left, rgba(0,216,214,0.25), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(0,102,255,0.18), transparent 55%),
-    linear-gradient(145deg,#071220,#030a14);
-  border: 1px solid var(--border-soft);
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 28px;
-  animation: softIn 340ms ease;
-}
-
-@keyframes softIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.logo {
-  width: 170px;
-  margin-bottom: 16px;
-}
-
-h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(30px,4vw,42px);
-  margin: 0 0 12px 0;
-}
-
-.subtitle {
-  color: var(--text-muted);
-  font-size: 15px;
-  max-width: 420px;
-  margin-bottom: 24px;
-}
-
-.category-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.category-buttons button,
-.skip-btn,
-.back-btn,
-.add-cart-btn,
-.toolbar-btn,
-.close-shopping-btn {
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  color: var(--text-main);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background-color 240ms ease, transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
-}
-
-.category-buttons button,
-.toolbar-btn,
-.add-cart-btn,
-.close-shopping-btn {
-  padding: 9px 16px;
-  background: rgba(9,19,32,0.95);
-}
-
-.category-buttons button:hover,
-.toolbar-btn:hover,
-.add-cart-btn:hover,
-.close-shopping-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
-  border-color: rgba(24,160,255,0.5);
-}
-
-.category-buttons button {
-  padding: 9px 16px;
-  background: rgba(9,19,32,0.95);
-  transition: 0.25s ease;
-}
-
-.category-buttons button:hover {
-  background: var(--accent-gradient);
-  color: #041014;
-  border-color: transparent;
-}
-
-.skip-btn {
-  margin-top: 18px;
-  background: transparent;
-  color: var(--accent);
-  border: none;
-}
-
-.skip-btn:hover {
-  transform: translateY(-2px);
-  text-shadow: 0 0 20px rgba(0,216,214,0.45);
-}
-
-.visual {
-  border-radius: 22px;
-  min-height: 260px;
-  border: 1px solid var(--border-soft);
-  position: relative;
-  overflow: hidden;
-  background: #08111e;
-}
-
-.visual-slide {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 1;
-  transition: opacity 300ms ease;
-}
-
-.visual-overlay {
-  position: absolute;
-  inset: auto 0 0;
-  padding: 14px;
-  background: linear-gradient(to top, rgba(3,10,16,0.9), rgba(3,10,16,0.25));
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 12px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.visual-copy { min-width: 0; }
-
-.visual-kicker {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(233,242,242,0.75);
-}
-
-.visual-title {
-  margin-top: 6px;
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  line-height: 1.15;
-}
-
-.visual-subtitle {
-  margin-top: 4px;
-  color: rgba(233,242,242,0.82);
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.visual-controls {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-  pointer-events: auto;
-}
-
-.visual-controls button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--border-soft);
-  background: rgba(3,10,16,0.84);
-  color: var(--text-main);
-  cursor: pointer;
-  transition: transform 200ms ease, background-color 200ms ease;
-}
-
-.visual-controls button:hover {
-  transform: translateY(-1px) scale(1.05);
-  background: rgba(24,160,255,0.22);
-}
-
-#catalogue {
-  display: none;
-  padding: 44px 28px;
-  max-width: 1200px;
-  margin: auto;
-}
-
-.catalogue-toolbar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.back-btn,
-.toolbar-btn {
-  padding: 8px 16px;
-  background: rgba(9,19,32,0.95);
-}
-
-.catalogue-title {
-  font-family:'Playfair Display', serif;
-  font-size: 32px;
-  margin-bottom: 24px;
-}
-
-.shopping-panel {
-  display: none;
-  margin-bottom: 18px;
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  background: rgba(5,13,23,0.9);
-  padding: 14px;
-}
-
-.shopping-panel.open { display: block; animation: softIn 220ms ease; }
-
-.shopping-panel-title {
-  margin: 0 0 8px 0;
-  font-size: 13px;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.shopping-list-items {
-  margin: 0 0 12px 0;
-  padding-left: 18px;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
-  gap: 20px;
-  transition: opacity 240ms ease, transform 240ms ease;
-}
-
-.product-card {
-  background: linear-gradient(145deg,#050b13,#0e1823);
-  border-radius: 18px;
-  border: 1px solid var(--border-soft);
-  overflow: hidden;
-  transition: transform 240ms ease, border-color 240ms ease, box-shadow 240ms ease, opacity 240ms ease;
-  cursor: pointer;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(24,160,255,0.5);
-  box-shadow: 0 16px 34px rgba(0,0,0,0.28);
-}
-
-.product-grid.dimmed .product-card {
-  opacity: 0.18;
-  pointer-events: none;
-  transform: scale(0.98);
-}
-
-.product-grid.dimmed .product-card.active-card {
-  opacity: 1;
-  transform: none;
-  border-color: rgba(24,160,255,0.75);
-}
-
-.product-card img {
-  width:100%;
-  height:180px;
-  object-fit:cover;
-}
-
-.product-card-body { padding:14px; }
-.product-name { font-size:14px; margin-bottom:6px; }
-.product-price { font-size: 13px; color: var(--accent); font-weight: 600; }
-.product-category { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }
-
-.product-modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(2, 7, 12, 0.82);
-  padding: 18px;
-  z-index: 1000;
-}
-
-.product-modal.active { display: flex; }
-
-.product-modal-content {
-  position: relative;
-  width: min(900px, 100%);
-  border-radius: 22px;
-  overflow: hidden;
-  background: linear-gradient(165deg,#0d1824,#030a13);
-  border: 1px solid var(--border-soft);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.modal-image {
-  width: 100%;
-  height: 100%;
-  min-height: 260px;
-  object-fit: cover;
-}
-
-.modal-details { padding: 26px; }
-
-.modal-category {
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.modal-name {
-  margin: 0;
-  font-size: clamp(24px, 3vw, 34px);
-  font-family: 'Playfair Display', serif;
-}
-
-.modal-price {
-  color: var(--accent);
-  font-weight: 700;
-  margin: 12px 0;
-  font-size: 18px;
-}
-
-.modal-description {
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.cart-feedback {
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.close-x {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--border-soft);
-  background: rgba(4,10,16,0.8);
-  color: var(--text-main);
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform 200ms ease;
-}
-
-.close-x:hover { transform: scale(1.06); }
-
-@media(max-width:900px){
-  .welcome-card{
-    grid-template-columns:1fr;
-    padding:28px 18px;
-  }
-}
-
-@media(max-width:860px){
-  .product-modal-content { grid-template-columns: 1fr; }
-  #catalogue { padding: 24px 14px 36px; }
-  .catalogue-title { font-size: 28px; }
-
-  .visual-title { font-size: 20px; }
-  .visual-subtitle { font-size: 12px; }
-
-  .catalogue-toolbar {
-    flex-wrap: wrap;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
-}
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/slideshow.css">
+  <link rel="stylesheet" href="css/products.css">
+  <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
 
-<section id="welcome" class="page-section active" aria-label="Welcome">
+<section id="welcome" class="section-panel">
   <div class="welcome-card">
     <div class="welcome-copy">
       <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
@@ -455,7 +33,7 @@ h1 {
     </div>
 
     <div class="visual" id="visualHero">
-      <div class="visual-slide" id="slideImage"></div>
+      <div class="visual-slide active" id="slideImage"></div>
       <div class="visual-overlay">
         <div class="visual-copy">
           <div class="visual-kicker">Featured Product</div>
@@ -471,24 +49,16 @@ h1 {
   </div>
 </section>
 
-<section id="catalogue" class="page-section" aria-label="Catalogue">
-  <div class="catalogue-toolbar">
-    <button class="back-btn" onclick="goBack()">← Back</button>
-    <button class="toolbar-btn" onclick="toggleShoppingPanel()">Shopping List (<span id="cartCount">0</span>)</button>
+<section id="catalogue" class="section-panel hidden">
+  <div class="catalogue-header">
+    <div class="catalogue-actions">
+      <button class="back-btn" onclick="goBack()">← Back</button>
+      <button class="toolbar-btn" onclick="toggleShoppingList()">Shopping List</button>
+    </div>
+    <div class="catalogue-title" id="catTitle">All Products</div>
   </div>
-
-  <div class="shopping-panel" id="shoppingPanel">
-    <p class="shopping-panel-title">Saved Items</p>
-    <ul class="shopping-list-items" id="shoppingListItems">
-      <li>No items yet.</li>
-    </ul>
-    <button class="close-shopping-btn" onclick="toggleShoppingPanel(false)">Close list</button>
-  </div>
-
-  <div class="catalogue-title" id="catTitle">All Products</div>
 
   <div class="product-grid" id="products">
-
     <div class="product-card" data-category="Spearguns" data-name="Carbon Elite Gun" data-price="$649" data-details="A high-performance speargun with carbon barrel construction, balanced recoil control, and a precision trigger for serious freedivers." onclick="showProductModal(this)">
       <img src="images/item.png" alt="Carbon Elite Gun">
       <div class="product-card-body">
@@ -551,7 +121,13 @@ h1 {
         <div class="product-price">$74</div>
       </div>
     </div>
+  </div>
 
+  <div class="shopping-drawer" id="shoppingDrawer">
+    <h3>Your Shopping List</h3>
+    <ul class="shopping-list" id="shoppingListItems">
+      <li>No items added yet.</li>
+    </ul>
   </div>
 </section>
 
@@ -570,176 +146,9 @@ h1 {
   </div>
 </div>
 
-<script>
-const shoppingList = [];
-let selectedProduct = null;
-
-const heroSlides = [
-  { image: "images/item.png", title: "Carbon Elite Gun", subtitle: "Engineered for precision, speed, and all-day dive comfort." },
-  { image: "images/item2.png", title: "Reinforced Dive Gloves", subtitle: "Secure grip and thermal comfort for colder dives." },
-  { image: "images/item3.png", title: "Carbon Blade Fins", subtitle: "Lightweight blades for power and reduced fatigue." },
-  { image: "images/item4.png", title: "Hydro Flow Snorkel", subtitle: "Semi-dry airflow with all-day comfort." }
-];
-
-let heroIndex = 0;
-let heroTimer = null;
-
-function renderHeroSlide(){
-  const imageEl = document.getElementById("slideImage");
-  const titleEl = document.getElementById("slideTitle");
-  const subtitleEl = document.getElementById("slideSubtitle");
-  const slide = heroSlides[heroIndex];
-
-  if(!imageEl || !titleEl || !subtitleEl || !slide) return;
-
-  imageEl.style.backgroundImage = `url('${slide.image}')`;
-  titleEl.textContent = slide.title;
-  subtitleEl.textContent = slide.subtitle;
-}
-
-function restartHeroTimer(){
-  clearInterval(heroTimer);
-  if(heroSlides.length < 2) return;
-
-  heroTimer = setInterval(() => {
-    heroIndex = (heroIndex + 1) % heroSlides.length;
-    renderHeroSlide();
-  }, 4300);
-}
-
-function nextHeroSlide(){
-  heroIndex = (heroIndex + 1) % heroSlides.length;
-  renderHeroSlide();
-  restartHeroTimer();
-}
-
-function prevHeroSlide(){
-  heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
-  renderHeroSlide();
-  restartHeroTimer();
-}
-
-function setSectionState(showWelcome){
-  const welcome = document.getElementById("welcome");
-  const catalogue = document.getElementById("catalogue");
-
-  if(showWelcome){
-    catalogue.classList.remove("active");
-    catalogue.style.display = "none";
-    welcome.style.display = "flex";
-    requestAnimationFrame(() => welcome.classList.add("active"));
-  } else {
-    welcome.classList.remove("active");
-    welcome.style.display = "none";
-    catalogue.style.display = "block";
-    requestAnimationFrame(() => catalogue.classList.add("active"));
-  }
-}
-
-function openCategory(category){
-  setSectionState(false);
-  closeProductModal();
-
-  const title = document.getElementById("catTitle");
-  const products = document.querySelectorAll(".product-card");
-
-  if(category === "All"){
-    title.textContent = "All Products";
-    products.forEach(p => p.style.display = "block");
-  } else {
-    title.textContent = category;
-    products.forEach(p => {
-      p.style.display = p.dataset.category === category ? "block" : "none";
-    });
-  }
-}
-
-function goBack(){
-  closeProductModal();
-  toggleShoppingPanel(false);
-  setSectionState(true);
-}
-
-function showProductModal(card){
-  const modal = document.getElementById("productModal");
-  const grid = document.getElementById("products");
-
-  selectedProduct = {
-    name: card.dataset.name,
-    price: card.dataset.price,
-    category: card.dataset.category
-  };
-
-  document.getElementById("modalImage").src = card.querySelector("img").src;
-  document.getElementById("modalCategory").textContent = card.dataset.category;
-  document.getElementById("modalName").textContent = card.dataset.name;
-  document.getElementById("modalPrice").textContent = card.dataset.price;
-  document.getElementById("modalDescription").textContent = card.dataset.details;
-  document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
-
-  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
-  card.classList.add("active-card");
-  grid.classList.add("dimmed");
-  modal.classList.add("active");
-}
-
-function closeProductModal(){
-  const modal = document.getElementById("productModal");
-  const grid = document.getElementById("products");
-
-  modal.classList.remove("active");
-  grid.classList.remove("dimmed");
-  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
-}
-
-function handleOverlayClick(event){
-  const popup = document.querySelector(".product-modal-content");
-  if(!popup.contains(event.target)) closeProductModal();
-}
-
-function updateShoppingListUI(){
-  const count = document.getElementById("cartCount");
-  const list = document.getElementById("shoppingListItems");
-
-  count.textContent = String(shoppingList.length);
-
-  if(shoppingList.length === 0){
-    list.innerHTML = "<li>No items yet.</li>";
-    return;
-  }
-
-  list.innerHTML = shoppingList
-    .map(item => `<li><strong>${item.name}</strong> — ${item.price} (${item.category})</li>`)
-    .join("");
-}
-
-function addToCartFromModal(){
-  if(!selectedProduct) return;
-
-  shoppingList.push(selectedProduct);
-  updateShoppingListUI();
-  document.getElementById("cartFeedback").textContent =
-    `${selectedProduct.name} added. Cart items: ${shoppingList.length}.`;
-}
-
-function toggleShoppingPanel(forceState){
-  const panel = document.getElementById("shoppingPanel");
-  const shouldOpen = typeof forceState === "boolean" ? forceState : !panel.classList.contains("open");
-  panel.classList.toggle("open", shouldOpen);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  renderHeroSlide();
-  restartHeroTimer();
-  updateShoppingListUI();
-});
-
-window.addEventListener("keydown", (event) => {
-  if(event.key === "Escape") closeProductModal();
-});
-
-history.replaceState({ view: "welcome" }, "", "#welcome");
-</script>
-
+<script src="js/products.js" defer></script>
+<script src="js/slideshow.js" defer></script>
+<script src="js/modal.js" defer></script>
+<script src="js/main.js" defer></script>
 </body>
 </html>
