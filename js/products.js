@@ -11,8 +11,10 @@ window.openCategory = function openCategory(category){
   const catalogue = document.getElementById("catalogue");
 
   welcome.classList.add("hidden");
+  welcome.style.display = "none";
   catalogue.style.display = "block";
   requestAnimationFrame(() => catalogue.classList.remove("hidden"));
+  window.scrollTo({ top: 0, behavior: "auto" });
 
   if (typeof window.closeProductModal === "function") {
     window.closeProductModal();
@@ -45,7 +47,9 @@ window.goBack = function goBack(){
 
   setTimeout(() => {
     catalogue.style.display = "none";
+    welcome.style.display = "flex";
     welcome.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "auto" });
   }, 220);
 };
 
