@@ -51,6 +51,12 @@ body {
   gap: 28px;
 }
 
+.welcome-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 @media(max-width:900px){
   .welcome-card{
     grid-template-columns:1fr;
@@ -187,6 +193,10 @@ h1 {
   cursor: pointer;
 }
 
+  background: url('images/item.png') center/cover;
+  border: 1px solid var(--border-soft);
+}
+
 #catalogue {
   display: none;
   padding: 44px 28px;
@@ -249,6 +259,42 @@ h1 {
 .product-name { font-size:14px; margin-bottom:6px; }
 .product-price { font-size: 13px; color: var(--accent); font-weight: 600; }
 .product-category { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }
+}
+
+.product-grid.dimmed .product-card.active-card {
+  opacity: 1;
+  transform: none;
+  border-color: rgba(24,160,255,0.75);
+}
+
+.product-card img {
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+
+.product-card-body { padding:14px; }
+.product-name { font-size:14px; margin-bottom:6px; }
+.product-price { font-size: 13px; color: var(--accent); font-weight: 600; }
+.product-category { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }
+
+.mobile-toolbar {
+  display: none;
+  margin-bottom: 18px;
+  gap: 10px;
+  align-items: center;
+}
+
+.toolbar-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: rgba(9,19,32,0.95);
+  color: var(--text-main);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 
 .product-modal {
   position: fixed;
@@ -350,6 +396,126 @@ h1 {
 
   .visual-subtitle {
     font-size: 12px;
+
+.cart-feedback {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.close-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: rgba(4,10,16,0.8);
+  color: var(--text-main);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media(max-width:860px){
+  .product-modal-content { grid-template-columns: 1fr; }
+  #catalogue { padding: 24px 14px 36px; }
+  .catalogue-title { font-size: 28px; }
+  .back-btn { margin-bottom: 18px; }
+}
+
+.shopping-drawer {
+  margin-top: 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(4, 10, 16, 0.82);
+  display: none;
+}
+
+.shopping-drawer.open {
+  display: block;
+}
+
+.shopping-drawer h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.shopping-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.shopping-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 10px;
+}
+
+@media(max-width:640px){
+  #welcome {
+    height: auto;
+    min-height: 100vh;
+    padding: 12px;
+  }
+
+  .welcome-card {
+    border-radius: 22px;
+    padding: 22px 16px;
+    gap: 18px;
+  }
+
+  .logo {
+    width: 145px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .category-buttons {
+    gap: 8px;
+  }
+
+  .category-buttons button {
+    font-size: 11px;
+    padding: 9px 12px;
+  }
+
+  .visual {
+    min-height: 240px;
+  }
+
+  #catalogue {
+    padding: 24px 14px 44px;
+  }
+
+  .catalogue-title {
+    font-size: 27px;
+    margin-bottom: 20px;
+  }
+
+  .back-btn {
+    display: none;
+  }
+
+  .mobile-toolbar {
+    display: flex;
   }
 }
 </style>
@@ -358,7 +524,7 @@ h1 {
 
 <section id="welcome">
   <div class="welcome-card">
-    <div>
+    <div class="welcome-copy">
       <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">Select a category below to explore our curated distribution catalogue.</p>
@@ -387,6 +553,15 @@ h1 {
           <button type="button" aria-label="Previous slide" onclick="prevHeroSlide()">‹</button>
           <button type="button" aria-label="Next slide" onclick="nextHeroSlide()">›</button>
         </div>
+    <div class="visual" id="visualPanel">
+      <div class="visual-content">
+        <div class="visual-kicker" id="visualKicker">Featured Product</div>
+        <div class="visual-title" id="visualTitle">Carbon Elite Gun</div>
+        <div class="visual-subtitle" id="visualSubtitle">Engineered for precision, speed, and all-day dive comfort.</div>
+      </div>
+      <div class="visual-controls">
+        <button aria-label="Previous highlight" onclick="prevSlide()">‹</button>
+        <button aria-label="Next highlight" onclick="nextSlide()">›</button>
       </div>
     </div>
   </div>
@@ -394,6 +569,10 @@ h1 {
 
 <section id="catalogue">
   <button class="back-btn" onclick="goBack()">← Back</button>
+  <div class="mobile-toolbar">
+    <button class="toolbar-btn" onclick="goBack()">← Back</button>
+    <button class="toolbar-btn" onclick="toggleShoppingDrawer()">Shopping List</button>
+  </div>
   <div class="catalogue-title" id="catTitle">All Products</div>
 
   <div class="product-grid" id="products">
@@ -582,6 +761,31 @@ function closeProductModal(){
   selectedCard = null;
 }
 
+
+  document.getElementById("modalImage").src = card.querySelector("img").src;
+  document.getElementById("modalCategory").textContent = card.dataset.category;
+  document.getElementById("modalName").textContent = card.dataset.name;
+  document.getElementById("modalPrice").textContent = card.dataset.price;
+  document.getElementById("modalDescription").textContent = card.dataset.details;
+  document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
+
+  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
+  card.classList.add("active-card");
+  grid.classList.add("dimmed");
+  modal.classList.add("active");
+}
+
+function closeProductModal(){
+  const modal = document.getElementById("productModal");
+  const grid = document.getElementById("products");
+
+  modal.classList.remove("active");
+  grid.classList.remove("dimmed");
+
+  document.querySelectorAll(".product-card").forEach(item => item.classList.remove("active-card"));
+  selectedCard = null;
+}
+
 function handleOverlayClick(event){
   const popup = document.querySelector(".product-modal-content");
   if(!popup.contains(event.target)){
@@ -600,11 +804,18 @@ function addToCartFromModal(){
 renderHeroSlide();
 restartHeroTimer();
 
+  shoppingList.push(selectedProduct);
+  document.getElementById("cartFeedback").textContent =
+    `${selectedProduct.name} added. Cart items: ${shoppingList.length}.`;
+}
+
 window.addEventListener("keydown", (event) => {
   if(event.key === "Escape"){
     closeProductModal();
   }
 });
+
+history.replaceState({ view: "welcome" }, "", "#welcome");
 </script>
 
 </body>
