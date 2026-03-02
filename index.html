@@ -54,6 +54,12 @@ body {
   gap: 40px;
 }
 
+.welcome-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 @media(max-width:900px){
   .welcome-card{
     grid-template-columns:1fr;
@@ -126,6 +132,7 @@ h1 {
   overflow: hidden;
   transition: background-image 0.8s ease-in-out;
   touch-action: pan-y;
+  min-height: 320px;
 }
 
 .visual::after {
@@ -133,6 +140,50 @@ h1 {
   position:absolute;
   inset:0;
   background: linear-gradient(to top, rgba(0,0,0,0.75), transparent 60%);
+}
+
+.visual-content {
+  position: absolute;
+  inset: auto 18px 18px;
+  z-index: 2;
+}
+
+.visual-kicker {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(233,242,242,0.75);
+}
+
+.visual-title {
+  margin-top: 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.visual-subtitle {
+  color: rgba(233,242,242,0.78);
+  font-size: 13px;
+  margin-top: 6px;
+  max-width: 280px;
+}
+
+.visual-controls {
+  position: absolute;
+  inset: auto 18px 18px auto;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.visual-controls button {
+  border: 1px solid var(--border-soft);
+  background: rgba(3,8,14,0.8);
+  color: var(--text-main);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 /* ===== PRODUCTS ===== */
@@ -208,6 +259,24 @@ h1 {
   text-transform:uppercase;
   font-size:12px;
   cursor: pointer;
+}
+
+.mobile-toolbar {
+  display: none;
+  margin-bottom: 18px;
+  gap: 10px;
+  align-items: center;
+}
+
+.toolbar-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: rgba(9,19,32,0.95);
+  color: var(--text-main);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .product-modal {
@@ -386,6 +455,100 @@ h1 {
     max-height: 250px;
   }
 }
+
+.shopping-drawer {
+  margin-top: 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(4, 10, 16, 0.82);
+  display: none;
+}
+
+.shopping-drawer.open {
+  display: block;
+}
+
+.shopping-drawer h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.shopping-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.shopping-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 10px;
+}
+
+@media(max-width:640px){
+  #welcome {
+    height: auto;
+    min-height: 100vh;
+    padding: 12px;
+  }
+
+  .welcome-card {
+    border-radius: 22px;
+    padding: 22px 16px;
+    gap: 18px;
+  }
+
+  .logo {
+    width: 145px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .category-buttons {
+    gap: 8px;
+  }
+
+  .category-buttons button {
+    font-size: 11px;
+    padding: 9px 12px;
+  }
+
+  .visual {
+    min-height: 240px;
+  }
+
+  #catalogue {
+    padding: 24px 14px 44px;
+  }
+
+  .catalogue-title {
+    font-size: 27px;
+    margin-bottom: 20px;
+  }
+
+  .back-btn {
+    display: none;
+  }
+
+  .mobile-toolbar {
+    display: flex;
+  }
+}
 </style>
 </head>
 <body>
@@ -393,7 +556,7 @@ h1 {
 <!-- LANDING -->
 <section id="welcome">
   <div class="welcome-card">
-    <div>
+    <div class="welcome-copy">
       <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">
@@ -414,13 +577,27 @@ h1 {
       </button>
     </div>
 
-    <div class="visual"></div>
+    <div class="visual" id="visualPanel">
+      <div class="visual-content">
+        <div class="visual-kicker" id="visualKicker">Featured Product</div>
+        <div class="visual-title" id="visualTitle">Carbon Elite Gun</div>
+        <div class="visual-subtitle" id="visualSubtitle">Engineered for precision, speed, and all-day dive comfort.</div>
+      </div>
+      <div class="visual-controls">
+        <button aria-label="Previous highlight" onclick="prevSlide()">‹</button>
+        <button aria-label="Next highlight" onclick="nextSlide()">›</button>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- CATALOGUE -->
 <section id="catalogue">
   <button class="back-btn" onclick="goBack()">← Back</button>
+  <div class="mobile-toolbar">
+    <button class="toolbar-btn" onclick="goBack()">← Back</button>
+    <button class="toolbar-btn" onclick="toggleShoppingDrawer()">Shopping List</button>
+  </div>
   <div class="catalogue-title" id="catTitle">All Products</div>
 
   <div class="product-grid" id="products">
@@ -504,6 +681,14 @@ h1 {
     <button class="close-spotlight" onclick="closeProductSpotlight()">Close</button>
   </div>
 </div>
+
+<div class="shopping-drawer" id="shoppingDrawer">
+  <h3>Your Shopping List</h3>
+  <ul class="shopping-list" id="shoppingListItems">
+    <li>Your selected items will appear here.</li>
+  </ul>
+  <button class="toolbar-btn" onclick="toggleShoppingDrawer(false)">Close</button>
+</div>
 </section>
 
 
@@ -511,6 +696,9 @@ h1 {
 function openCategory(category){
   document.getElementById("welcome").style.display="none";
   document.getElementById("catalogue").style.display="block";
+  closeProductSpotlight();
+  toggleShoppingDrawer(false);
+  syncHistory("catalogue");
 
   const title=document.getElementById("catTitle");
   const products=document.querySelectorAll(".product-card");
@@ -527,9 +715,11 @@ function openCategory(category){
 }
 
 function goBack(){
-  closeProductModal();
+  closeProductSpotlight();
+  toggleShoppingDrawer(false);
   document.getElementById("catalogue").style.display="none";
   document.getElementById("welcome").style.display="flex";
+  syncHistory("welcome");
 }
 
 const shoppingList = [];
@@ -550,32 +740,75 @@ function showProductSpotlight(card){
   };
   spotlight.classList.add("open");
   spotlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  syncHistory("spotlight");
 }
 
 function promptAddToShoppingList(){
   if(!selectedProduct) return;
-
-  const shouldAdd = window.confirm(`Add ${selectedProduct.name} (${selectedProduct.price}) to your shopping list?`);
   const feedback = document.getElementById("cartFeedback");
-
-  if(shouldAdd){
-    shoppingList.push(selectedProduct);
-    feedback.textContent = `${selectedProduct.name} added. Shopping list items: ${shoppingList.length}.`;
-  }else{
-    feedback.textContent = `No problem — ${selectedProduct.name} was not added.`;
-  }
+  shoppingList.push(selectedProduct);
+  feedback.textContent = `${selectedProduct.name} added. Shopping list items: ${shoppingList.length}.`;
+  renderShoppingList();
+  toggleShoppingDrawer(true);
 }
 
 function closeProductSpotlight(){
   document.getElementById("productSpotlight").classList.remove("open");
 }
+
+function renderShoppingList(){
+  const list = document.getElementById("shoppingListItems");
+  if(!shoppingList.length){
+    list.innerHTML = "<li>Your selected items will appear here.</li>";
+    return;
+  }
+
+  list.innerHTML = shoppingList
+    .map(item => `<li><strong>${item.name}</strong><br>${item.category} · ${item.price}</li>`)
+    .join("");
+}
+
+function toggleShoppingDrawer(forceState){
+  const drawer = document.getElementById("shoppingDrawer");
+  const shouldOpen = typeof forceState === "boolean" ? forceState : !drawer.classList.contains("open");
+  drawer.classList.toggle("open", shouldOpen);
+  if(shouldOpen){
+    syncHistory("cart");
+  }
+}
+
+function syncHistory(view){
+  const state = { view };
+  if(history.state?.view === view) return;
+  history.pushState(state, "", "#" + view);
+}
+
+window.addEventListener("popstate", () => {
+  const spotlightOpen = document.getElementById("productSpotlight").classList.contains("open");
+  const drawerOpen = document.getElementById("shoppingDrawer").classList.contains("open");
+
+  if(spotlightOpen){
+    closeProductSpotlight();
+    return;
+  }
+
+  if(drawerOpen){
+    toggleShoppingDrawer(false);
+    return;
+  }
+
+  if(document.getElementById("catalogue").style.display === "block"){
+    document.getElementById("catalogue").style.display="none";
+    document.getElementById("welcome").style.display="flex";
+  }
+});
   /* ===== MOBILE HERO SLIDESHOW ===== */
 
 const slides = [
-  "images/item.png",
-  "images/item2.png",
-  "images/item3.png",
-  "images/item4.png"
+  { image: "images/item.png", title: "Carbon Elite Gun", subtitle: "Engineered for precision, speed, and all-day dive comfort." },
+  { image: "images/item2.png", title: "Reinforced Dive Gloves", subtitle: "Reliable grip and thermal shielding for colder waters." },
+  { image: "images/item3.png", title: "Carbon Blade Fins", subtitle: "High-efficiency propulsion with reduced fatigue." },
+  { image: "images/item4.png", title: "Hydro Flow Snorkel", subtitle: "Semi-dry comfort with dependable anti-splash airflow." }
 ];
 
 let currentSlide = 0;
@@ -583,13 +816,16 @@ const visual = document.querySelector(".visual");
 
 // show first image
 function showSlide(index){
-  visual.style.backgroundImage = `url(${slides[index]})`;
+  const slide = slides[index];
+  visual.style.backgroundImage = `url(${slide.image})`;
+  document.getElementById("visualTitle").textContent = slide.title;
+  document.getElementById("visualSubtitle").textContent = slide.subtitle;
 }
 
 showSlide(currentSlide);
 
 // ===== AUTO LOOP =====
-let slideInterval = setInterval(nextSlide, 4000);
+let slideInterval = window.matchMedia("(max-width: 640px)").matches ? null : setInterval(nextSlide, 5000);
 
 function nextSlide(){
   currentSlide = (currentSlide + 1) % slides.length;
@@ -609,7 +845,7 @@ let endX = 0;
 
 visual.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
-  clearInterval(slideInterval); // pause auto-slide while swiping
+  if(slideInterval) clearInterval(slideInterval);
 });
 
 visual.addEventListener("touchend", e => {
@@ -623,8 +859,12 @@ visual.addEventListener("touchend", e => {
   }
 
   // restart autoplay
-  slideInterval = setInterval(nextSlide, 4000);
+  if(!window.matchMedia("(max-width: 640px)").matches){
+    slideInterval = setInterval(nextSlide, 5000);
+  }
 });
+
+history.replaceState({ view: "welcome" }, "", "#welcome");
 </script>
 
 </body>
