@@ -1,0 +1,8 @@
+# Binary files are intentionally not committed.
+# Run ./scripts/download-wetsuit-images.sh to fetch these into /images locally.
+wetsuit-01.png	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/470/2588/Abyss_Wetsuit_Men_Hee_Camo__52876.1748381510.PNG?c=2
+wetsuit-02.png	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/468/2587/Abyss_Wetsuit_Men_Hee_Camo__35551.1748381137.PNG?c=2
+wetsuit-03.png	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/436/2372/Abyss_Wetsuit_Men_Hee_Camo__94241.1745481310.PNG?c=2
+wetsuit-04.png	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/437/2374/Abyss_Wetsuit_Men_Ehu_Camo_01__96487.1745481310.PNG?c=2
+wetsuit-05.png	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/438/2376/Abyss_Wetsuit_Men_Kea_Camo_02__11509.1745481310.PNG?c=2
+wetsuit-06.jpg	https://cdn11.bigcommerce.com/s-9842s2iis2/images/stencil/300x300/products/466/2590/Abyss-Freediver-Men-3-mm-Yamamoto__77372.1748443465.jpg?c=2
