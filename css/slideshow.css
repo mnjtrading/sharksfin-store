@@ -1,0 +1,82 @@
+/* Hero slideshow styles */
+.visual {
+  border-radius: 22px;
+  min-height: 260px;
+  border: 1px solid var(--border-soft);
+  position: relative;
+  overflow: hidden;
+  background: #08111e;
+}
+
+.visual-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.visual-slide.active {
+  opacity: 1;
+}
+
+.visual-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 14px;
+  background: linear-gradient(to top, rgba(3,10,16,0.9), rgba(3,10,16,0.25));
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.visual-copy {
+  min-width: 0;
+}
+
+.visual-kicker {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(233,242,242,0.75);
+}
+
+.visual-title {
+  margin-top: 6px;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.visual-subtitle {
+  margin-top: 4px;
+  color: rgba(233,242,242,0.82);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.visual-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+.visual-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-soft);
+  background: rgba(3,10,16,0.84);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+@media(max-width:860px){
+  .visual-title { font-size: 20px; }
+  .visual-subtitle { font-size: 12px; }
+}
