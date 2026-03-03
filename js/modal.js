@@ -69,7 +69,10 @@ window.showProductModal = function showProductModal(card) {
   document.getElementById("modalCategory").textContent = card.dataset.category;
   document.getElementById("modalName").textContent = card.dataset.name;
   document.getElementById("modalPrice").textContent = card.dataset.price;
-  document.getElementById("modalDescription").textContent = card.dataset.details;
+  const modalDescription = document.getElementById("modalDescription");
+  const details = card.dataset.details || "";
+  modalDescription.textContent = details;
+  modalDescription.style.display = details.trim() ? "block" : "none";
   document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
 
   renderSizeOptions(card.dataset.category);
