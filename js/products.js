@@ -110,6 +110,13 @@ window.goBack = function goBack() {
   }, 220);
 };
 
+// Messenger checkout integrates through this button visibility helper to mirror cart state.
+window.updateCheckoutButtonVisibility = function updateCheckoutButtonVisibility() {
+  const checkoutButton = document.getElementById("checkoutButton");
+  if (!checkoutButton) return;
+  checkoutButton.hidden = window.AppState.shoppingList.length === 0;
+};
+
 window.renderShoppingList = function renderShoppingList() {
   const cartItems = document.getElementById("cartItems");
   const cartSummary = document.getElementById("cartSummary");
@@ -120,6 +127,7 @@ window.renderShoppingList = function renderShoppingList() {
     cartItems.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
     cartSummary.textContent = "0 items";
     cartGrandTotal.textContent = "₱0";
+    window.updateCheckoutButtonVisibility();
     return;
   }
 
@@ -145,6 +153,7 @@ window.renderShoppingList = function renderShoppingList() {
   const totals = getCartTotals();
   cartSummary.textContent = `${totals.itemCount} item${totals.itemCount === 1 ? "" : "s"}`;
   cartGrandTotal.textContent = totals.totalLabel;
+  window.updateCheckoutButtonVisibility();
 };
 
 window.toggleShoppingList = function toggleShoppingList(forceState) {

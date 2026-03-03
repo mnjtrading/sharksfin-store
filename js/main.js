@@ -9,6 +9,7 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
   const hasOpenOverlay =
     document.getElementById("productModal")?.classList.contains("active") ||
     document.getElementById("cartModal")?.classList.contains("active") ||
+    document.getElementById("messengerCheckoutModal")?.classList.contains("active") ||
     document.getElementById("categoryButtons")?.classList.contains("open");
 
   setBodyScrollLock(Boolean(hasOpenOverlay));
