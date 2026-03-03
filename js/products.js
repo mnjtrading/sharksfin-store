@@ -63,7 +63,7 @@ window.renderShoppingList = function renderShoppingList(){
   }
 
   list.innerHTML = window.AppState.shoppingList
-    .map(item => `<li>${item.name} · ${item.price}</li>`)
+    .map(item => `<li>${item.name} · ${item.price}${item.size ? ` · ${item.size}` : ""}</li>`)
     .join("");
 };
 
@@ -83,8 +83,11 @@ window.addToCartFromModal = function addToCartFromModal(){
   if(!window.AppState.selectedProduct) return;
 
   window.AppState.shoppingList.push(window.AppState.selectedProduct);
+  const withSize = window.AppState.selectedProduct.size
+    ? ` (${window.AppState.selectedProduct.size})`
+    : "";
   document.getElementById("cartFeedback").textContent =
-    `${window.AppState.selectedProduct.name} added. Cart items: ${window.AppState.shoppingList.length}.`;
+    `${window.AppState.selectedProduct.name}${withSize} added. Cart items: ${window.AppState.shoppingList.length}.`;
 
   window.renderShoppingList();
 };
