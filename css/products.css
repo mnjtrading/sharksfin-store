@@ -480,3 +480,106 @@
     overflow-wrap: anywhere;
   }
 }
+
+.checkout-btn {
+  border: 1px solid rgba(113, 214, 255, 0.35);
+  color: #d6f4ff;
+  background: rgba(12, 34, 51, 0.92);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.checkout-btn[hidden] {
+  display: none;
+}
+
+.messenger-checkout-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 7, 12, 0.82);
+  z-index: 1200;
+  padding: 18px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.messenger-checkout-modal.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.messenger-checkout-content {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(92vh, 760px);
+  overflow-y: auto;
+  border-radius: 22px;
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(165deg,#0d1824,#030a13);
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+  transform: translateY(10px);
+  transition: transform 220ms ease;
+}
+
+.messenger-checkout-modal.active .messenger-checkout-content {
+  transform: translateY(0);
+}
+
+.order-summary-items {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.messenger-checkout-form {
+  display: grid;
+  gap: 6px;
+}
+
+.messenger-checkout-form label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.messenger-checkout-form input,
+.messenger-checkout-form textarea {
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: rgba(4, 10, 16, 0.8);
+  color: var(--text-main);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.messenger-checkout-form input[aria-invalid="true"],
+.messenger-checkout-form textarea[aria-invalid="true"] {
+  border-color: rgba(255, 95, 95, 0.75);
+}
+
+.field-error {
+  min-height: 16px;
+  margin: 0 0 4px;
+  color: #ffb4b4;
+  font-size: 12px;
+  opacity: 0;
+}
+
+.field-error.active {
+  opacity: 1;
+}
+
+.confirm-order-btn {
+  margin-top: 6px;
+}
