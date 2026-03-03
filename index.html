@@ -142,12 +142,6 @@
     </div>
   </div>
 
-  <div class="shopping-drawer" id="shoppingDrawer">
-    <h3>Your Shopping List</h3>
-    <ul class="shopping-list" id="shoppingListItems">
-      <li>No items added yet.</li>
-    </ul>
-  </div>
 </section>
 
 <div class="product-modal" id="productModal" onclick="handleOverlayClick(event)">
@@ -168,8 +162,32 @@
         <h3 class="modal-size-title">Select Size</h3>
         <div class="size-grid" id="sizeGrid"></div>
       </div>
+      <div class="size-warning" id="sizeWarning">Please select a size before adding this item.</div>
+      <div class="modal-quantity-block">
+        <h3 class="modal-size-title">Quantity</h3>
+        <div class="quantity-control" id="modalQuantityControl">
+          <button type="button" class="qty-btn" id="qtyMinus" aria-label="Decrease quantity">−</button>
+          <span class="qty-value" id="modalQuantity">1</span>
+          <button type="button" class="qty-btn" id="qtyPlus" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
       <button class="add-cart-btn" onclick="addToCartFromModal()">🛒 Add to Cart</button>
       <div class="cart-feedback" id="cartFeedback">Tap Add to Cart to save this item.</div>
+    </div>
+  </div>
+</div>
+
+<div class="cart-modal" id="cartModal" onclick="handleCartOverlayClick(event)">
+  <div class="cart-modal-content" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <button class="close-x" aria-label="Close cart" onclick="closeCartModal()">×</button>
+    <div class="cart-modal-header">
+      <h3>Your Shopping Cart</h3>
+      <p id="cartSummary">0 items</p>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-total-row">
+      <span>Total</span>
+      <strong id="cartGrandTotal">₱0</strong>
     </div>
   </div>
 </div>

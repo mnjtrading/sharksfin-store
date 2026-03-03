@@ -1,4 +1,4 @@
-// Product modal open/close behavior, overlay interaction, sizes, and image magnification
+// Product modal open/close behavior, overlay interaction, sizes, quantity, and image magnification
 const WETSUIT_SIZES = [
   "XX-Small",
   "X-Small",
@@ -14,20 +14,26 @@ const WETSUIT_SIZES = [
 function renderSizeOptions(productCategory) {
   const sizeBlock = document.getElementById("modalSizeBlock");
   const sizeGrid = document.getElementById("sizeGrid");
+  const sizeWarning = document.getElementById("sizeWarning");
 
   if (productCategory !== "Wetsuit") {
     sizeBlock.style.display = "none";
+    sizeWarning.classList.remove("active");
     sizeGrid.innerHTML = "";
     return;
   }
 
   sizeBlock.style.display = "block";
+  sizeWarning.classList.remove("active");
   sizeGrid.innerHTML = WETSUIT_SIZES
-    .map(
-      (size) =>
-        `<button type="button" class="size-option" data-size="${size}" onclick="selectProductSize(this)">${size}</button>`
-    )
+    .map((size) => `<button type="button" class="size-option" data-size="${size}">${size}</button>`)
     .join("");
+}
+
+function syncModalQuantity() {
+  const quantityView = document.getElementById("modalQuantity");
+  if (!quantityView || !window.AppState.selectedProduct) return;
+  quantityView.textContent = String(window.AppState.selectedProduct.quantity);
 }
 
 window.selectProductSize = function selectProductSize(option) {
@@ -36,9 +42,19 @@ window.selectProductSize = function selectProductSize(option) {
     sizeOption.classList.toggle("selected", sizeOption === option);
   });
 
+  document.getElementById("sizeWarning").classList.remove("active");
+  document.getElementById("modalSizeBlock").classList.remove("has-warning");
+
   if (window.AppState.selectedProduct) {
     window.AppState.selectedProduct.size = selectedSize;
   }
+};
+
+window.changeModalQuantity = function changeModalQuantity(delta) {
+  if (!window.AppState.selectedProduct) return;
+  const nextQuantity = Math.max(1, window.AppState.selectedProduct.quantity + delta);
+  window.AppState.selectedProduct.quantity = nextQuantity;
+  syncModalQuantity();
 };
 
 function resetImageZoom() {
@@ -56,26 +72,33 @@ window.toggleImageZoom = function toggleImageZoom() {
 window.showProductModal = function showProductModal(card) {
   const modal = document.getElementById("productModal");
   const grid = document.getElementById("products");
+  const details = card.dataset.details || "";
+  const modalDescription = document.getElementById("modalDescription");
 
+  const parsedPrice = window.parsePriceLabel(card.dataset.price);
   window.AppState.selectedCard = card;
   window.AppState.selectedProduct = {
+    key: "",
     name: card.dataset.name,
-    price: card.dataset.price,
+    priceLabel: card.dataset.price,
+    symbol: parsedPrice.symbol,
+    unitPrice: parsedPrice.value,
     category: card.dataset.category,
-    size: null
+    size: null,
+    quantity: 1,
+    image: card.querySelector("img").src
   };
 
   document.getElementById("modalImage").src = card.querySelector("img").src;
   document.getElementById("modalCategory").textContent = card.dataset.category;
   document.getElementById("modalName").textContent = card.dataset.name;
   document.getElementById("modalPrice").textContent = card.dataset.price;
-  const modalDescription = document.getElementById("modalDescription");
-  const details = card.dataset.details || "";
   modalDescription.textContent = details;
   modalDescription.style.display = details.trim() ? "block" : "none";
   document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
 
   renderSizeOptions(card.dataset.category);
+  syncModalQuantity();
   resetImageZoom();
 
   document.querySelectorAll(".product-card").forEach((item) => item.classList.remove("active-card"));
@@ -106,9 +129,40 @@ window.handleOverlayClick = function handleOverlayClick(event) {
 window.addEventListener("DOMContentLoaded", () => {
   const imageFrame = document.getElementById("modalImageFrame");
   const zoomToggle = document.getElementById("zoomToggle");
+  const sizeGrid = document.getElementById("sizeGrid");
 
   if (zoomToggle) {
     zoomToggle.addEventListener("click", window.toggleImageZoom);
+  }
+
+  if (sizeGrid) {
+    sizeGrid.addEventListener("click", (event) => {
+      const button = event.target.closest(".size-option");
+      if (!button) return;
+      window.selectProductSize(button);
+    });
+  }
+
+  document.getElementById("qtyMinus")?.addEventListener("click", () => window.changeModalQuantity(-1));
+  document.getElementById("qtyPlus")?.addEventListener("click", () => window.changeModalQuantity(1));
+
+  const addButton = document.querySelector(".add-cart-btn");
+  if (addButton) {
+    addButton.addEventListener("click", (event) => {
+      const selected = window.AppState.selectedProduct;
+      if (!selected) return;
+
+      if (selected.category === "Wetsuit" && !selected.size) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        document.getElementById("sizeWarning").classList.add("active");
+        document.getElementById("modalSizeBlock").classList.add("has-warning");
+        document.getElementById("cartFeedback").textContent = "Select a size to continue.";
+        return;
+      }
+
+      selected.key = window.getCartKey(selected);
+    }, { capture: true });
   }
 
   if (imageFrame) {
