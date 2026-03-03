@@ -25,6 +25,7 @@
         <button onclick="openCategory('Gloves')">Gloves</button>
         <button onclick="openCategory('Snorkels')">Snorkels</button>
         <button onclick="openCategory('Fins')">Fins</button>
+        <button onclick="openCategory('Wetsuit')">Wetsuit</button>
         <button onclick="openCategory('Misc')">Misc</button>
         <button onclick="openCategory('All')">View All</button>
       </div>
@@ -95,6 +96,24 @@
       </div>
     </div>
 
+    <div class="product-card" data-category="Wetsuit" data-name="Ambush 2-piece Wetsuit, 1.5mm, Men, Shark Camo, Blue" data-price="₱6,500" data-details="" onclick="showProductModal(this)">
+      <img src="images/Wetsuit_1.png" alt="Ambush 2-piece Wetsuit, 1.5mm, Men, Shark Camo, Blue">
+      <div class="product-card-body">
+        <div class="product-category">Wetsuit</div>
+        <div class="product-name">Ambush 2-piece Wetsuit, 1.5mm, Men, Shark Camo, Blue</div>
+        <div class="product-price">₱6,500</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-category="Wetsuit" data-name="Ambush 2-piece Wetsuit, 1.5mm Men, Shark Camo, Green" data-price="₱6,500" data-details="" onclick="showProductModal(this)">
+      <img src="images/Wetsuit_2.jpg" alt="Ambush 2-piece Wetsuit, 1.5mm Men, Shark Camo, Green">
+      <div class="product-card-body">
+        <div class="product-category">Wetsuit</div>
+        <div class="product-name">Ambush 2-piece Wetsuit, 1.5mm Men, Shark Camo, Green</div>
+        <div class="product-price">₱6,500</div>
+      </div>
+    </div>
+
     <div class="product-card" data-category="Misc" data-name="Dive Utility Bag" data-price="$89" data-details="Water-resistant gear bag with ventilated mesh panels and heavy-duty zippers to carry your full kit." onclick="showProductModal(this)">
       <img src="images/item2.png" alt="Dive Utility Bag">
       <div class="product-card-body">
@@ -123,25 +142,52 @@
     </div>
   </div>
 
-  <div class="shopping-drawer" id="shoppingDrawer">
-    <h3>Your Shopping List</h3>
-    <ul class="shopping-list" id="shoppingListItems">
-      <li>No items added yet.</li>
-    </ul>
-  </div>
 </section>
 
 <div class="product-modal" id="productModal" onclick="handleOverlayClick(event)">
   <div class="product-modal-content">
     <button class="close-x" aria-label="Close popup" onclick="closeProductModal()">×</button>
-    <img id="modalImage" class="modal-image" src="" alt="Selected product image">
+    <div class="modal-image-panel">
+      <button type="button" class="zoom-toggle" id="zoomToggle" aria-label="Toggle image magnification">🔍</button>
+      <div class="modal-image-frame" id="modalImageFrame">
+        <img id="modalImage" class="modal-image" src="" alt="Selected product image">
+      </div>
+    </div>
     <div class="modal-details">
       <div class="modal-category" id="modalCategory"></div>
       <h2 class="modal-name" id="modalName"></h2>
       <div class="modal-price" id="modalPrice"></div>
       <div class="modal-description" id="modalDescription"></div>
+      <div class="modal-size-block" id="modalSizeBlock">
+        <h3 class="modal-size-title">Select Size</h3>
+        <div class="size-grid" id="sizeGrid"></div>
+      </div>
+      <div class="size-warning" id="sizeWarning">Please select a size before adding this item.</div>
+      <div class="modal-quantity-block">
+        <h3 class="modal-size-title">Quantity</h3>
+        <div class="quantity-control" id="modalQuantityControl">
+          <button type="button" class="qty-btn" id="qtyMinus" aria-label="Decrease quantity">−</button>
+          <span class="qty-value" id="modalQuantity">1</span>
+          <button type="button" class="qty-btn" id="qtyPlus" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
       <button class="add-cart-btn" onclick="addToCartFromModal()">🛒 Add to Cart</button>
       <div class="cart-feedback" id="cartFeedback">Tap Add to Cart to save this item.</div>
+    </div>
+  </div>
+</div>
+
+<div class="cart-modal" id="cartModal" onclick="handleCartOverlayClick(event)">
+  <div class="cart-modal-content" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <button class="close-x" aria-label="Close cart" onclick="closeCartModal()">×</button>
+    <div class="cart-modal-header">
+      <h3>Your Shopping Cart</h3>
+      <p id="cartSummary">0 items</p>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-total-row">
+      <span>Total</span>
+      <strong id="cartGrandTotal">₱0</strong>
     </div>
   </div>
 </div>
