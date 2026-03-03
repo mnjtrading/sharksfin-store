@@ -1,5 +1,5 @@
 // Messenger checkout configuration (single integration point)
-const MESSENGER_PAGE_USERNAME = "iam.nathan.18";
+const MESSENGER_PAGE_USERNAME = "mnjdistributionsinc";
 const CLEAR_CART_AFTER_CHECKOUT = true;
 
 function formatMessengerLineItem(item) {
