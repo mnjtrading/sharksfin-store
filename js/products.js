@@ -163,6 +163,9 @@ window.openCartModal = function openCartModal() {
   window.AppState.cartModalOpen = true;
   window.renderShoppingList();
   cartModal.classList.add("active");
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
 };
 
 window.closeCartModal = function closeCartModal() {
@@ -171,6 +174,9 @@ window.closeCartModal = function closeCartModal() {
 
   window.AppState.cartModalOpen = false;
   cartModal.classList.remove("active");
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
 };
 
 window.handleCartOverlayClick = function handleCartOverlayClick(event) {

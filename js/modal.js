@@ -105,6 +105,9 @@ window.showProductModal = function showProductModal(card) {
   card.classList.add("active-card");
   grid.classList.add("dimmed");
   modal.classList.add("active");
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
 };
 
 window.closeProductModal = function closeProductModal() {
@@ -117,6 +120,9 @@ window.closeProductModal = function closeProductModal() {
   document.querySelectorAll(".product-card").forEach((item) => item.classList.remove("active-card"));
   window.AppState.selectedCard = null;
   resetImageZoom();
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
 };
 
 window.handleOverlayClick = function handleOverlayClick(event) {

@@ -20,7 +20,15 @@
       <h1>Welcome. How may we assist you today?</h1>
       <p class="subtitle">Select a category below to explore our curated distribution catalogue.</p>
 
-      <div class="category-buttons">
+      <button
+        type="button"
+        class="category-menu-toggle"
+        id="categoryMenuToggle"
+        aria-expanded="false"
+        aria-controls="categoryButtons"
+      >☰ Categories</button>
+
+      <div class="category-buttons" id="categoryButtons">
         <button onclick="openCategory('Spearguns')">Spearguns</button>
         <button onclick="openCategory('Gloves')">Gloves</button>
         <button onclick="openCategory('Snorkels')">Snorkels</button>
