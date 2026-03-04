@@ -2,7 +2,7 @@
 window.HeroSlideshow = {
   slides: [
     { image: "images/item.png", title: "Carbon Elite Gun", subtitle: "Engineered for precision, speed, and all-day dive comfort." },
-    { image: "images/item2.png", title: "Reinforced Dive Gloves", subtitle: "Secure grip and thermal comfort for colder dives." },
+    { image: "images/gloves/blue_gloves.png", title: "gloves1", subtitle: "Durable dive gloves built for comfort and grip." },
     { image: "images/item3.png", title: "Carbon Blade Fins", subtitle: "Lightweight blades for power and reduced fatigue." },
     { image: "images/item4.png", title: "Hydro Flow Snorkel", subtitle: "Semi-dry airflow with all-day comfort." }
   ],

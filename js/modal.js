@@ -16,7 +16,9 @@ function renderSizeOptions(productCategory) {
   const sizeGrid = document.getElementById("sizeGrid");
   const sizeWarning = document.getElementById("sizeWarning");
 
-  if (productCategory !== "Wetsuit") {
+  const requiresSizeSelection = ["Wetsuit", "Gloves"].includes(productCategory);
+
+  if (!requiresSizeSelection) {
     sizeBlock.style.display = "none";
     sizeWarning.classList.remove("active");
     sizeGrid.innerHTML = "";
@@ -158,7 +160,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const selected = window.AppState.selectedProduct;
       if (!selected) return;
 
-      if (selected.category === "Wetsuit" && !selected.size) {
+      if (["Wetsuit", "Gloves"].includes(selected.category) && !selected.size) {
         event.stopImmediatePropagation();
         event.preventDefault();
         document.getElementById("sizeWarning").classList.add("active");
