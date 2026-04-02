@@ -321,7 +321,8 @@ window.getHeroSlidesFromCatalog = function getHeroSlidesFromCatalog() {
     .map((item) => ({
       image: item.image,
       title: item.name,
-      subtitle: item.details || `${item.category} essentials crafted for performance.`
+      subtitle: item.details || `${item.category} essentials crafted for performance.`,
+      category: item.category
     }));
 };
 
