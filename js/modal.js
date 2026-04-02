@@ -72,10 +72,14 @@ window.toggleImageZoom = function toggleImageZoom() {
 };
 
 window.showProductModal = function showProductModal(card) {
+  if (card.dataset.comingSoon === "true") return;
+
   const modal = document.getElementById("productModal");
   const grid = document.getElementById("products");
   const details = card.dataset.details || "";
   const modalDescription = document.getElementById("modalDescription");
+  const image = card.querySelector("img");
+  if (!image) return;
 
   const parsedPrice = window.parsePriceLabel(card.dataset.price);
   window.AppState.selectedCard = card;
@@ -88,10 +92,10 @@ window.showProductModal = function showProductModal(card) {
     category: card.dataset.category,
     size: null,
     quantity: 1,
-    image: card.querySelector("img").src
+    image: image.src
   };
 
-  document.getElementById("modalImage").src = card.querySelector("img").src;
+  document.getElementById("modalImage").src = image.src;
   document.getElementById("modalCategory").textContent = card.dataset.category;
   document.getElementById("modalName").textContent = card.dataset.name;
   document.getElementById("modalPrice").textContent = card.dataset.price;

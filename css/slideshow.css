@@ -1,7 +1,7 @@
 /* Hero slideshow styles */
 .visual {
   border-radius: 22px;
-  min-height: 260px;
+  min-height: 280px;
   border: 1px solid var(--border-soft);
   position: relative;
   overflow: hidden;
@@ -14,17 +14,20 @@
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.7s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+  will-change: transform, opacity;
+  transform: scale(1.015) translate3d(0, 0, 0);
 }
 
 .visual-slide.active {
   opacity: 1;
+  animation: heroDrift 11s ease-in-out both;
 }
 
 .visual-overlay {
   position: absolute;
   inset: auto 0 0;
-  padding: 14px;
+  padding: 16px;
   background: linear-gradient(to top, rgba(3,10,16,0.9), rgba(3,10,16,0.25));
   display: flex;
   align-items: end;
@@ -36,6 +39,14 @@
 
 .visual-copy {
   min-width: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 360ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), transform 360ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.visual-copy.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .visual-kicker {
@@ -48,8 +59,9 @@
 .visual-title {
   margin-top: 6px;
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .visual-subtitle {
@@ -67,16 +79,69 @@
 }
 
 .visual-controls button {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--border-soft);
   background: rgba(3,10,16,0.84);
   color: var(--text-main);
   cursor: pointer;
+  transition: transform 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), background-color 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), border-color 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.visual-controls button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(24, 160, 255, 0.6);
+}
+
+.visual-controls button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(17, 220, 242, 0.24);
+}
+
+@keyframes heroDrift {
+  0% {
+    transform: scale(1.015) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.045) translate3d(1.2%, -0.8%, 0);
+  }
 }
 
 @media(max-width:860px){
-  .visual-title { font-size: 20px; }
+  .visual {
+    min-height: 250px;
+  }
+
+  .visual-title { font-size: 19px; }
   .visual-subtitle { font-size: 12px; }
+}
+
+@media (max-width: 420px) {
+  .visual {
+    min-height: 224px;
+  }
+
+  .visual-overlay {
+    padding: 12px;
+  }
+
+  .visual-title {
+    font-size: 18px;
+  }
+
+  .visual-subtitle {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visual-slide,
+  .visual-copy,
+  .visual-controls button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
