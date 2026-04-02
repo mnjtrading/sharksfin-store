@@ -1,5 +1,138 @@
 // Product page state + catalogue navigation + shopping cart modal
 const CART_STORAGE_KEY = "mnj-cart-items";
+const ACTIVE_VISUAL_CATEGORIES = ["Gloves", "Wetsuit", "Fins", "Snorkels"];
+const COMING_SOON_CATEGORIES = ["Spearguns", "Misc"];
+
+window.ProductCatalog = [
+  {
+    id: "gloves-blue",
+    category: "Gloves",
+    name: "Hammerhead Blue Dive Gloves",
+    price: "₱1,500",
+    image: "images/gloves/blue_gloves.png",
+    details: "Flexible neoprene gloves with reinforced palms for dependable grip and comfort.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "gloves-black",
+    category: "Gloves",
+    name: "Hammerhead Black Dive Gloves",
+    price: "₱1,500",
+    image: "images/gloves/hh_blk_gloves.png",
+    details: "Streamlined black gloves built for durability and thermal protection underwater.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "gloves-knuckle-black",
+    category: "Gloves",
+    name: "Hammerhead Black Knuckle Gloves",
+    price: "₱1,500",
+    image: "images/gloves/hh_blk_gloves_knuckles.png",
+    details: "Knuckle-protected glove design for rugged use around reefs and rocky entries.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "gloves-red",
+    category: "Gloves",
+    name: "Hammerhead Red Dive Gloves",
+    price: "₱1,500",
+    image: "images/gloves/hh_gloves_red.png",
+    details: "High-visibility red finish with soft inner lining for long dive sessions.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "gloves-red-knuckle",
+    category: "Gloves",
+    name: "Hammerhead Red Knuckle Gloves",
+    price: "₱1,500",
+    image: "images/gloves/hh_red_knuckles_gloves.png",
+    details: "Reinforced red gloves balancing flexibility, grip, and added knuckle coverage.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "fins-black",
+    category: "Fins",
+    name: "HAMMERHEAD BLACK KAUDAL FINS",
+    price: "₱4,500",
+    image: "images/fins/Fins_Black.png",
+    details: "Lightweight long-blade fins designed for deep dives, giving efficient propulsion with reduced fatigue.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "fins-white",
+    category: "Fins",
+    name: "HAMMERHEAD WHITE KAUDAL FINS",
+    price: "₱4,500",
+    image: "images/fins/hammerhead_fins_white.png",
+    details: "Responsive long-blade design tuned for glide efficiency and steady kicks.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "snorkel-green",
+    category: "Snorkels",
+    name: "Hammerhead Green Snorkel",
+    price: "₱3,500",
+    image: "images/snorkel/green_snorkel.png",
+    details: "Semi-dry top snorkel with low-profile shape to reduce drag and splash entry.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "snorkel-black",
+    category: "Snorkels",
+    name: "Hammerhead Black Snorkel",
+    price: "₱3,500",
+    image: "images/snorkel/hh_black_snorkel.png",
+    details: "Comfort mouthpiece and simple purge flow for reliable breathing between dives.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "wetsuit-blue",
+    category: "Wetsuit",
+    name: "Ambush 2-Piece Wetsuit 1.5mm (Blue Shark Camo)",
+    price: "₱6,500",
+    image: "images/Wetsuit_1.png",
+    details: "Two-piece 1.5mm wetsuit optimized for tropical freediving with streamlined mobility.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "wetsuit-green",
+    category: "Wetsuit",
+    name: "Ambush 2-Piece Wetsuit 1.5mm (Green Shark Camo)",
+    price: "₱6,500",
+    image: "images/Wetsuit_2.jpg",
+    details: "Two-piece camo wetsuit with flexible panels for comfort through extended sessions.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "spearguns-soon",
+    category: "Spearguns",
+    name: "Spearguns",
+    price: "Coming soon",
+    details: "New products will be added soon.",
+    allProductsVisible: false,
+    comingSoon: true
+  },
+  {
+    id: "misc-soon",
+    category: "Misc",
+    name: "Misc Accessories",
+    price: "Coming soon",
+    details: "New products will be added soon.",
+    allProductsVisible: false,
+    comingSoon: true
+  }
+];
 
 function parsePriceLabel(priceLabel) {
   const symbolMatch = priceLabel.match(/[₱$]/);
@@ -17,6 +150,79 @@ function formatPrice(symbol, amount) {
 function getCartKey(item) {
   return `${item.name}__${item.size || "no-size"}`;
 }
+
+function buildProductCard(product) {
+  const comingSoonClass = product.comingSoon ? " is-coming-soon" : "";
+  const productPrice = product.comingSoon ? "Coming soon" : product.price;
+  const media = product.comingSoon
+    ? `
+      <div class="product-placeholder" aria-label="${product.category} coming soon">
+        <div class="coming-soon-title">Coming soon</div>
+        <p>New products will be added soon.</p>
+      </div>
+    `
+    : `<img src="${product.image}" alt="${product.name}" loading="lazy">`;
+
+  return `
+    <article
+      class="product-card${comingSoonClass}"
+      data-id="${product.id}"
+      data-category="${product.category}"
+      data-name="${product.name}"
+      data-price="${productPrice}"
+      data-details="${product.details || ""}"
+      data-all-visible="${product.allProductsVisible}"
+      data-coming-soon="${product.comingSoon}"
+      ${product.comingSoon ? "" : "onclick=\"showProductModal(this)\""}
+    >
+      ${media}
+      <div class="product-card-body">
+        <div class="product-category">${product.category}</div>
+        <div class="product-name">${product.name}</div>
+        <div class="product-price">${productPrice}</div>
+      </div>
+    </article>
+  `;
+}
+
+function renderCatalogCards() {
+  const productsGrid = document.getElementById("products");
+  if (!productsGrid) return;
+
+  productsGrid.innerHTML = window.ProductCatalog
+    .map((product) => buildProductCard(product))
+    .join("");
+}
+
+function setVisibleProductsForCategory(category) {
+  const title = document.getElementById("catTitle");
+  const products = document.querySelectorAll(".product-card");
+
+  if (category === "All") {
+    title.textContent = "All Products";
+    products.forEach((productCard) => {
+      const isVisible = productCard.dataset.allVisible === "true";
+      productCard.style.display = isVisible ? "flex" : "none";
+    });
+    return;
+  }
+
+  title.textContent = category;
+  products.forEach((productCard) => {
+    productCard.style.display = productCard.dataset.category === category ? "flex" : "none";
+  });
+}
+
+window.getHeroSlidesFromCatalog = function getHeroSlidesFromCatalog() {
+  return ACTIVE_VISUAL_CATEGORIES
+    .map((category) => window.ProductCatalog.find((item) => item.category === category && !item.comingSoon && item.image))
+    .filter(Boolean)
+    .map((item) => ({
+      image: item.image,
+      title: item.name,
+      subtitle: item.details || `${item.category} essentials crafted for performance.`
+    }));
+};
 
 window.AppState = {
   shoppingList: [],
@@ -74,21 +280,7 @@ window.openCategory = function openCategory(category) {
   }
 
   window.closeCartModal();
-
-  const title = document.getElementById("catTitle");
-  const products = document.querySelectorAll(".product-card");
-
-  if (category === "All") {
-    title.textContent = "All Products";
-    products.forEach((product) => {
-      product.style.display = "block";
-    });
-  } else {
-    title.textContent = category;
-    products.forEach((product) => {
-      product.style.display = product.dataset.category === category ? "block" : "none";
-    });
-  }
+  setVisibleProductsForCategory(category);
 };
 
 window.goBack = function goBack() {
@@ -231,6 +423,8 @@ window.addToCartFromModal = function addToCartFromModal() {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
+  renderCatalogCards();
+  setVisibleProductsForCategory("All");
   loadCartState();
   window.renderShoppingList();
 
@@ -256,3 +450,5 @@ window.addEventListener("DOMContentLoaded", () => {
 
 window.parsePriceLabel = parsePriceLabel;
 window.getCartKey = getCartKey;
+window.ACTIVE_VISUAL_CATEGORIES = ACTIVE_VISUAL_CATEGORIES;
+window.COMING_SOON_CATEGORIES = COMING_SOON_CATEGORIES;
