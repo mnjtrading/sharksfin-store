@@ -263,7 +263,8 @@ window.AppState = {
   shoppingList: [],
   selectedCard: null,
   selectedProduct: null,
-  cartModalOpen: false
+  cartModalOpen: false,
+  cartToastTimer: null
 };
 
 function saveCartState() {
@@ -298,6 +299,72 @@ function getCartTotals() {
     .join(" + ") || "₱0";
 
   return { itemCount, totalLabel };
+}
+
+function showCartToast(message) {
+  const toast = document.getElementById("cartToast");
+  const toastMessage = document.getElementById("cartToastMessage");
+  if (!toast || !toastMessage) return;
+
+  toastMessage.textContent = message;
+  toast.classList.add("is-visible");
+  toast.classList.remove("is-hiding");
+
+  if (window.AppState.cartToastTimer) {
+    window.clearTimeout(window.AppState.cartToastTimer);
+  }
+
+  window.AppState.cartToastTimer = window.setTimeout(() => {
+    toast.classList.add("is-hiding");
+    toast.classList.remove("is-visible");
+    window.AppState.cartToastTimer = null;
+  }, 2600);
+}
+
+window.dismissCartToast = function dismissCartToast() {
+  const toast = document.getElementById("cartToast");
+  if (!toast) return;
+
+  if (window.AppState.cartToastTimer) {
+    window.clearTimeout(window.AppState.cartToastTimer);
+    window.AppState.cartToastTimer = null;
+  }
+
+  toast.classList.remove("is-visible");
+  toast.classList.add("is-hiding");
+};
+
+function pulseCartHighlight() {
+  const cartPanel = document.querySelector(".cart-modal-content");
+  if (!cartPanel) return;
+
+  cartPanel.classList.remove("cart-highlight");
+  void cartPanel.offsetWidth;
+  cartPanel.classList.add("cart-highlight");
+}
+
+function animateAddButtonFeedback() {
+  const addButton = document.querySelector(".add-cart-btn");
+  if (!addButton) return;
+
+  if (!addButton.dataset.defaultLabel) {
+    addButton.dataset.defaultLabel = addButton.innerHTML;
+  }
+
+  if (addButton.dataset.feedbackTimeoutId) {
+    window.clearTimeout(Number(addButton.dataset.feedbackTimeoutId));
+  }
+
+  addButton.classList.add("is-added");
+  addButton.textContent = "Added ✓";
+
+  const timeoutId = window.setTimeout(() => {
+    addButton.classList.remove("is-added");
+    addButton.innerHTML = addButton.dataset.defaultLabel || "🛒 Add to Cart";
+    delete addButton.dataset.feedbackTimeoutId;
+  }, 1000);
+
+  addButton.dataset.feedbackTimeoutId = String(timeoutId);
 }
 
 window.openCategory = function openCategory(category) {
@@ -460,6 +527,9 @@ window.addToCartFromModal = function addToCartFromModal() {
   document.getElementById("cartFeedback").textContent =
     `${incoming.name}${withSize} added x${incoming.quantity}.`;
 
+  showCartToast(`Added to cart: ${incoming.name}${withSize}`);
+  pulseCartHighlight();
+  animateAddButtonFeedback();
   window.renderShoppingList();
 };
 
@@ -478,6 +548,9 @@ window.addEventListener("DOMContentLoaded", () => {
       window.removeCartItem(button.dataset.removeKey);
     });
   }
+
+  const toastCloseButton = document.getElementById("cartToastClose");
+  toastCloseButton?.addEventListener("click", window.dismissCartToast);
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
