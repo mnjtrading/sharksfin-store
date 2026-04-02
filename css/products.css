@@ -429,6 +429,10 @@
   padding: 20px;
 }
 
+.cart-empty p {
+  margin: 0 0 12px;
+}
+
 .close-x {
   position: absolute;
   top: 12px;
@@ -592,14 +596,34 @@
 
 .order-summary-items {
   margin: 0;
-  padding-left: 18px;
+  padding: 0;
+  list-style: none;
   display: grid;
-  gap: 6px;
+  gap: 8px;
+}
+
+.order-summary-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: rgba(6, 16, 26, 0.8);
+}
+
+.order-summary-items li span {
+  overflow-wrap: anywhere;
+}
+
+.order-summary-items li strong {
+  color: var(--accent);
+  white-space: nowrap;
 }
 
 .messenger-checkout-form {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .messenger-checkout-form label {
@@ -617,23 +641,54 @@
   font: inherit;
 }
 
-.messenger-checkout-form input[aria-invalid="true"],
-.messenger-checkout-form textarea[aria-invalid="true"] {
-  border-color: rgba(255, 95, 95, 0.75);
+.messenger-checkout-form textarea {
+  resize: vertical;
+  min-height: 78px;
 }
 
-.field-error {
-  min-height: 16px;
-  margin: 0 0 4px;
-  color: #ffb4b4;
-  font-size: 12px;
-  opacity: 0;
+.checkout-feedback {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  min-height: 20px;
 }
 
-.field-error.active {
-  opacity: 1;
+.checkout-feedback.success {
+  color: #9cf5d9;
 }
 
-.confirm-order-btn {
-  margin-top: 6px;
+.checkout-feedback.warning {
+  color: #ffc9c9;
+}
+
+.manual-copy-area {
+  width: 100%;
+  min-height: 140px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 180, 180, 0.55);
+  background: rgba(24, 8, 8, 0.45);
+  color: #ffe8e8;
+  padding: 10px 12px;
+  font: inherit;
+  display: none;
+}
+
+.manual-copy-area.active {
+  display: block;
+}
+
+.checkout-action-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.continue-shopping-btn {
+  margin-inline: auto;
+}
+
+@media (max-width: 560px) {
+  .checkout-action-grid {
+    grid-template-columns: 1fr;
+  }
 }

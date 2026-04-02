@@ -121,37 +121,36 @@
 </div>
 
 <div class="messenger-checkout-modal" id="messengerCheckoutModal" onclick="handleMessengerCheckoutOverlayClick(event)">
-  <div class="messenger-checkout-content" role="dialog" aria-modal="true" aria-label="Messenger checkout form">
+  <div class="messenger-checkout-content" role="dialog" aria-modal="true" aria-label="Checkout summary">
     <button class="close-x" aria-label="Close order summary" onclick="closeMessengerCheckoutModal()">×</button>
     <div class="cart-modal-header">
-      <h3>Order Summary</h3>
-      <p>Confirm your details before continuing to Messenger.</p>
+      <h3>Checkout Summary</h3>
+      <p>Copy the order first, then open our Facebook page and paste it into Messenger.</p>
     </div>
 
     <ul class="order-summary-items" id="orderSummaryItems"></ul>
     <div class="cart-total-row">
-      <span>Total</span>
+      <span id="orderSummaryCount">Total Items: 0</span>
       <strong id="orderSummaryTotal">₱0</strong>
     </div>
 
     <form id="messengerCheckoutForm" class="messenger-checkout-form" novalidate>
       <label for="checkoutName">Name</label>
-      <input id="checkoutName" name="name" type="text" autocomplete="name" required>
-      <p class="field-error" id="nameError"></p>
-
-      <label for="checkoutPhone">Phone Number</label>
-      <input id="checkoutPhone" name="phone" type="tel" autocomplete="tel" required>
-      <p class="field-error" id="phoneError"></p>
-
-      <label for="checkoutAddress">Delivery Address</label>
-      <textarea id="checkoutAddress" name="address" rows="2" autocomplete="street-address" required></textarea>
-      <p class="field-error" id="addressError"></p>
+      <input id="checkoutName" name="name" type="text" autocomplete="name" placeholder="Optional">
 
       <label for="checkoutNotes">Notes (optional)</label>
       <textarea id="checkoutNotes" name="notes" rows="2"></textarea>
-
-      <button type="submit" class="checkout-btn confirm-order-btn">Confirm Order</button>
     </form>
+
+    <p class="checkout-feedback" id="checkoutFeedback" role="status" aria-live="polite"></p>
+    <textarea class="manual-copy-area" id="manualCopyArea" readonly aria-label="Manual copy fallback"></textarea>
+
+    <div class="checkout-action-grid">
+      <button type="button" class="checkout-btn" id="copyOrderButton">Copy Order Details</button>
+      <button type="button" class="checkout-btn" id="openFacebookButton">Open Facebook Page</button>
+      <button type="button" class="checkout-btn" id="backToCartButton">Back to Cart</button>
+      <button type="button" class="checkout-btn" id="closeCheckoutButton">Close</button>
+    </div>
   </div>
 </div>
 

@@ -316,7 +316,12 @@ window.renderShoppingList = function renderShoppingList() {
   if (!cartItems || !cartSummary || !cartGrandTotal) return;
 
   if (window.AppState.shoppingList.length === 0) {
-    cartItems.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
+    cartItems.innerHTML = `
+      <div class="cart-empty">
+        <p>Your cart is empty.</p>
+        <button type="button" class="checkout-btn continue-shopping-btn" onclick="closeCartModal()">Continue Shopping</button>
+      </div>
+    `;
     cartSummary.textContent = "0 items";
     cartGrandTotal.textContent = "₱0";
     window.updateCheckoutButtonVisibility();
