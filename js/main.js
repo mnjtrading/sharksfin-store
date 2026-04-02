@@ -16,8 +16,7 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  window.renderHeroSlide();
-  window.restartHeroTimer();
+  window.initializeHeroSlideshow();
   window.renderShoppingList();
 
   const categoryToggle = document.getElementById("categoryMenuToggle");

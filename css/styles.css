@@ -36,7 +36,7 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 .welcome-card {
@@ -52,7 +52,7 @@ body.no-scroll {
   box-shadow: 0 30px 80px rgba(0,0,0,0.6);
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  gap: 28px;
+  gap: 24px;
 }
 
 .logo {
@@ -77,6 +77,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: stretch;
 }
 
 .category-menu-toggle {
@@ -112,6 +113,7 @@ h1 {
   padding: 9px 16px;
   background: rgba(9,19,32,0.95);
   transition: transform 260ms ease, background-color 260ms ease, box-shadow 260ms ease;
+  min-width: 118px;
 }
 
 .category-buttons button:hover {
@@ -213,6 +215,7 @@ h1 {
   .category-buttons.open {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .category-buttons button,
@@ -228,6 +231,7 @@ h1 {
   .skip-btn {
     margin-top: 14px;
     min-height: 44px;
+    white-space: normal;
   }
 
   .catalogue-actions {
@@ -241,6 +245,7 @@ h1 {
 
   .catalogue-title {
     line-height: 1.2;
+    font-size: 26px;
   }
 }
 
@@ -264,6 +269,18 @@ h1 {
   .welcome-card {
     border-radius: 20px;
     padding: 20px 14px;
+  }
+
+  .subtitle {
+    margin-bottom: 18px;
+  }
+
+  .category-buttons button,
+  .skip-btn,
+  .back-btn,
+  .toolbar-btn {
+    font-size: 10px;
+    letter-spacing: 0.06em;
   }
 
   #catalogue {
