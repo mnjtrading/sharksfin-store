@@ -2,8 +2,9 @@
 const CART_STORAGE_KEY = "mnj-cart-items";
 const ACTIVE_VISUAL_CATEGORIES = ["Gloves", "Wetsuit", "Fins", "Snorkels"];
 const COMING_SOON_CATEGORIES = ["Spearguns", "Misc"];
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSTueITT9gJNyIkgAaDn0RxkP4XbUpMJg8Xbm06EgKThTXTtoqF0FjjyAaqfexmbkMnGIJgUnfzTzrm/pub?output=csv";
 
-window.ProductCatalog = [
+const DEFAULT_PRODUCT_CATALOG = [
   {
     id: "gloves-blue",
     category: "Gloves",
@@ -134,6 +135,78 @@ window.ProductCatalog = [
   }
 ];
 
+window.ProductCatalog = [...DEFAULT_PRODUCT_CATALOG];
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  const headers = lines[0].split(",");
+
+  return lines.slice(1).map((line) => {
+    const values = line.split(",");
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = values[i]?.trim();
+    });
+    return obj;
+  });
+}
+
+function parseBooleanFlag(value, fallback = false) {
+  if (typeof value !== "string") return fallback;
+  return ["true", "1", "yes"].includes(value.toLowerCase());
+}
+
+function normalizeSheetProduct(row, fallbackProduct) {
+  const numericPrice = Number(row.price);
+  const hasNumericPrice = Number.isFinite(numericPrice) && numericPrice > 0;
+  const symbol = row.symbol || "₱";
+  const comingSoon = parseBooleanFlag(row.comingSoon, fallbackProduct?.comingSoon || false);
+  const defaultPrice = fallbackProduct?.price || "Coming soon";
+
+  return {
+    id: row.id || fallbackProduct?.id || "",
+    category: row.category || fallbackProduct?.category || "Misc",
+    name: row.name || fallbackProduct?.name || "Unnamed Product",
+    price: hasNumericPrice ? `${symbol}${numericPrice.toLocaleString("en-PH")}` : defaultPrice,
+    image: row.image || fallbackProduct?.image || "",
+    details: row.details || fallbackProduct?.details || "",
+    allProductsVisible: parseBooleanFlag(row.allProductsVisible, fallbackProduct?.allProductsVisible ?? !comingSoon),
+    comingSoon
+  };
+}
+
+async function loadProductsFromSheet() {
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const text = await res.text();
+    const data = parseCSV(text);
+    const rows = data.filter((row) => row.id && row.name);
+    const fallbackById = new Map(DEFAULT_PRODUCT_CATALOG.map((product) => [product.id, product]));
+    const sheetById = new Map(rows.map((row) => [row.id, row]));
+
+    const mergedProducts = DEFAULT_PRODUCT_CATALOG
+      .map((product) => normalizeSheetProduct(sheetById.get(product.id) || {}, product))
+      .concat(
+        rows
+          .filter((row) => !fallbackById.has(row.id))
+          .map((row) => normalizeSheetProduct(row))
+      );
+
+    if (mergedProducts.length) {
+      window.ProductCatalog = mergedProducts;
+    }
+  } catch (err) {
+    console.error("Sheet load failed, fallback to local data", err);
+    window.ProductCatalog = [...DEFAULT_PRODUCT_CATALOG];
+  } finally {
+    initializeApp();
+  }
+}
+
 function parsePriceLabel(priceLabel) {
   const symbolMatch = priceLabel.match(/[₱$]/);
   const value = Number(priceLabel.replace(/[^0-9.]/g, "")) || 0;
@@ -263,7 +336,9 @@ window.AppState = {
   shoppingList: [],
   selectedCard: null,
   selectedProduct: null,
-  cartModalOpen: false
+  cartModalOpen: false,
+  cartToastTimer: null,
+  hasInitialized: false
 };
 
 function saveCartState() {
@@ -298,6 +373,72 @@ function getCartTotals() {
     .join(" + ") || "₱0";
 
   return { itemCount, totalLabel };
+}
+
+function showCartToast(message) {
+  const toast = document.getElementById("cartToast");
+  const toastMessage = document.getElementById("cartToastMessage");
+  if (!toast || !toastMessage) return;
+
+  toastMessage.textContent = message;
+  toast.classList.add("is-visible");
+  toast.classList.remove("is-hiding");
+
+  if (window.AppState.cartToastTimer) {
+    window.clearTimeout(window.AppState.cartToastTimer);
+  }
+
+  window.AppState.cartToastTimer = window.setTimeout(() => {
+    toast.classList.add("is-hiding");
+    toast.classList.remove("is-visible");
+    window.AppState.cartToastTimer = null;
+  }, 2600);
+}
+
+window.dismissCartToast = function dismissCartToast() {
+  const toast = document.getElementById("cartToast");
+  if (!toast) return;
+
+  if (window.AppState.cartToastTimer) {
+    window.clearTimeout(window.AppState.cartToastTimer);
+    window.AppState.cartToastTimer = null;
+  }
+
+  toast.classList.remove("is-visible");
+  toast.classList.add("is-hiding");
+};
+
+function pulseCartHighlight() {
+  const cartPanel = document.querySelector(".cart-modal-content");
+  if (!cartPanel) return;
+
+  cartPanel.classList.remove("cart-highlight");
+  void cartPanel.offsetWidth;
+  cartPanel.classList.add("cart-highlight");
+}
+
+function animateAddButtonFeedback() {
+  const addButton = document.querySelector(".add-cart-btn");
+  if (!addButton) return;
+
+  if (!addButton.dataset.defaultLabel) {
+    addButton.dataset.defaultLabel = addButton.innerHTML;
+  }
+
+  if (addButton.dataset.feedbackTimeoutId) {
+    window.clearTimeout(Number(addButton.dataset.feedbackTimeoutId));
+  }
+
+  addButton.classList.add("is-added");
+  addButton.textContent = "Added ✓";
+
+  const timeoutId = window.setTimeout(() => {
+    addButton.classList.remove("is-added");
+    addButton.innerHTML = addButton.dataset.defaultLabel || "🛒 Add to Cart";
+    delete addButton.dataset.feedbackTimeoutId;
+  }, 1000);
+
+  addButton.dataset.feedbackTimeoutId = String(timeoutId);
 }
 
 window.openCategory = function openCategory(category) {
@@ -460,10 +601,16 @@ window.addToCartFromModal = function addToCartFromModal() {
   document.getElementById("cartFeedback").textContent =
     `${incoming.name}${withSize} added x${incoming.quantity}.`;
 
+  showCartToast(`Added to cart: ${incoming.name}${withSize}`);
+  pulseCartHighlight();
+  animateAddButtonFeedback();
   window.renderShoppingList();
 };
 
-window.addEventListener("DOMContentLoaded", () => {
+function initializeApp() {
+  if (window.AppState.hasInitialized) return;
+  window.AppState.hasInitialized = true;
+
   renderCatalogCards();
   setVisibleProductsForCategory("All");
   setActiveCategoryButton("All");
@@ -479,6 +626,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const toastCloseButton = document.getElementById("cartToastClose");
+  toastCloseButton?.addEventListener("click", window.dismissCartToast);
+
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (window.AppState.cartModalOpen) {
@@ -488,9 +638,14 @@ window.addEventListener("DOMContentLoaded", () => {
       window.closeProductModal();
     }
   });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadProductsFromSheet();
 });
 
 window.parsePriceLabel = parsePriceLabel;
 window.getCartKey = getCartKey;
 window.ACTIVE_VISUAL_CATEGORIES = ACTIVE_VISUAL_CATEGORIES;
 window.COMING_SOON_CATEGORIES = COMING_SOON_CATEGORIES;
+window.initializeApp = initializeApp;
