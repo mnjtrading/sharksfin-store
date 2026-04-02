@@ -151,28 +151,15 @@ function parseCSV(text) {
   });
 }
 
-function parseBooleanFlag(value, fallback = false) {
-  if (typeof value !== "string") return fallback;
-  return ["true", "1", "yes"].includes(value.toLowerCase());
+function toNumberPrice(value, fallbackValue) {
+  const parsed = Number(String(value).replace(/[^0-9.]/g, ""));
+  if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  const fallbackParsed = Number(String(fallbackValue).replace(/[^0-9.]/g, ""));
+  return Number.isFinite(fallbackParsed) ? fallbackParsed : 0;
 }
 
-function normalizeSheetProduct(row, fallbackProduct) {
-  const numericPrice = Number(row.price);
-  const hasNumericPrice = Number.isFinite(numericPrice) && numericPrice > 0;
-  const symbol = row.symbol || "₱";
-  const comingSoon = parseBooleanFlag(row.comingSoon, fallbackProduct?.comingSoon || false);
-  const defaultPrice = fallbackProduct?.price || "Coming soon";
-
-  return {
-    id: row.id || fallbackProduct?.id || "",
-    category: row.category || fallbackProduct?.category || "Misc",
-    name: row.name || fallbackProduct?.name || "Unnamed Product",
-    price: hasNumericPrice ? `${symbol}${numericPrice.toLocaleString("en-PH")}` : defaultPrice,
-    image: row.image || fallbackProduct?.image || "",
-    details: row.details || fallbackProduct?.details || "",
-    allProductsVisible: parseBooleanFlag(row.allProductsVisible, fallbackProduct?.allProductsVisible ?? !comingSoon),
-    comingSoon
-  };
+function formatPriceLabel(value) {
+  return `₱${Number(value).toLocaleString("en-PH")}`;
 }
 
 async function loadProductsFromSheet() {
@@ -184,24 +171,30 @@ async function loadProductsFromSheet() {
 
     const text = await res.text();
     const data = parseCSV(text);
-    const rows = data.filter((row) => row.id && row.name);
-    const fallbackById = new Map(DEFAULT_PRODUCT_CATALOG.map((product) => [product.id, product]));
-    const sheetById = new Map(rows.map((row) => [row.id, row]));
+    const rows = data.filter((row) => row.id);
+    console.log("Loaded sheet rows:", rows);
+    const sheetMap = new Map(rows.map((row) => [row.id, row]));
 
-    const mergedProducts = DEFAULT_PRODUCT_CATALOG
-      .map((product) => normalizeSheetProduct(sheetById.get(product.id) || {}, product))
-      .concat(
-        rows
-          .filter((row) => !fallbackById.has(row.id))
-          .map((row) => normalizeSheetProduct(row))
-      );
+    window.ProductCatalog = DEFAULT_PRODUCT_CATALOG.map((product) => {
+      const row = sheetMap.get(product.id);
+      const numericPrice = row
+        ? toNumberPrice(row.price, product.price)
+        : toNumberPrice(product.price, product.price);
 
-    if (mergedProducts.length) {
-      window.ProductCatalog = mergedProducts;
-    }
+      return {
+        ...product,
+        name: row?.name?.trim() || product.name,
+        price: product.comingSoon ? product.price : formatPriceLabel(numericPrice)
+      };
+    });
+
+    console.log("Using sheet override fallback:", false);
+    console.log("Final ProductCatalog:", window.ProductCatalog);
   } catch (err) {
     console.error("Sheet load failed, fallback to local data", err);
     window.ProductCatalog = [...DEFAULT_PRODUCT_CATALOG];
+    console.log("Using sheet override fallback:", true);
+    console.log("Final ProductCatalog:", window.ProductCatalog);
   } finally {
     initializeApp();
   }
