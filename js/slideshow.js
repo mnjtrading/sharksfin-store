@@ -2,7 +2,8 @@
 window.HeroSlideshow = {
   slides: [],
   index: 0,
-  timer: null
+  timer: null,
+  navigationInProgress: false
 };
 
 function getFallbackSlides() {
@@ -10,7 +11,8 @@ function getFallbackSlides() {
     {
       image: "images/gloves/blue_gloves.png",
       title: "Hammerhead Blue Dive Gloves",
-      subtitle: "Durable dive gloves built for comfort and grip."
+      subtitle: "Durable dive gloves built for comfort and grip.",
+      category: "Gloves"
     }
   ];
 }
@@ -20,6 +22,8 @@ window.renderHeroSlide = function renderHeroSlide() {
   const titleEl = document.getElementById("slideTitle");
   const subtitleEl = document.getElementById("slideSubtitle");
   const visualCopy = document.querySelector(".visual-copy");
+  const visualHero = document.getElementById("visualHero");
+  const visualHint = document.getElementById("slideHint");
   const slide = window.HeroSlideshow.slides[window.HeroSlideshow.index];
 
   if (!imageEl || !titleEl || !subtitleEl || !slide) return;
@@ -30,6 +34,15 @@ window.renderHeroSlide = function renderHeroSlide() {
   imageEl.classList.add("active");
   titleEl.textContent = slide.title;
   subtitleEl.textContent = slide.subtitle;
+  if (visualHero) {
+    const categoryLabel = slide.category || "category";
+    visualHero.setAttribute("aria-label", `View ${categoryLabel} products`);
+    visualHero.dataset.category = categoryLabel;
+  }
+  if (visualHint) {
+    const verb = window.matchMedia("(max-width: 860px)").matches ? "Tap" : "Click";
+    visualHint.textContent = `${verb} to view ${slide.category || "category"}`;
+  }
 
   if (visualCopy) {
     visualCopy.classList.remove("is-visible");
@@ -64,7 +77,21 @@ window.prevHeroSlide = function prevHeroSlide() {
   window.restartHeroTimer();
 };
 
+window.openHeroSlideCategory = function openHeroSlideCategory() {
+  const currentSlide = window.HeroSlideshow.slides[window.HeroSlideshow.index];
+  const category = currentSlide?.category;
+  if (!category || typeof window.openCategory !== "function") return;
+  if (window.HeroSlideshow.navigationInProgress) return;
+
+  window.HeroSlideshow.navigationInProgress = true;
+  window.openCategory(category);
+  window.setTimeout(() => {
+    window.HeroSlideshow.navigationInProgress = false;
+  }, 220);
+};
+
 window.initializeHeroSlideshow = function initializeHeroSlideshow() {
+  const visualHero = document.getElementById("visualHero");
   const derivedSlides = typeof window.getHeroSlidesFromCatalog === "function"
     ? window.getHeroSlidesFromCatalog()
     : [];
@@ -74,4 +101,23 @@ window.initializeHeroSlideshow = function initializeHeroSlideshow() {
 
   window.renderHeroSlide();
   window.restartHeroTimer();
+
+  if (visualHero && !visualHero.dataset.bound) {
+    visualHero.classList.add("is-interactive");
+    visualHero.setAttribute("role", "button");
+    visualHero.setAttribute("tabindex", "0");
+
+    visualHero.addEventListener("click", (event) => {
+      if (event.target.closest(".visual-controls")) return;
+      window.openHeroSlideCategory();
+    });
+
+    visualHero.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      window.openHeroSlideCategory();
+    });
+
+    visualHero.dataset.bound = "true";
+  }
 };
