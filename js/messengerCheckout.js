@@ -1,116 +1,252 @@
-// Messenger checkout configuration (single integration point)
-const MESSENGER_PAGE_USERNAME = "mnjdistributionsinc";
-const CLEAR_CART_AFTER_CHECKOUT = true;
+// Unified checkout summary + copy-to-clipboard flow
+const FACEBOOK_PAGE_URL = "https://www.facebook.com/mnjdistributionsinc";
 
-function formatMessengerLineItem(item) {
-  const itemName = item.size ? `${item.name} (${item.size})` : item.name;
-  return `${itemName} x${item.quantity}`;
-}
-
-function getMessengerTotalLabel(cart) {
-  const total = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
-  return `₱${total.toLocaleString("en-PH")}`;
-}
-
-function buildMessengerMessage(cart, total, customerInfo) {
-  const itemLines = cart.map(formatMessengerLineItem).join("\n");
-  const notes = customerInfo.notes ? customerInfo.notes : "None";
-
-  return `Hello! I would like to place an order from mnjtrading.shop
-
-## ORDER DETAILS
-
-${itemLines}
-
-TOTAL: ${total}
-
-## CUSTOMER INFO
-
-Name: ${customerInfo.name}
-Phone: ${customerInfo.phone}
-Address: ${customerInfo.address}
-
-Notes: ${notes}
-
-Please confirm availability. Thank you!`;
-}
-
-function clearMessengerCheckoutErrors(form) {
-  ["name", "phone", "address"].forEach((field) => {
-    form.elements[field]?.removeAttribute("aria-invalid");
-    const errorElement = document.getElementById(`${field}Error`);
-    if (errorElement) {
-      errorElement.textContent = "";
-      errorElement.classList.remove("active");
-    }
-  });
-}
-
-function validateMessengerCheckout(form) {
-  clearMessengerCheckoutErrors(form);
-  let isValid = true;
-
-  ["name", "phone", "address"].forEach((field) => {
-    const input = form.elements[field];
-    if (!input || input.value.trim()) return;
-
-    isValid = false;
-    input.setAttribute("aria-invalid", "true");
-    const label = field === "address" ? "Delivery address" : field[0].toUpperCase() + field.slice(1);
-    const errorElement = document.getElementById(`${field}Error`);
-    if (errorElement) {
-      errorElement.textContent = `${label} is required.`;
-      errorElement.classList.add("active");
-    }
-  });
-
-  return isValid;
-}
-
-window.checkoutViaMessenger = function checkoutViaMessenger(cart, total, customerInfo) {
-  const message = buildMessengerMessage(cart, total, customerInfo);
-  const encodedMessage = encodeURIComponent(message);
-  const messengerUrl = `https://m.me/${MESSENGER_PAGE_USERNAME}?text=${encodedMessage}`;
-  window.open(messengerUrl, "_blank", "noopener,noreferrer");
+window.CheckoutState = {
+  isOpen: false,
+  copyInProgress: false
 };
 
-window.openMessengerCheckoutModal = function openMessengerCheckoutModal() {
+function getCheckoutElements() {
+  return {
+    modal: document.getElementById("messengerCheckoutModal"),
+    form: document.getElementById("messengerCheckoutForm"),
+    nameInput: document.getElementById("checkoutName"),
+    notesInput: document.getElementById("checkoutNotes"),
+    summaryList: document.getElementById("orderSummaryItems"),
+    summaryCount: document.getElementById("orderSummaryCount"),
+    summaryTotal: document.getElementById("orderSummaryTotal"),
+    feedback: document.getElementById("checkoutFeedback"),
+    manualCopyArea: document.getElementById("manualCopyArea"),
+    copyButton: document.getElementById("copyOrderButton"),
+    openFacebookButton: document.getElementById("openFacebookButton"),
+    backToCartButton: document.getElementById("backToCartButton"),
+    closeButton: document.getElementById("closeCheckoutButton")
+  };
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function getCartTotalsBySymbol(cart) {
+  const totalsBySymbol = {};
+
+  cart.forEach((item) => {
+    const symbol = item.symbol || "₱";
+    totalsBySymbol[symbol] = (totalsBySymbol[symbol] || 0) + (item.unitPrice * item.quantity);
+  });
+
+  return Object.entries(totalsBySymbol)
+    .map(([symbol, total]) => `${symbol}${total.toLocaleString("en-PH")}`)
+    .join(" + ") || "₱0";
+}
+
+function getItemCount(cart) {
+  return cart.reduce((total, item) => total + item.quantity, 0);
+}
+
+function getItemLabel(item) {
+  return item.size ? `${item.name} (${item.size})` : item.name;
+}
+
+function buildCheckoutMessage() {
+  const { nameInput, notesInput } = getCheckoutElements();
   const cart = window.AppState?.shoppingList || [];
-  if (!cart.length) return;
 
-  const totalText = getMessengerTotalLabel(cart);
-  const orderSummaryItems = document.getElementById("orderSummaryItems");
-  const orderSummaryTotal = document.getElementById("orderSummaryTotal");
-  const modal = document.getElementById("messengerCheckoutModal");
-  const form = document.getElementById("messengerCheckoutForm");
+  const itemLines = cart
+    .map((item) => `- ${getItemLabel(item)} x${item.quantity}`)
+    .join("\n");
 
-  if (!orderSummaryItems || !orderSummaryTotal || !modal || !form) return;
+  const chunks = [
+    "Hello MNJ Trading, I would like to order:",
+    "",
+    "Items:",
+    itemLines,
+    "",
+    `Total Items: ${getItemCount(cart)}`,
+    `Total: ${getCartTotalsBySymbol(cart)}`
+  ];
 
-  orderSummaryItems.innerHTML = cart
-    .map((item) => `<li>${formatMessengerLineItem(item)}</li>`)
+  const customerName = nameInput?.value.trim();
+  const notes = notesInput?.value.trim();
+
+  if (customerName) {
+    chunks.push("", `Name: ${customerName}`);
+  }
+
+  if (notes) {
+    chunks.push("", `Notes: ${notes}`);
+  }
+
+  chunks.push("", "Please let me know the availability. Thank you.");
+  return chunks.join("\n");
+}
+
+function renderCheckoutSummary() {
+  const { summaryList, summaryCount, summaryTotal } = getCheckoutElements();
+  const cart = window.AppState?.shoppingList || [];
+
+  if (!summaryList || !summaryCount || !summaryTotal) return;
+
+  summaryList.innerHTML = cart
+    .map((item) => {
+      const subtotal = `${item.symbol || "₱"}${(item.unitPrice * item.quantity).toLocaleString("en-PH")}`;
+      return `<li><span>${escapeHtml(getItemLabel(item))} x${item.quantity}</span><strong>${subtotal}</strong></li>`;
+    })
     .join("");
-  orderSummaryTotal.textContent = totalText;
-  clearMessengerCheckoutErrors(form);
-  modal.classList.add("active");
-  form.elements.name?.focus();
 
+  summaryCount.textContent = `Total Items: ${getItemCount(cart)}`;
+  summaryTotal.textContent = getCartTotalsBySymbol(cart);
+}
+
+function resetCheckoutFeedback() {
+  const { feedback, manualCopyArea } = getCheckoutElements();
+  if (!feedback || !manualCopyArea) return;
+
+  feedback.textContent = "";
+  feedback.classList.remove("success", "warning");
+  manualCopyArea.value = "";
+  manualCopyArea.classList.remove("active");
+}
+
+function setCheckoutFeedback(message, type) {
+  const { feedback } = getCheckoutElements();
+  if (!feedback) return;
+
+  feedback.textContent = message;
+  feedback.classList.remove("success", "warning");
+  feedback.classList.add(type);
+}
+
+function fallbackCopyWithTextarea(text) {
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "readonly");
+  helper.style.position = "fixed";
+  helper.style.top = "-9999px";
+  helper.style.left = "-9999px";
+  document.body.appendChild(helper);
+  helper.select();
+  helper.setSelectionRange(0, helper.value.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch (error) {
+    copied = false;
+  }
+
+  document.body.removeChild(helper);
+  return copied;
+}
+
+async function copyOrderDetails() {
+  const { manualCopyArea, copyButton } = getCheckoutElements();
+  if (window.CheckoutState.copyInProgress || !copyButton || !manualCopyArea) return;
+
+  const cart = window.AppState?.shoppingList || [];
+  if (!cart.length) {
+    setCheckoutFeedback("Your cart is empty.", "warning");
+    return;
+  }
+
+  window.CheckoutState.copyInProgress = true;
+  copyButton.disabled = true;
+
+  const orderText = buildCheckoutMessage();
+  let copied = false;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(orderText);
+      copied = true;
+    }
+  } catch (error) {
+    copied = false;
+  }
+
+  if (!copied) {
+    copied = fallbackCopyWithTextarea(orderText);
+  }
+
+  if (copied) {
+    setCheckoutFeedback(
+      "Order details copied. You can now paste it into Facebook Messenger.",
+      "success"
+    );
+    manualCopyArea.classList.remove("active");
+  } else {
+    setCheckoutFeedback(
+      "Automatic copy was not available. Please manually copy the order details below.",
+      "warning"
+    );
+    manualCopyArea.value = orderText;
+    manualCopyArea.classList.add("active");
+    manualCopyArea.focus();
+    manualCopyArea.select();
+  }
+
+  copyButton.disabled = false;
+  window.CheckoutState.copyInProgress = false;
+}
+
+function focusCheckoutModal() {
+  const { nameInput, copyButton } = getCheckoutElements();
+  (nameInput || copyButton)?.focus();
+}
+
+window.openMessengerCheckoutModal = function openMessengerCheckoutModal() {
+  const { modal } = getCheckoutElements();
+  const cart = window.AppState?.shoppingList || [];
+  if (!modal) return;
+
+  if (!cart.length) {
+    window.openCartModal();
+    window.renderShoppingList();
+    return;
+  }
+
+  if (window.CheckoutState.isOpen) return;
+
+  window.closeCartModal();
+  window.CheckoutState.isOpen = true;
+  renderCheckoutSummary();
+  resetCheckoutFeedback();
+
+  modal.classList.add("active");
   if (typeof window.syncBodyScrollLock === "function") {
     window.syncBodyScrollLock();
   }
+
+  window.requestAnimationFrame(() => {
+    focusCheckoutModal();
+  });
 };
 
 window.closeMessengerCheckoutModal = function closeMessengerCheckoutModal() {
-  const modal = document.getElementById("messengerCheckoutModal");
-  const form = document.getElementById("messengerCheckoutForm");
-  if (!modal || !form) return;
+  const { modal } = getCheckoutElements();
+  if (!modal) return;
 
+  window.CheckoutState.isOpen = false;
   modal.classList.remove("active");
-  form.reset();
-  clearMessengerCheckoutErrors(form);
 
   if (typeof window.syncBodyScrollLock === "function") {
     window.syncBodyScrollLock();
   }
+};
+
+window.backToCartFromCheckout = function backToCartFromCheckout() {
+  window.closeMessengerCheckoutModal();
+  window.openCartModal();
+};
+
+window.openFacebookPage = function openFacebookPage() {
+  window.open(FACEBOOK_PAGE_URL, "_blank", "noopener,noreferrer");
 };
 
 window.handleMessengerCheckoutOverlayClick = function handleMessengerCheckoutOverlayClick(event) {
@@ -120,44 +256,23 @@ window.handleMessengerCheckoutOverlayClick = function handleMessengerCheckoutOve
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("messengerCheckoutForm");
-  if (!form) return;
+  const {
+    copyButton,
+    openFacebookButton,
+    backToCartButton,
+    closeButton
+  } = getCheckoutElements();
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    if (!validateMessengerCheckout(form)) return;
-
-    const cart = window.AppState?.shoppingList || [];
-    const totalText = getMessengerTotalLabel(cart);
-    const customerInfo = {
-      name: form.elements.name.value.trim(),
-      phone: form.elements.phone.value.trim(),
-      address: form.elements.address.value.trim(),
-      notes: form.elements.notes.value.trim()
-    };
-
-    window.checkoutViaMessenger(cart, totalText, customerInfo);
-
-    if (CLEAR_CART_AFTER_CHECKOUT) {
-      window.AppState.shoppingList = [];
-      localStorage.setItem("mnj-cart-items", JSON.stringify([]));
-      window.renderShoppingList();
-      if (typeof window.updateCheckoutButtonVisibility === "function") {
-        window.updateCheckoutButtonVisibility();
-      }
-      window.closeCartModal();
-    }
-
-    window.closeMessengerCheckoutModal();
-  });
+  copyButton?.addEventListener("click", copyOrderDetails);
+  openFacebookButton?.addEventListener("click", window.openFacebookPage);
+  backToCartButton?.addEventListener("click", window.backToCartFromCheckout);
+  closeButton?.addEventListener("click", window.closeMessengerCheckoutModal);
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    const modal = document.getElementById("messengerCheckoutModal");
+    const { modal } = getCheckoutElements();
     if (modal?.classList.contains("active")) {
       window.closeMessengerCheckoutModal();
     }
   });
 });
-
