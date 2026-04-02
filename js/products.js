@@ -194,6 +194,38 @@ function renderCatalogCards() {
     .join("");
 }
 
+function setActiveCategoryButton(category) {
+  const categoryButtons = document.querySelectorAll("#categoryButtons button");
+  categoryButtons.forEach((button) => {
+    const isActive = button.textContent.trim() === (category === "All" ? "View All" : category);
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function animateVisibleProductCards() {
+  const productGrid = document.getElementById("products");
+  if (!productGrid) return;
+
+  const visibleCards = Array.from(productGrid.querySelectorAll(".product-card"))
+    .filter((card) => card.style.display !== "none");
+
+  productGrid.classList.remove("is-animating");
+  visibleCards.forEach((card) => card.classList.remove("is-entering"));
+  void productGrid.offsetWidth;
+  productGrid.classList.add("is-animating");
+
+  visibleCards.forEach((card, index) => {
+    card.style.setProperty("--stagger-delay", `${Math.min(index * 36, 220)}ms`);
+    card.classList.add("is-entering");
+  });
+
+  window.setTimeout(() => {
+    productGrid.classList.remove("is-animating");
+    visibleCards.forEach((card) => card.classList.remove("is-entering"));
+  }, 420);
+}
+
 function setVisibleProductsForCategory(category) {
   const title = document.getElementById("catTitle");
   const products = document.querySelectorAll(".product-card");
@@ -204,6 +236,7 @@ function setVisibleProductsForCategory(category) {
       const isVisible = productCard.dataset.allVisible === "true";
       productCard.style.display = isVisible ? "flex" : "none";
     });
+    animateVisibleProductCards();
     return;
   }
 
@@ -211,6 +244,8 @@ function setVisibleProductsForCategory(category) {
   products.forEach((productCard) => {
     productCard.style.display = productCard.dataset.category === category ? "flex" : "none";
   });
+
+  animateVisibleProductCards();
 }
 
 window.getHeroSlidesFromCatalog = function getHeroSlidesFromCatalog() {
@@ -281,6 +316,7 @@ window.openCategory = function openCategory(category) {
 
   window.closeCartModal();
   setVisibleProductsForCategory(category);
+  setActiveCategoryButton(category);
 };
 
 window.goBack = function goBack() {
@@ -430,6 +466,7 @@ window.addToCartFromModal = function addToCartFromModal() {
 window.addEventListener("DOMContentLoaded", () => {
   renderCatalogCards();
   setVisibleProductsForCategory("All");
+  setActiveCategoryButton("All");
   loadCartState();
   window.renderShoppingList();
 

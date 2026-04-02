@@ -19,13 +19,24 @@ window.renderHeroSlide = function renderHeroSlide() {
   const imageEl = document.getElementById("slideImage");
   const titleEl = document.getElementById("slideTitle");
   const subtitleEl = document.getElementById("slideSubtitle");
+  const visualCopy = document.querySelector(".visual-copy");
   const slide = window.HeroSlideshow.slides[window.HeroSlideshow.index];
 
   if (!imageEl || !titleEl || !subtitleEl || !slide) return;
 
+  imageEl.classList.remove("active");
+  void imageEl.offsetWidth;
   imageEl.style.backgroundImage = `url('${slide.image}')`;
+  imageEl.classList.add("active");
   titleEl.textContent = slide.title;
   subtitleEl.textContent = slide.subtitle;
+
+  if (visualCopy) {
+    visualCopy.classList.remove("is-visible");
+    window.requestAnimationFrame(() => {
+      visualCopy.classList.add("is-visible");
+    });
+  }
 };
 
 window.restartHeroTimer = function restartHeroTimer() {

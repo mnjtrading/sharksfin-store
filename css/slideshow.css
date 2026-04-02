@@ -14,11 +14,14 @@
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.7s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+  will-change: transform, opacity;
+  transform: scale(1.015) translate3d(0, 0, 0);
 }
 
 .visual-slide.active {
   opacity: 1;
+  animation: heroDrift 11s ease-in-out both;
 }
 
 .visual-overlay {
@@ -36,6 +39,14 @@
 
 .visual-copy {
   min-width: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 360ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), transform 360ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.visual-copy.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .visual-kicker {
@@ -75,6 +86,26 @@
   background: rgba(3,10,16,0.84);
   color: var(--text-main);
   cursor: pointer;
+  transition: transform 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), background-color 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)), border-color 220ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.visual-controls button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(24, 160, 255, 0.6);
+}
+
+.visual-controls button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(17, 220, 242, 0.24);
+}
+
+@keyframes heroDrift {
+  0% {
+    transform: scale(1.015) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.045) translate3d(1.2%, -0.8%, 0);
+  }
 }
 
 @media(max-width:860px){
@@ -102,5 +133,15 @@
   .visual-subtitle {
     font-size: 11px;
     line-height: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visual-slide,
+  .visual-copy,
+  .visual-controls button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
   }
 }
