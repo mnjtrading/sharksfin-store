@@ -3,7 +3,7 @@ const FACEBOOK_PAGE_URL = "https://www.facebook.com/mnjdistributionsinc";
 
 window.CheckoutState = {
   isOpen: false,
-  copyInProgress: false
+  actionInProgress: false
 };
 
 function getCheckoutElements() {
@@ -17,8 +17,7 @@ function getCheckoutElements() {
     summaryTotal: document.getElementById("orderSummaryTotal"),
     feedback: document.getElementById("checkoutFeedback"),
     manualCopyArea: document.getElementById("manualCopyArea"),
-    copyButton: document.getElementById("copyOrderButton"),
-    openFacebookButton: document.getElementById("openFacebookButton"),
+    copyOpenButton: document.getElementById("copyOpenChatButton"),
     backToCartButton: document.getElementById("backToCartButton"),
     closeButton: document.getElementById("closeCheckoutButton")
   };
@@ -145,18 +144,21 @@ function fallbackCopyWithTextarea(text) {
   return copied;
 }
 
-async function copyOrderDetails() {
-  const { manualCopyArea, copyButton } = getCheckoutElements();
-  if (window.CheckoutState.copyInProgress || !copyButton || !manualCopyArea) return;
+function openFacebookPageOnce() {
+  window.open(FACEBOOK_PAGE_URL, "_blank", "noopener,noreferrer");
+}
 
+async function copyAndOpenFacebookChat() {
+  const { manualCopyArea, copyOpenButton } = getCheckoutElements();
+  if (window.CheckoutState.actionInProgress || !copyOpenButton || !manualCopyArea) return;
   const cart = window.AppState?.shoppingList || [];
   if (!cart.length) {
     setCheckoutFeedback("Your cart is empty.", "warning");
     return;
   }
 
-  window.CheckoutState.copyInProgress = true;
-  copyButton.disabled = true;
+  window.CheckoutState.actionInProgress = true;
+  copyOpenButton.disabled = true;
 
   const orderText = buildCheckoutMessage();
   let copied = false;
@@ -174,15 +176,14 @@ async function copyOrderDetails() {
     copied = fallbackCopyWithTextarea(orderText);
   }
 
+  openFacebookPageOnce();
+
   if (copied) {
-    setCheckoutFeedback(
-      "Order details copied. You can now paste it into Facebook Messenger.",
-      "success"
-    );
+    setCheckoutFeedback("Order copied. Paste it into Messenger.", "success");
     manualCopyArea.classList.remove("active");
   } else {
     setCheckoutFeedback(
-      "Automatic copy was not available. Please manually copy the order details below.",
+      "Facebook opened, but automatic copy was unavailable. Please copy the order below.",
       "warning"
     );
     manualCopyArea.value = orderText;
@@ -191,13 +192,13 @@ async function copyOrderDetails() {
     manualCopyArea.select();
   }
 
-  copyButton.disabled = false;
-  window.CheckoutState.copyInProgress = false;
+  copyOpenButton.disabled = false;
+  window.CheckoutState.actionInProgress = false;
 }
 
 function focusCheckoutModal() {
-  const { nameInput, copyButton } = getCheckoutElements();
-  (nameInput || copyButton)?.focus();
+  const { nameInput, copyOpenButton } = getCheckoutElements();
+  (nameInput || copyOpenButton)?.focus();
 }
 
 window.openMessengerCheckoutModal = function openMessengerCheckoutModal() {
@@ -245,10 +246,6 @@ window.backToCartFromCheckout = function backToCartFromCheckout() {
   window.openCartModal();
 };
 
-window.openFacebookPage = function openFacebookPage() {
-  window.open(FACEBOOK_PAGE_URL, "_blank", "noopener,noreferrer");
-};
-
 window.handleMessengerCheckoutOverlayClick = function handleMessengerCheckoutOverlayClick(event) {
   if (event.target === event.currentTarget) {
     window.closeMessengerCheckoutModal();
@@ -257,14 +254,12 @@ window.handleMessengerCheckoutOverlayClick = function handleMessengerCheckoutOve
 
 window.addEventListener("DOMContentLoaded", () => {
   const {
-    copyButton,
-    openFacebookButton,
+    copyOpenButton,
     backToCartButton,
     closeButton
   } = getCheckoutElements();
 
-  copyButton?.addEventListener("click", copyOrderDetails);
-  openFacebookButton?.addEventListener("click", window.openFacebookPage);
+  copyOpenButton?.addEventListener("click", copyAndOpenFacebookChat);
   backToCartButton?.addEventListener("click", window.backToCartFromCheckout);
   closeButton?.addEventListener("click", window.closeMessengerCheckoutModal);
 

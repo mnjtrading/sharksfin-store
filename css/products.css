@@ -311,6 +311,14 @@
 .add-cart-btn {
   padding: 10px 16px;
   background: rgba(9,19,32,0.95);
+  transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease, background-color 220ms ease;
+}
+
+.add-cart-btn.is-added {
+  background: linear-gradient(120deg, rgba(44, 209, 120, 0.95), rgba(17, 174, 155, 0.95));
+  border-color: rgba(119, 255, 199, 0.75);
+  color: #042018;
+  box-shadow: 0 10px 22px rgba(21, 137, 109, 0.3);
 }
 
 .cart-feedback {
@@ -347,6 +355,29 @@
   grid-template-rows: auto 1fr auto;
   padding: 20px;
   gap: 14px;
+}
+
+.cart-modal-content.cart-highlight {
+  animation: cartSignalGlow 1200ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)) 1;
+}
+
+@keyframes cartSignalGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(64, 245, 183, 0), 0 0 0 0 rgba(58, 156, 255, 0);
+    border-color: var(--border-soft);
+  }
+  35% {
+    box-shadow: 0 0 0 1px rgba(102, 255, 204, 0.35), 0 0 26px 2px rgba(58, 156, 255, 0.24);
+    border-color: rgba(102, 255, 204, 0.55);
+  }
+  75% {
+    box-shadow: 0 0 0 1px rgba(58, 156, 255, 0.24), 0 0 14px 0 rgba(58, 156, 255, 0.18);
+    border-color: rgba(58, 156, 255, 0.36);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(64, 245, 183, 0), 0 0 0 0 rgba(58, 156, 255, 0);
+    border-color: var(--border-soft);
+  }
 }
 
 .cart-modal-header h3 {
@@ -566,6 +597,13 @@
   font-weight: 600;
 }
 
+.checkout-btn.checkout-btn-primary {
+  background: linear-gradient(120deg, rgba(0, 216, 214, 0.92), rgba(24, 160, 255, 0.92));
+  color: #041014;
+  border-color: transparent;
+  box-shadow: 0 14px 30px rgba(8, 129, 173, 0.28);
+}
+
 .checkout-btn[hidden] {
   display: none;
 }
@@ -696,7 +734,12 @@
 .checkout-action-grid {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.checkout-action-grid #backToCartButton,
+.checkout-action-grid #closeCheckoutButton {
+  background: rgba(8, 22, 34, 0.9);
 }
 
 .continue-shopping-btn {
@@ -711,6 +754,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .product-grid.is-animating .product-card.is-entering {
+    animation: none !important;
+  }
+
+  .cart-modal-content.cart-highlight {
     animation: none !important;
   }
 }
