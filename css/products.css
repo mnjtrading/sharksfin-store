@@ -151,27 +151,23 @@
 .modal-image-panel {
   position: relative;
   background: #02060c;
-}
-
-.zoom-toggle {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  color: var(--text-main);
-  background: rgba(2, 7, 12, 0.8);
-  cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .modal-image-frame {
   overflow: hidden;
   height: 100%;
+  touch-action: none;
+  cursor: default;
+}
+
+.modal-image-frame.can-pan {
+  cursor: grab;
+}
+
+.modal-image-frame.can-pan.is-dragging {
+  cursor: grabbing;
 }
 
 .modal-image {
@@ -179,13 +175,46 @@
   height: 100%;
   min-height: 320px;
   object-fit: cover;
-  transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
-  transition: transform 220ms ease;
+  transform-origin: center center;
+  transition: transform 140ms ease;
 }
 
-.modal-image-frame:hover .modal-image,
-.modal-image-frame.is-zoomed .modal-image {
-  transform: scale(1.8);
+.image-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(4, 11, 18, 0.92);
+}
+
+.zoom-control {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.zoom-control span {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.zoom-control input[type="range"] {
+  width: 100%;
+  accent-color: #29daf7;
+}
+
+.zoom-reset-btn {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-main);
+  background: rgba(7, 19, 30, 0.95);
+  min-height: 40px;
+  padding: 0 14px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .modal-details {
@@ -216,9 +245,10 @@
 }
 
 .modal-price-note {
-  margin: -2px 0 12px;
+  margin: -4px 0 12px;
+  color: #d6eeff;
   font-size: 13px;
-  color: #d6f4ff;
+  line-height: 1.45;
 }
 
 .modal-description {
@@ -331,8 +361,10 @@
   transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease, background-color 220ms ease;
 }
 
-.add-cart-btn[hidden] {
-  display: none;
+.inquiry-btn {
+  margin-top: 2px;
+  border-color: rgba(102, 224, 255, 0.45);
+  background: linear-gradient(120deg, rgba(10, 63, 96, 0.95), rgba(23, 124, 174, 0.9));
 }
 
 .add-cart-btn.is-added {
@@ -542,10 +574,6 @@
     width: 100%;
   }
 
-  .modal-image-frame:hover .modal-image {
-    transform: none;
-  }
-
   .product-card:hover {
     transform: none;
     box-shadow: none;
@@ -568,6 +596,15 @@
 
   .modal-details {
     padding: 18px;
+  }
+
+  .image-viewer-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .zoom-reset-btn {
+    width: 100%;
   }
 
   .size-grid {
