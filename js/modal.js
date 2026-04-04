@@ -1,4 +1,4 @@
-// Product modal open/close behavior, overlay interaction, sizes, quantity, and image magnification
+// Product modal open/close behavior, overlay interaction, sizes, quantity, image viewer, and Speargun inquiry flow
 const WETSUIT_SIZES = [
   "XX-Small",
   "X-Small",
@@ -10,6 +10,128 @@ const WETSUIT_SIZES = [
   "3X-Large",
   "4X-Large"
 ];
+
+const SPEARGUN_MODAL_NOTE = "Starting prices vary from ₱4,000 to ₱22,000+";
+const MESSENGER_CHAT_URL = "https://m.me/mnjdistributionsinc";
+
+const imageViewerState = {
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+  dragging: false,
+  pointerId: null,
+  dragStartX: 0,
+  dragStartY: 0,
+  panStartX: 0,
+  panStartY: 0
+};
+
+window.SpeargunInquiryState = {
+  isOpen: false,
+  actionInProgress: false,
+  productName: ""
+};
+
+function getImageViewerElements() {
+  return {
+    frame: document.getElementById("modalImageFrame"),
+    image: document.getElementById("modalImage"),
+    slider: document.getElementById("modalZoomSlider"),
+    resetButton: document.getElementById("modalResetView")
+  };
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getPanBounds() {
+  const { frame } = getImageViewerElements();
+  if (!frame) return { maxX: 0, maxY: 0 };
+
+  const frameRect = frame.getBoundingClientRect();
+  const maxX = Math.max(0, ((frameRect.width * imageViewerState.zoom) - frameRect.width) / 2);
+  const maxY = Math.max(0, ((frameRect.height * imageViewerState.zoom) - frameRect.height) / 2);
+  return { maxX, maxY };
+}
+
+function applyImageTransform() {
+  const { image, frame } = getImageViewerElements();
+  if (!image || !frame) return;
+
+  const { maxX, maxY } = getPanBounds();
+  imageViewerState.panX = clamp(imageViewerState.panX, -maxX, maxX);
+  imageViewerState.panY = clamp(imageViewerState.panY, -maxY, maxY);
+
+  image.style.transform = `translate(${imageViewerState.panX}px, ${imageViewerState.panY}px) scale(${imageViewerState.zoom})`;
+  frame.classList.toggle("can-pan", imageViewerState.zoom > 1.01);
+}
+
+function resetImageViewer() {
+  const { slider } = getImageViewerElements();
+  imageViewerState.zoom = 1;
+  imageViewerState.panX = 0;
+  imageViewerState.panY = 0;
+  imageViewerState.dragging = false;
+  imageViewerState.pointerId = null;
+
+  if (slider) {
+    slider.value = "1";
+  }
+
+  applyImageTransform();
+}
+
+function setZoom(nextZoom) {
+  const parsed = Number(nextZoom);
+  imageViewerState.zoom = clamp(Number.isFinite(parsed) ? parsed : 1, 1, 3);
+
+  if (imageViewerState.zoom <= 1.01) {
+    imageViewerState.panX = 0;
+    imageViewerState.panY = 0;
+  }
+
+  applyImageTransform();
+}
+
+function onImagePointerDown(event) {
+  const { frame } = getImageViewerElements();
+  if (!frame || imageViewerState.zoom <= 1.01) return;
+
+  event.preventDefault();
+  imageViewerState.dragging = true;
+  imageViewerState.pointerId = event.pointerId;
+  imageViewerState.dragStartX = event.clientX;
+  imageViewerState.dragStartY = event.clientY;
+  imageViewerState.panStartX = imageViewerState.panX;
+  imageViewerState.panStartY = imageViewerState.panY;
+  frame.classList.add("is-dragging");
+
+  try {
+    frame.setPointerCapture(event.pointerId);
+  } catch (error) {
+    // Ignore if pointer capture is unsupported.
+  }
+}
+
+function onImagePointerMove(event) {
+  if (!imageViewerState.dragging || event.pointerId !== imageViewerState.pointerId) return;
+
+  const deltaX = event.clientX - imageViewerState.dragStartX;
+  const deltaY = event.clientY - imageViewerState.dragStartY;
+  imageViewerState.panX = imageViewerState.panStartX + deltaX;
+  imageViewerState.panY = imageViewerState.panStartY + deltaY;
+  applyImageTransform();
+}
+
+function endImageDrag(event) {
+  if (!imageViewerState.dragging || event.pointerId !== imageViewerState.pointerId) return;
+
+  const { frame } = getImageViewerElements();
+  imageViewerState.dragging = false;
+  imageViewerState.pointerId = null;
+  frame?.classList.remove("is-dragging");
+}
 
 function renderSizeOptions(productCategory) {
   const sizeBlock = document.getElementById("modalSizeBlock");
@@ -38,6 +160,175 @@ function syncModalQuantity() {
   quantityView.textContent = String(window.AppState.selectedProduct.quantity);
 }
 
+function getInquiryElements() {
+  return {
+    modal: document.getElementById("speargunInquiryModal"),
+    productName: document.getElementById("inquiryProductName"),
+    nameInput: document.getElementById("inquiryName"),
+    notesInput: document.getElementById("inquiryNotes"),
+    feedback: document.getElementById("inquiryFeedback"),
+    manualCopyArea: document.getElementById("inquiryManualCopyArea"),
+    copyOpenButton: document.getElementById("copyOpenInquiryButton"),
+    closeButton: document.getElementById("closeInquiryButton")
+  };
+}
+
+function resetInquiryFeedback() {
+  const { feedback, manualCopyArea } = getInquiryElements();
+  if (!feedback || !manualCopyArea) return;
+
+  feedback.textContent = "";
+  feedback.classList.remove("success", "warning");
+  manualCopyArea.value = "";
+  manualCopyArea.classList.remove("active");
+}
+
+function setInquiryFeedback(message, type) {
+  const { feedback } = getInquiryElements();
+  if (!feedback) return;
+
+  feedback.textContent = message;
+  feedback.classList.remove("success", "warning");
+  feedback.classList.add(type);
+}
+
+function fallbackCopyWithTextarea(text) {
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "readonly");
+  helper.style.position = "fixed";
+  helper.style.top = "-9999px";
+  helper.style.left = "-9999px";
+  document.body.appendChild(helper);
+  helper.select();
+  helper.setSelectionRange(0, helper.value.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch (error) {
+    copied = false;
+  }
+
+  document.body.removeChild(helper);
+  return copied;
+}
+
+function buildSpeargunInquiryMessage() {
+  const { nameInput, notesInput } = getInquiryElements();
+  const selectedName = window.SpeargunInquiryState.productName || window.AppState.selectedProduct?.name || "Speargun";
+  const customerName = nameInput?.value.trim();
+  const notes = notesInput?.value.trim();
+
+  const chunks = [
+    "Hello MNJ Trading, I would like to inquire about this speargun:",
+    "",
+    "Product:",
+    selectedName,
+    "",
+    "Please let me know the availability and price range."
+  ];
+
+  if (customerName) {
+    chunks.push("", `Name: ${customerName}`);
+  }
+
+  if (notes) {
+    chunks.push("", `Notes: ${notes}`);
+  }
+
+  chunks.push("", "Thank you.");
+
+  return chunks.join("\n");
+}
+
+async function copyAndOpenSpeargunInquiryChat() {
+  const { manualCopyArea, copyOpenButton } = getInquiryElements();
+  if (!copyOpenButton || !manualCopyArea || window.SpeargunInquiryState.actionInProgress) return;
+
+  const inquiryText = buildSpeargunInquiryMessage();
+  let copied = false;
+
+  window.SpeargunInquiryState.actionInProgress = true;
+  copyOpenButton.disabled = true;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(inquiryText);
+      copied = true;
+    }
+  } catch (error) {
+    copied = false;
+  }
+
+  if (!copied) {
+    copied = fallbackCopyWithTextarea(inquiryText);
+  }
+
+  window.open(MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
+
+  if (copied) {
+    setInquiryFeedback("Copied. Paste it into Messenger.", "success");
+    manualCopyArea.classList.remove("active");
+  } else {
+    setInquiryFeedback(
+      "Messenger opened, but automatic copy was unavailable. Please copy the inquiry below.",
+      "warning"
+    );
+    manualCopyArea.value = inquiryText;
+    manualCopyArea.classList.add("active");
+    manualCopyArea.focus();
+    manualCopyArea.select();
+  }
+
+  copyOpenButton.disabled = false;
+  window.SpeargunInquiryState.actionInProgress = false;
+}
+
+window.openSpeargunInquiryModal = function openSpeargunInquiryModal() {
+  const { modal, productName, nameInput, notesInput } = getInquiryElements();
+  const selectedProduct = window.AppState.selectedProduct;
+  if (!modal || !selectedProduct?.isDisplayOnly) return;
+
+  window.SpeargunInquiryState.productName = selectedProduct.name;
+  window.SpeargunInquiryState.isOpen = true;
+
+  if (productName) {
+    productName.textContent = selectedProduct.name;
+  }
+
+  if (nameInput) nameInput.value = "";
+  if (notesInput) notesInput.value = "";
+  resetInquiryFeedback();
+
+  modal.classList.add("active");
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
+
+  window.requestAnimationFrame(() => {
+    nameInput?.focus();
+  });
+};
+
+window.closeSpeargunInquiryModal = function closeSpeargunInquiryModal() {
+  const { modal } = getInquiryElements();
+  if (!modal) return;
+
+  window.SpeargunInquiryState.isOpen = false;
+  modal.classList.remove("active");
+
+  if (typeof window.syncBodyScrollLock === "function") {
+    window.syncBodyScrollLock();
+  }
+};
+
+window.handleSpeargunInquiryOverlayClick = function handleSpeargunInquiryOverlayClick(event) {
+  if (event.target === event.currentTarget) {
+    window.closeSpeargunInquiryModal();
+  }
+};
+
 window.selectProductSize = function selectProductSize(option) {
   const selectedSize = option.dataset.size;
   document.querySelectorAll(".size-option").forEach((sizeOption) => {
@@ -59,31 +350,27 @@ window.changeModalQuantity = function changeModalQuantity(delta) {
   syncModalQuantity();
 };
 
-function resetImageZoom() {
-  const imageFrame = document.getElementById("modalImageFrame");
-  imageFrame.classList.remove("is-zoomed");
-  imageFrame.style.removeProperty("--zoom-x");
-  imageFrame.style.removeProperty("--zoom-y");
-}
-
-window.toggleImageZoom = function toggleImageZoom() {
-  const imageFrame = document.getElementById("modalImageFrame");
-  imageFrame.classList.toggle("is-zoomed");
-};
-
 window.showProductModal = function showProductModal(card) {
   if (card.dataset.comingSoon === "true") return;
 
   const modal = document.getElementById("productModal");
   const grid = document.getElementById("products");
   const details = card.dataset.details || "";
+  const isDisplayOnly = card.dataset.displayOnly === "true";
+  const priceNote = card.dataset.priceNote || SPEARGUN_MODAL_NOTE;
   const modalDescription = document.getElementById("modalDescription");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalPriceNote = document.getElementById("modalPriceNote");
+  const quantityBlock = document.getElementById("modalQuantityControl")?.closest(".modal-quantity-block");
+  const addButton = document.querySelector(".add-cart-btn");
+  const inquiryButton = document.getElementById("speargunInquiryButton");
   const image = card.querySelector("img");
   if (!image) return;
 
   const parsedPrice = window.parsePriceLabel(card.dataset.price);
   window.AppState.selectedCard = card;
   window.AppState.selectedProduct = {
+    id: card.dataset.id,
     key: "",
     name: card.dataset.name,
     priceLabel: card.dataset.price,
@@ -92,20 +379,38 @@ window.showProductModal = function showProductModal(card) {
     category: card.dataset.category,
     size: null,
     quantity: 1,
-    image: image.src
+    image: image.src,
+    isDisplayOnly,
+    priceNote
   };
 
   document.getElementById("modalImage").src = image.src;
   document.getElementById("modalCategory").textContent = card.dataset.category;
   document.getElementById("modalName").textContent = card.dataset.name;
-  document.getElementById("modalPrice").textContent = card.dataset.price;
+  modalPrice.textContent = isDisplayOnly ? "Availability / price inquiry" : card.dataset.price;
+  modalPriceNote.hidden = !isDisplayOnly;
+  modalPriceNote.textContent = isDisplayOnly ? priceNote : "";
   modalDescription.textContent = details;
   modalDescription.style.display = details.trim() ? "block" : "none";
-  document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
+  document.getElementById("cartFeedback").textContent = isDisplayOnly
+    ? "This product is inquiry-only. Tap the button below to message us."
+    : "Tap Add to Cart to save this item.";
+
+  if (quantityBlock) {
+    quantityBlock.hidden = isDisplayOnly;
+  }
+
+  if (addButton) {
+    addButton.hidden = isDisplayOnly;
+  }
+
+  if (inquiryButton) {
+    inquiryButton.hidden = !isDisplayOnly;
+  }
 
   renderSizeOptions(card.dataset.category);
   syncModalQuantity();
-  resetImageZoom();
+  resetImageViewer();
 
   document.querySelectorAll(".product-card").forEach((item) => item.classList.remove("active-card"));
   card.classList.add("active-card");
@@ -125,7 +430,24 @@ window.closeProductModal = function closeProductModal() {
 
   document.querySelectorAll(".product-card").forEach((item) => item.classList.remove("active-card"));
   window.AppState.selectedCard = null;
-  resetImageZoom();
+  const quantityBlock = document.getElementById("modalQuantityControl")?.closest(".modal-quantity-block");
+  const addButton = document.querySelector(".add-cart-btn");
+  const inquiryButton = document.getElementById("speargunInquiryButton");
+
+  if (quantityBlock) {
+    quantityBlock.hidden = false;
+  }
+
+  if (addButton) {
+    addButton.hidden = false;
+  }
+
+  if (inquiryButton) {
+    inquiryButton.hidden = true;
+  }
+
+  window.closeSpeargunInquiryModal();
+  resetImageViewer();
   if (typeof window.syncBodyScrollLock === "function") {
     window.syncBodyScrollLock();
   }
@@ -139,13 +461,11 @@ window.handleOverlayClick = function handleOverlayClick(event) {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  const imageFrame = document.getElementById("modalImageFrame");
-  const zoomToggle = document.getElementById("zoomToggle");
   const sizeGrid = document.getElementById("sizeGrid");
-
-  if (zoomToggle) {
-    zoomToggle.addEventListener("click", window.toggleImageZoom);
-  }
+  const { frame, slider, resetButton, image } = getImageViewerElements();
+  const inquiryButton = document.getElementById("speargunInquiryButton");
+  const inquiryCopyButton = document.getElementById("copyOpenInquiryButton");
+  const inquiryCloseButton = document.getElementById("closeInquiryButton");
 
   if (sizeGrid) {
     sizeGrid.addEventListener("click", (event) => {
@@ -154,6 +474,32 @@ window.addEventListener("DOMContentLoaded", () => {
       window.selectProductSize(button);
     });
   }
+
+  slider?.addEventListener("input", () => {
+    setZoom(slider.value);
+  });
+
+  resetButton?.addEventListener("click", resetImageViewer);
+
+  if (frame && image) {
+    frame.addEventListener("pointerdown", onImagePointerDown);
+    frame.addEventListener("pointermove", onImagePointerMove);
+    frame.addEventListener("pointerup", endImageDrag);
+    frame.addEventListener("pointercancel", endImageDrag);
+    frame.addEventListener("lostpointercapture", endImageDrag);
+
+    image.addEventListener("load", () => {
+      applyImageTransform();
+    });
+
+    window.addEventListener("resize", () => {
+      applyImageTransform();
+    });
+  }
+
+  inquiryButton?.addEventListener("click", window.openSpeargunInquiryModal);
+  inquiryCopyButton?.addEventListener("click", copyAndOpenSpeargunInquiryChat);
+  inquiryCloseButton?.addEventListener("click", window.closeSpeargunInquiryModal);
 
   document.getElementById("qtyMinus")?.addEventListener("click", () => window.changeModalQuantity(-1));
   document.getElementById("qtyPlus")?.addEventListener("click", () => window.changeModalQuantity(1));
@@ -177,18 +523,18 @@ window.addEventListener("DOMContentLoaded", () => {
     }, { capture: true });
   }
 
-  if (imageFrame) {
-    imageFrame.addEventListener("mousemove", (event) => {
-      const frameBounds = imageFrame.getBoundingClientRect();
-      const x = ((event.clientX - frameBounds.left) / frameBounds.width) * 100;
-      const y = ((event.clientY - frameBounds.top) / frameBounds.height) * 100;
-      imageFrame.style.setProperty("--zoom-x", `${x}%`);
-      imageFrame.style.setProperty("--zoom-y", `${y}%`);
-    });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
 
-    imageFrame.addEventListener("mouseleave", () => {
-      imageFrame.style.setProperty("--zoom-x", "50%");
-      imageFrame.style.setProperty("--zoom-y", "50%");
-    });
-  }
+    const inquiryModal = document.getElementById("speargunInquiryModal");
+    if (inquiryModal?.classList.contains("active")) {
+      window.closeSpeargunInquiryModal();
+      return;
+    }
+
+    const productModal = document.getElementById("productModal");
+    if (productModal?.classList.contains("active")) {
+      window.closeProductModal();
+    }
+  });
 });
