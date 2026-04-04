@@ -12,7 +12,7 @@ const WETSUIT_SIZES = [
 ];
 
 const SPEARGUN_MODAL_NOTE = "Starting prices vary from ₱4,000 to ₱22,000+";
-const FACEBOOK_PAGE_URL = "https://www.facebook.com/mnjdistributionsinc";
+const MESSENGER_CHAT_URL = "https://m.me/mnjdistributionsinc";
 
 const imageViewerState = {
   zoom: 1,
@@ -265,14 +265,14 @@ async function copyAndOpenSpeargunInquiryChat() {
     copied = fallbackCopyWithTextarea(inquiryText);
   }
 
-  window.open(FACEBOOK_PAGE_URL, "_blank", "noopener,noreferrer");
+  window.open(MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 
   if (copied) {
-    setInquiryFeedback("Inquiry copied. Paste it into Messenger.", "success");
+    setInquiryFeedback("Copied. Paste it into Messenger.", "success");
     manualCopyArea.classList.remove("active");
   } else {
     setInquiryFeedback(
-      "Facebook opened, but automatic copy was unavailable. Please copy the inquiry below.",
+      "Messenger opened, but automatic copy was unavailable. Please copy the inquiry below.",
       "warning"
     );
     manualCopyArea.value = inquiryText;

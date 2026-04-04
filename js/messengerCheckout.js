@@ -1,5 +1,5 @@
 // Unified checkout summary + copy-to-clipboard flow
-const FACEBOOK_PAGE_URL = "https://www.facebook.com/mnjdistributionsinc";
+const MESSENGER_CHAT_URL = "https://m.me/mnjdistributionsinc";
 
 window.CheckoutState = {
   isOpen: false,
@@ -144,11 +144,11 @@ function fallbackCopyWithTextarea(text) {
   return copied;
 }
 
-function openFacebookPageOnce() {
-  window.open(FACEBOOK_PAGE_URL, "_blank", "noopener,noreferrer");
+function openMessengerChatOnce() {
+  window.open(MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 }
 
-async function copyAndOpenFacebookChat() {
+async function copyAndOpenMessengerChat() {
   const { manualCopyArea, copyOpenButton } = getCheckoutElements();
   if (window.CheckoutState.actionInProgress || !copyOpenButton || !manualCopyArea) return;
   const cart = window.AppState?.shoppingList || [];
@@ -176,14 +176,14 @@ async function copyAndOpenFacebookChat() {
     copied = fallbackCopyWithTextarea(orderText);
   }
 
-  openFacebookPageOnce();
+  openMessengerChatOnce();
 
   if (copied) {
-    setCheckoutFeedback("Order copied. Paste it into Messenger.", "success");
+    setCheckoutFeedback("Copied. Paste it into Messenger.", "success");
     manualCopyArea.classList.remove("active");
   } else {
     setCheckoutFeedback(
-      "Facebook opened, but automatic copy was unavailable. Please copy the order below.",
+      "Messenger opened, but automatic copy was unavailable. Please copy the order below.",
       "warning"
     );
     manualCopyArea.value = orderText;
@@ -259,7 +259,7 @@ window.addEventListener("DOMContentLoaded", () => {
     closeButton
   } = getCheckoutElements();
 
-  copyOpenButton?.addEventListener("click", copyAndOpenFacebookChat);
+  copyOpenButton?.addEventListener("click", copyAndOpenMessengerChat);
   backToCartButton?.addEventListener("click", window.backToCartFromCheckout);
   closeButton?.addEventListener("click", window.closeMessengerCheckoutModal);
 
