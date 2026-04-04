@@ -1,7 +1,10 @@
 // Product page state + catalogue navigation + shopping cart modal
 const CART_STORAGE_KEY = "mnj-cart-items";
 const ACTIVE_VISUAL_CATEGORIES = ["Gloves", "Wetsuit", "Fins", "Snorkels"];
-const COMING_SOON_CATEGORIES = ["Spearguns", "Misc"];
+const COMING_SOON_CATEGORIES = ["Misc"];
+const CATEGORY_NOTICE_MAP = {
+  Spearguns: "Speargun starting prices vary from ₱4,000 to ₱22,000+"
+};
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSTueITT9gJNyIkgAaDn0RxkP4XbUpMJg8Xbm06EgKThTXTtoqF0FjjyAaqfexmbkMnGIJgUnfzTzrm/pub?output=csv";
 
 const DEFAULT_PRODUCT_CATALOG = [
@@ -116,13 +119,48 @@ const DEFAULT_PRODUCT_CATALOG = [
     comingSoon: false
   },
   {
-    id: "spearguns-soon",
+    id: "speargun-carbon",
     category: "Spearguns",
-    name: "Spearguns",
-    price: "Coming soon",
-    details: "New products will be added soon.",
+    name: "Carbon Speargun",
+    price: "",
+    image: "images/speargun/carbon_speargun.png",
+    details: "High-performance carbon speargun built for lightweight handling and power.",
     allProductsVisible: false,
-    comingSoon: true
+    inquiryOnly: true,
+    comingSoon: false
+  },
+  {
+    id: "speargun-mini-1",
+    category: "Spearguns",
+    name: "Mini Speargun",
+    price: "",
+    image: "images/speargun/mini speargun.png",
+    details: "Compact speargun option suited for smaller setups and maneuverability.",
+    allProductsVisible: false,
+    inquiryOnly: true,
+    comingSoon: false
+  },
+  {
+    id: "speargun-mini-2",
+    category: "Spearguns",
+    name: "Mini Speargun 2",
+    price: "",
+    image: "images/speargun/mini_speargun2.png",
+    details: "Alternate compact speargun model with a clean, streamlined build.",
+    allProductsVisible: false,
+    inquiryOnly: true,
+    comingSoon: false
+  },
+  {
+    id: "speargun-wood",
+    category: "Spearguns",
+    name: "Wood Speargun",
+    price: "",
+    image: "images/speargun/wood speargun.png",
+    details: "Traditional wood speargun style with a premium handcrafted look.",
+    allProductsVisible: false,
+    inquiryOnly: true,
+    comingSoon: false
   },
   {
     id: "misc-soon",
@@ -176,6 +214,10 @@ async function loadProductsFromSheet() {
     const sheetMap = new Map(rows.map((row) => [row.id, row]));
 
     window.ProductCatalog = DEFAULT_PRODUCT_CATALOG.map((product) => {
+      if (product.id.startsWith("speargun-")) {
+        return { ...product };
+      }
+
       const row = sheetMap.get(product.id);
       const numericPrice = row
         ? toNumberPrice(row.price, product.price)
@@ -184,7 +226,7 @@ async function loadProductsFromSheet() {
       return {
         ...product,
         name: row?.name?.trim() || product.name,
-        price: product.comingSoon ? product.price : formatPriceLabel(numericPrice)
+        price: product.comingSoon || product.inquiryOnly ? product.price : formatPriceLabel(numericPrice)
       };
     });
 
@@ -219,7 +261,9 @@ function getCartKey(item) {
 
 function buildProductCard(product) {
   const comingSoonClass = product.comingSoon ? " is-coming-soon" : "";
-  const productPrice = product.comingSoon ? "Coming soon" : product.price;
+  const productPrice = product.comingSoon
+    ? "Coming soon"
+    : (product.inquiryOnly ? "Starting price varies from ₱4,000 to ₱22,000+" : product.price);
   const media = product.comingSoon
     ? `
       <div class="product-placeholder" aria-label="${product.category} coming soon">
@@ -239,6 +283,7 @@ function buildProductCard(product) {
       data-details="${product.details || ""}"
       data-all-visible="${product.allProductsVisible}"
       data-coming-soon="${product.comingSoon}"
+      data-inquiry-only="${product.inquiryOnly || false}"
       ${product.comingSoon ? "" : "onclick=\"showProductModal(this)\""}
     >
       ${media}
@@ -294,10 +339,15 @@ function animateVisibleProductCards() {
 
 function setVisibleProductsForCategory(category) {
   const title = document.getElementById("catTitle");
+  const categoryNotice = document.getElementById("categoryNotice");
   const products = document.querySelectorAll(".product-card");
 
   if (category === "All") {
     title.textContent = "All Products";
+    if (categoryNotice) {
+      categoryNotice.hidden = true;
+      categoryNotice.textContent = "";
+    }
     products.forEach((productCard) => {
       const isVisible = productCard.dataset.allVisible === "true";
       productCard.style.display = isVisible ? "flex" : "none";
@@ -307,6 +357,11 @@ function setVisibleProductsForCategory(category) {
   }
 
   title.textContent = category;
+  if (categoryNotice) {
+    const notice = CATEGORY_NOTICE_MAP[category];
+    categoryNotice.hidden = !notice;
+    categoryNotice.textContent = notice || "";
+  }
   products.forEach((productCard) => {
     productCard.style.display = productCard.dataset.category === category ? "flex" : "none";
   });
@@ -582,6 +637,10 @@ window.addToCartFromModal = function addToCartFromModal() {
   if (!window.AppState.selectedProduct) return;
 
   const incoming = window.AppState.selectedProduct;
+  if (incoming.inquiryOnly) {
+    document.getElementById("cartFeedback").textContent = "This item is for display/inquiry only.";
+    return;
+  }
   const existing = window.AppState.shoppingList.find((item) => item.key === incoming.key);
 
   if (existing) {

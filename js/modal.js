@@ -77,7 +77,12 @@ window.showProductModal = function showProductModal(card) {
   const modal = document.getElementById("productModal");
   const grid = document.getElementById("products");
   const details = card.dataset.details || "";
+  const isInquiryOnly = card.dataset.inquiryOnly === "true";
   const modalDescription = document.getElementById("modalDescription");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalPriceNote = document.getElementById("modalPriceNote");
+  const modalQuantityBlock = document.querySelector(".modal-quantity-block");
+  const addButton = document.querySelector(".add-cart-btn");
   const image = card.querySelector("img");
   if (!image) return;
 
@@ -92,16 +97,28 @@ window.showProductModal = function showProductModal(card) {
     category: card.dataset.category,
     size: null,
     quantity: 1,
-    image: image.src
+    image: image.src,
+    inquiryOnly: isInquiryOnly
   };
 
   document.getElementById("modalImage").src = image.src;
   document.getElementById("modalCategory").textContent = card.dataset.category;
   document.getElementById("modalName").textContent = card.dataset.name;
-  document.getElementById("modalPrice").textContent = card.dataset.price;
+  modalPrice.textContent = isInquiryOnly ? "Display item" : card.dataset.price;
+  modalPriceNote.hidden = !isInquiryOnly;
+  modalPriceNote.textContent = isInquiryOnly ? "Starting price varies from ₱4,000 to ₱22,000+" : "";
   modalDescription.textContent = details;
   modalDescription.style.display = details.trim() ? "block" : "none";
-  document.getElementById("cartFeedback").textContent = "Tap Add to Cart to save this item.";
+  document.getElementById("cartFeedback").textContent = isInquiryOnly
+    ? "This item is for display/inquiry only."
+    : "Tap Add to Cart to save this item.";
+
+  if (modalQuantityBlock) {
+    modalQuantityBlock.style.display = isInquiryOnly ? "none" : "block";
+  }
+  if (addButton) {
+    addButton.hidden = isInquiryOnly;
+  }
 
   renderSizeOptions(card.dataset.category);
   syncModalQuantity();
@@ -163,6 +180,11 @@ window.addEventListener("DOMContentLoaded", () => {
     addButton.addEventListener("click", (event) => {
       const selected = window.AppState.selectedProduct;
       if (!selected) return;
+      if (selected.inquiryOnly) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        return;
+      }
 
       if (["Wetsuit", "Gloves"].includes(selected.category) && !selected.size) {
         event.stopImmediatePropagation();
