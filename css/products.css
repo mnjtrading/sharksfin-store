@@ -6,6 +6,17 @@
   transition: 0.25s ease;
 }
 
+.category-notice {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(113, 214, 255, 0.38);
+  border-radius: 12px;
+  color: #d6f4ff;
+  background: linear-gradient(140deg, rgba(8, 26, 39, 0.9), rgba(5, 14, 24, 0.86));
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .product-grid.is-animating .product-card.is-entering {
   animation: cardReveal 320ms var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1)) both;
   animation-delay: var(--stagger-delay, 0ms);
@@ -204,6 +215,12 @@
   font-size: 18px;
 }
 
+.modal-price-note {
+  margin: -2px 0 12px;
+  font-size: 13px;
+  color: #d6f4ff;
+}
+
 .modal-description {
   color: var(--text-muted);
   line-height: 1.6;
@@ -312,6 +329,10 @@
   padding: 10px 16px;
   background: rgba(9,19,32,0.95);
   transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease, background-color 220ms ease;
+}
+
+.add-cart-btn[hidden] {
+  display: none;
 }
 
 .add-cart-btn.is-added {
