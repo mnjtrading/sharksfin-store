@@ -509,6 +509,11 @@ window.addEventListener("DOMContentLoaded", () => {
     addButton.addEventListener("click", (event) => {
       const selected = window.AppState.selectedProduct;
       if (!selected) return;
+      if (selected.inquiryOnly) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        return;
+      }
 
       if (["Wetsuit", "Gloves"].includes(selected.category) && !selected.size) {
         event.stopImmediatePropagation();
