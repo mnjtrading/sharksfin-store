@@ -69,7 +69,10 @@
       <button class="back-btn" onclick="goBack()">← Back</button>
       <button class="toolbar-btn" onclick="toggleShoppingList()">Shopping List</button>
     </div>
-    <div class="catalogue-title" id="catTitle">All Products</div>
+    <div class="catalogue-meta">
+      <div class="catalogue-title" id="catTitle">All Products</div>
+      <p class="category-notice" id="categoryNotice" hidden>Speargun starting prices vary from ₱4,000 to ₱22,000+</p>
+    </div>
   </div>
 
   <div class="product-grid" id="products"></div>
@@ -80,16 +83,29 @@
   <div class="product-modal-content">
     <button class="close-x" aria-label="Close popup" onclick="closeProductModal()">×</button>
     <div class="modal-image-panel">
-      <button type="button" class="zoom-toggle" id="zoomToggle" aria-label="Toggle image magnification">🔍</button>
       <div class="modal-image-frame" id="modalImageFrame">
         <img id="modalImage" class="modal-image" src="" alt="Selected product image">
+      </div>
+      <div class="image-viewer-controls">
+        <label class="zoom-control" for="modalZoomSlider">
+          <span>Zoom</span>
+          <input type="range" id="modalZoomSlider" min="1" max="3" step="0.05" value="1">
+        </label>
+        <button type="button" class="zoom-reset-btn" id="modalResetView">Reset View</button>
       </div>
     </div>
     <div class="modal-details">
       <div class="modal-category" id="modalCategory"></div>
       <h2 class="modal-name" id="modalName"></h2>
       <div class="modal-price" id="modalPrice"></div>
+      <p class="modal-price-note" id="modalPriceNote" hidden>Starting prices vary from ₱4,000 to ₱22,000+</p>
       <div class="modal-description" id="modalDescription"></div>
+      <div class="woodgun-variant-block" id="woodgunVariantBlock" hidden>
+        <h3 class="modal-size-title">Woodgun Variants</h3>
+        <p class="woodgun-variant-copy">Select a branch variant to continue your inquiry.</p>
+        <div class="woodgun-variant-grid" id="woodgunVariantGrid"></div>
+        <p class="woodgun-variant-selection" id="woodgunVariantSelection">No variant selected yet.</p>
+      </div>
       <div class="modal-size-block" id="modalSizeBlock">
         <h3 class="modal-size-title">Select Size</h3>
         <div class="size-grid" id="sizeGrid"></div>
@@ -104,7 +120,38 @@
         </div>
       </div>
       <button class="add-cart-btn" onclick="addToCartFromModal()">🛒 Add to Cart</button>
+      <button class="add-cart-btn inquiry-btn" id="speargunInquiryButton" type="button" hidden>Ask for Availability / Price</button>
       <div class="cart-feedback" id="cartFeedback">Tap Add to Cart to save this item.</div>
+    </div>
+  </div>
+</div>
+
+<div class="messenger-checkout-modal" id="speargunInquiryModal" onclick="handleSpeargunInquiryOverlayClick(event)">
+  <div class="messenger-checkout-content" role="dialog" aria-modal="true" aria-label="Speargun inquiry">
+    <button class="close-x" aria-label="Close inquiry" onclick="closeSpeargunInquiryModal()">×</button>
+    <div class="cart-modal-header">
+      <h3>Speargun Inquiry</h3>
+      <p>Copy a ready-to-send inquiry and continue in Messenger chat.</p>
+    </div>
+
+    <ul class="order-summary-items">
+      <li><span>Product</span><strong id="inquiryProductName">-</strong></li>
+    </ul>
+
+    <form id="speargunInquiryForm" class="messenger-checkout-form" novalidate>
+      <label for="inquiryName">Name</label>
+      <input id="inquiryName" name="name" type="text" autocomplete="name" placeholder="Optional">
+
+      <label for="inquiryNotes">Notes (optional)</label>
+      <textarea id="inquiryNotes" name="notes" rows="2"></textarea>
+    </form>
+
+    <p class="checkout-feedback" id="inquiryFeedback" role="status" aria-live="polite"></p>
+    <textarea class="manual-copy-area" id="inquiryManualCopyArea" readonly aria-label="Manual inquiry copy fallback"></textarea>
+
+    <div class="checkout-action-grid">
+      <button type="button" class="checkout-btn checkout-btn-primary" id="copyOpenInquiryButton">Copy &amp; Open Messenger Chat</button>
+      <button type="button" class="checkout-btn" id="closeInquiryButton">Close</button>
     </div>
   </div>
 </div>
@@ -130,7 +177,7 @@
     <button class="close-x" aria-label="Close order summary" onclick="closeMessengerCheckoutModal()">×</button>
     <div class="cart-modal-header">
       <h3>Checkout Summary</h3>
-      <p>Tap the button below to copy your order and open our Facebook chat. Then just paste and send.</p>
+      <p>Tap the button below to copy your order and open Messenger chat. Then just paste and send.</p>
     </div>
 
     <ul class="order-summary-items" id="orderSummaryItems"></ul>
@@ -151,7 +198,7 @@
     <textarea class="manual-copy-area" id="manualCopyArea" readonly aria-label="Manual copy fallback"></textarea>
 
     <div class="checkout-action-grid">
-      <button type="button" class="checkout-btn checkout-btn-primary" id="copyOpenChatButton">Copy &amp; Open Facebook Chat</button>
+      <button type="button" class="checkout-btn checkout-btn-primary" id="copyOpenChatButton">Copy &amp; Open Messenger Chat</button>
       <button type="button" class="checkout-btn" id="backToCartButton">Back to Cart</button>
       <button type="button" class="checkout-btn" id="closeCheckoutButton">Close</button>
     </div>

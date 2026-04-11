@@ -140,27 +140,23 @@
 .modal-image-panel {
   position: relative;
   background: #02060c;
-}
-
-.zoom-toggle {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  color: var(--text-main);
-  background: rgba(2, 7, 12, 0.8);
-  cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .modal-image-frame {
   overflow: hidden;
   height: 100%;
+  touch-action: none;
+  cursor: default;
+}
+
+.modal-image-frame.can-pan {
+  cursor: grab;
+}
+
+.modal-image-frame.can-pan.is-dragging {
+  cursor: grabbing;
 }
 
 .modal-image {
@@ -168,13 +164,46 @@
   height: 100%;
   min-height: 320px;
   object-fit: cover;
-  transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
-  transition: transform 220ms ease;
+  transform-origin: center center;
+  transition: transform 140ms ease;
 }
 
-.modal-image-frame:hover .modal-image,
-.modal-image-frame.is-zoomed .modal-image {
-  transform: scale(1.8);
+.image-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(4, 11, 18, 0.92);
+}
+
+.zoom-control {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.zoom-control span {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.zoom-control input[type="range"] {
+  width: 100%;
+  accent-color: #29daf7;
+}
+
+.zoom-reset-btn {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-main);
+  background: rgba(7, 19, 30, 0.95);
+  min-height: 40px;
+  padding: 0 14px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .modal-details {
@@ -204,10 +233,74 @@
   font-size: 18px;
 }
 
+.modal-price-note {
+  margin: -4px 0 12px;
+  color: #d6eeff;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .modal-description {
   color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: 20px;
+}
+
+.woodgun-variant-block {
+  border: 1px solid rgba(102, 224, 255, 0.22);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 18px;
+  background: rgba(5, 16, 24, 0.62);
+}
+
+.woodgun-variant-copy {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.woodgun-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.woodgun-variant-option {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(7, 18, 28, 0.95);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  min-height: 44px;
+  display: grid;
+  gap: 8px;
+}
+
+.woodgun-variant-option img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.woodgun-variant-name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.woodgun-variant-option.is-active {
+  border-color: rgba(64, 221, 255, 0.92);
+  box-shadow: 0 0 0 2px rgba(64, 221, 255, 0.2);
+}
+
+.woodgun-variant-selection {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #bcefff;
 }
 
 .modal-size-block {
@@ -312,6 +405,17 @@
   padding: 10px 16px;
   background: rgba(9,19,32,0.95);
   transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease, background-color 220ms ease;
+}
+
+.inquiry-btn {
+  margin-top: 2px;
+  border-color: rgba(102, 224, 255, 0.45);
+  background: linear-gradient(120deg, rgba(10, 63, 96, 0.95), rgba(23, 124, 174, 0.9));
+}
+
+.inquiry-btn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
 }
 
 .add-cart-btn.is-added {
@@ -507,6 +611,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .woodgun-variant-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .cart-item {
     grid-template-columns: 78px 1fr;
   }
@@ -519,10 +627,6 @@
   .remove-item-btn {
     grid-column: span 2;
     width: 100%;
-  }
-
-  .modal-image-frame:hover .modal-image {
-    transform: none;
   }
 
   .product-card:hover {
@@ -549,7 +653,20 @@
     padding: 18px;
   }
 
+  .image-viewer-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .zoom-reset-btn {
+    width: 100%;
+  }
+
   .size-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .woodgun-variant-grid {
     grid-template-columns: 1fr;
   }
 

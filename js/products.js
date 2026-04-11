@@ -1,7 +1,8 @@
 // Product page state + catalogue navigation + shopping cart modal
 const CART_STORAGE_KEY = "mnj-cart-items";
 const ACTIVE_VISUAL_CATEGORIES = ["Gloves", "Wetsuit", "Fins", "Snorkels"];
-const COMING_SOON_CATEGORIES = ["Spearguns", "Misc"];
+const COMING_SOON_CATEGORIES = ["Misc"];
+const SPEARGUN_PRICE_NOTICE = "Speargun starting prices vary from ₱4,000 to ₱22,000+";
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSTueITT9gJNyIkgAaDn0RxkP4XbUpMJg8Xbm06EgKThTXTtoqF0FjjyAaqfexmbkMnGIJgUnfzTzrm/pub?output=csv";
 
 const DEFAULT_PRODUCT_CATALOG = [
@@ -116,13 +117,78 @@ const DEFAULT_PRODUCT_CATALOG = [
     comingSoon: false
   },
   {
-    id: "spearguns-soon",
+    id: "speargun-carbon",
     category: "Spearguns",
-    name: "Spearguns",
-    price: "Coming soon",
-    details: "New products will be added soon.",
+    name: "Carbon Speargun",
+    price: "See pricing note",
+    image: "images/speargun/carbon_speargun.png",
+    details: "High-performance carbon speargun built for lightweight handling and power.",
     allProductsVisible: false,
-    comingSoon: true
+    comingSoon: false,
+    isDisplayOnly: true,
+    priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
+  },
+  {
+    id: "speargun-mini-1",
+    category: "Spearguns",
+    name: "Mini Speargun",
+    price: "See pricing note",
+    image: "images/speargun/mini speargun.png",
+    details: "Compact speargun option suited for smaller setups and maneuverability.",
+    allProductsVisible: false,
+    comingSoon: false,
+    isDisplayOnly: true,
+    priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
+  },
+  {
+    id: "speargun-mini-2",
+    category: "Spearguns",
+    name: "Mini Speargun 2",
+    price: "See pricing note",
+    image: "images/speargun/mini_speargun2.png",
+    details: "Alternate compact speargun model with a clean, streamlined build.",
+    allProductsVisible: false,
+    comingSoon: false,
+    isDisplayOnly: true,
+    priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
+  },
+  {
+    id: "speargun-wood",
+    category: "Spearguns",
+    name: "Woodgun",
+    price: "See pricing note",
+    image: "images/speargun/Woodgun_130cm.png",
+    details: "Traditional handcrafted woodgun collection. Open to choose your preferred variant.",
+    allProductsVisible: false,
+    comingSoon: false,
+    isDisplayOnly: true,
+    priceNote: "Starting price varies from ₱4,000 to ₱22,000+",
+    variants: [
+      {
+        id: "speargun-wood-100cm",
+        name: "Woodgun 100cm",
+        image: "images/speargun/Woodgun_100cm.png",
+        details: "Woodgun 100cm variant."
+      },
+      {
+        id: "speargun-wood-100cm-2",
+        name: "Woodgun 100cm 2",
+        image: "images/speargun/Woodgun_100cm_2.png",
+        details: "Alternate Woodgun 100cm variant."
+      },
+      {
+        id: "speargun-wood-130cm",
+        name: "Woodgun 130cm",
+        image: "images/speargun/Woodgun_130cm.png",
+        details: "Woodgun 130cm variant."
+      },
+      {
+        id: "speargun-wood-130cm-noreel",
+        name: "Woodgun 130cm No Reel",
+        image: "images/speargun/Woodgun_130cm_noreel.png",
+        details: "Woodgun 130cm without reel variant."
+      }
+    ]
   },
   {
     id: "misc-soon",
@@ -176,6 +242,7 @@ async function loadProductsFromSheet() {
     const sheetMap = new Map(rows.map((row) => [row.id, row]));
 
     window.ProductCatalog = DEFAULT_PRODUCT_CATALOG.map((product) => {
+      const isSpeargun = product.id.startsWith("speargun-");
       const row = sheetMap.get(product.id);
       const numericPrice = row
         ? toNumberPrice(row.price, product.price)
@@ -184,7 +251,7 @@ async function loadProductsFromSheet() {
       return {
         ...product,
         name: row?.name?.trim() || product.name,
-        price: product.comingSoon ? product.price : formatPriceLabel(numericPrice)
+        price: (product.comingSoon || isSpeargun) ? product.price : formatPriceLabel(numericPrice)
       };
     });
 
@@ -219,7 +286,10 @@ function getCartKey(item) {
 
 function buildProductCard(product) {
   const comingSoonClass = product.comingSoon ? " is-coming-soon" : "";
-  const productPrice = product.comingSoon ? "Coming soon" : product.price;
+  const isDisplayOnly = Boolean(product.isDisplayOnly);
+  const productPrice = product.comingSoon
+    ? "Coming soon"
+    : (isDisplayOnly ? "Availability / price inquiry" : product.price);
   const media = product.comingSoon
     ? `
       <div class="product-placeholder" aria-label="${product.category} coming soon">
@@ -239,6 +309,8 @@ function buildProductCard(product) {
       data-details="${product.details || ""}"
       data-all-visible="${product.allProductsVisible}"
       data-coming-soon="${product.comingSoon}"
+      data-display-only="${Boolean(product.isDisplayOnly)}"
+      data-price-note="${product.priceNote || ""}"
       ${product.comingSoon ? "" : "onclick=\"showProductModal(this)\""}
     >
       ${media}
@@ -298,6 +370,7 @@ function setVisibleProductsForCategory(category) {
 
   if (category === "All") {
     title.textContent = "All Products";
+    updateCategoryNotice(category);
     products.forEach((productCard) => {
       const isVisible = productCard.dataset.allVisible === "true";
       productCard.style.display = isVisible ? "flex" : "none";
@@ -307,11 +380,20 @@ function setVisibleProductsForCategory(category) {
   }
 
   title.textContent = category;
+  updateCategoryNotice(category);
   products.forEach((productCard) => {
     productCard.style.display = productCard.dataset.category === category ? "flex" : "none";
   });
 
   animateVisibleProductCards();
+}
+
+function updateCategoryNotice(category) {
+  const notice = document.getElementById("categoryNotice");
+  if (!notice) return;
+  const isSpeargunCategory = category === "Spearguns";
+  notice.hidden = !isSpeargunCategory;
+  notice.textContent = isSpeargunCategory ? SPEARGUN_PRICE_NOTICE : "";
 }
 
 window.getHeroSlidesFromCatalog = function getHeroSlidesFromCatalog() {
@@ -580,6 +662,10 @@ window.removeCartItem = function removeCartItem(itemKey) {
 
 window.addToCartFromModal = function addToCartFromModal() {
   if (!window.AppState.selectedProduct) return;
+  if (window.AppState.selectedProduct.isDisplayOnly) {
+    document.getElementById("cartFeedback").textContent = "This product is for display and inquiry only.";
+    return;
+  }
 
   const incoming = window.AppState.selectedProduct;
   const existing = window.AppState.shoppingList.find((item) => item.key === incoming.key);
