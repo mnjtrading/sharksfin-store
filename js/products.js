@@ -366,6 +366,7 @@ function animateVisibleProductCards() {
 
 function setVisibleProductsForCategory(category) {
   const title = document.getElementById("catTitle");
+  const categoryNotice = document.getElementById("categoryNotice");
   const products = document.querySelectorAll(".product-card");
 
   if (category === "All") {
@@ -668,6 +669,10 @@ window.addToCartFromModal = function addToCartFromModal() {
   }
 
   const incoming = window.AppState.selectedProduct;
+  if (incoming.inquiryOnly) {
+    document.getElementById("cartFeedback").textContent = "This item is for display/inquiry only.";
+    return;
+  }
   const existing = window.AppState.shoppingList.find((item) => item.key === incoming.key);
 
   if (existing) {
