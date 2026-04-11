@@ -32,6 +32,92 @@ window.SpeargunInquiryState = {
   productName: ""
 };
 
+function getWoodgunVariantElements() {
+  return {
+    block: document.getElementById("woodgunVariantBlock"),
+    grid: document.getElementById("woodgunVariantGrid"),
+    selection: document.getElementById("woodgunVariantSelection")
+  };
+}
+
+function getWoodgunVariants() {
+  const parent = window.ProductCatalog.find((item) => item.id === "speargun-wood");
+  return Array.isArray(parent?.variants) ? parent.variants : [];
+}
+
+function setWoodgunInquiryButtonState() {
+  const inquiryButton = document.getElementById("speargunInquiryButton");
+  if (!inquiryButton) return;
+
+  const selected = window.AppState.selectedProduct;
+  const needsVariantSelection = selected?.id === "speargun-wood";
+  const hasVariant = Boolean(selected?.selectedVariant);
+
+  inquiryButton.disabled = needsVariantSelection && !hasVariant;
+  inquiryButton.textContent = needsVariantSelection && hasVariant
+    ? `Ask for Availability / Price — ${selected.selectedVariant.name}`
+    : "Ask for Availability / Price";
+}
+
+function selectWoodgunVariant(variantId) {
+  const selected = window.AppState.selectedProduct;
+  if (!selected || selected.id !== "speargun-wood") return;
+
+  const variant = (selected.variants || []).find((item) => item.id === variantId);
+  if (!variant) return;
+
+  selected.selectedVariant = { ...variant };
+
+  document.getElementById("modalImage").src = variant.image;
+  document.getElementById("modalName").textContent = variant.name;
+  document.getElementById("modalDescription").textContent = variant.details || selected.baseDetails || "";
+
+  const { selection, grid } = getWoodgunVariantElements();
+  if (selection) {
+    selection.textContent = `Selected: ${variant.name}`;
+  }
+
+  if (grid) {
+    grid.querySelectorAll(".woodgun-variant-option").forEach((button) => {
+      const isActive = button.dataset.variantId === variant.id;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  }
+
+  setWoodgunInquiryButtonState();
+  resetImageViewer();
+}
+
+function renderWoodgunVariantGrid(selectedProduct) {
+  const { block, grid, selection } = getWoodgunVariantElements();
+  if (!block || !grid || !selection) return;
+
+  const isWoodgunParent = selectedProduct?.id === "speargun-wood";
+  block.hidden = !isWoodgunParent;
+  if (!isWoodgunParent) {
+    grid.innerHTML = "";
+    selection.textContent = "";
+    return;
+  }
+
+  const variants = selectedProduct.variants || [];
+  grid.innerHTML = variants
+    .map((variant) => `
+      <button
+        type="button"
+        class="woodgun-variant-option"
+        data-variant-id="${variant.id}"
+        aria-pressed="false"
+      >
+        <img src="${variant.image}" alt="${variant.name}" loading="lazy">
+        <span class="woodgun-variant-name">${variant.name}</span>
+      </button>
+    `)
+    .join("");
+  selection.textContent = "No variant selected yet.";
+}
+
 function getImageViewerElements() {
   return {
     frame: document.getElementById("modalImageFrame"),
@@ -289,8 +375,12 @@ window.openSpeargunInquiryModal = function openSpeargunInquiryModal() {
   const { modal, productName, nameInput, notesInput } = getInquiryElements();
   const selectedProduct = window.AppState.selectedProduct;
   if (!modal || !selectedProduct?.isDisplayOnly) return;
+  if (selectedProduct.id === "speargun-wood" && !selectedProduct.selectedVariant) {
+    document.getElementById("cartFeedback").textContent = "Select a Woodgun variant to continue.";
+    return;
+  }
 
-  window.SpeargunInquiryState.productName = selectedProduct.name;
+  window.SpeargunInquiryState.productName = selectedProduct.selectedVariant?.name || selectedProduct.name;
   window.SpeargunInquiryState.isOpen = true;
 
   if (productName) {
@@ -381,7 +471,11 @@ window.showProductModal = function showProductModal(card) {
     quantity: 1,
     image: image.src,
     isDisplayOnly,
-    priceNote
+    priceNote,
+    baseName: card.dataset.name,
+    baseDetails: details,
+    variants: card.dataset.id === "speargun-wood" ? getWoodgunVariants() : [],
+    selectedVariant: null
   };
 
   document.getElementById("modalImage").src = image.src;
@@ -408,6 +502,9 @@ window.showProductModal = function showProductModal(card) {
     inquiryButton.hidden = !isDisplayOnly;
   }
 
+  renderWoodgunVariantGrid(window.AppState.selectedProduct);
+  setWoodgunInquiryButtonState();
+
   renderSizeOptions(card.dataset.category);
   syncModalQuantity();
   resetImageViewer();
@@ -433,6 +530,7 @@ window.closeProductModal = function closeProductModal() {
   const quantityBlock = document.getElementById("modalQuantityControl")?.closest(".modal-quantity-block");
   const addButton = document.querySelector(".add-cart-btn");
   const inquiryButton = document.getElementById("speargunInquiryButton");
+  const { block } = getWoodgunVariantElements();
 
   if (quantityBlock) {
     quantityBlock.hidden = false;
@@ -444,6 +542,12 @@ window.closeProductModal = function closeProductModal() {
 
   if (inquiryButton) {
     inquiryButton.hidden = true;
+    inquiryButton.disabled = false;
+    inquiryButton.textContent = "Ask for Availability / Price";
+  }
+
+  if (block) {
+    block.hidden = true;
   }
 
   window.closeSpeargunInquiryModal();
@@ -498,6 +602,11 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   inquiryButton?.addEventListener("click", window.openSpeargunInquiryModal);
+  document.getElementById("woodgunVariantGrid")?.addEventListener("click", (event) => {
+    const option = event.target.closest(".woodgun-variant-option");
+    if (!option) return;
+    selectWoodgunVariant(option.dataset.variantId);
+  });
   inquiryCopyButton?.addEventListener("click", copyAndOpenSpeargunInquiryChat);
   inquiryCloseButton?.addEventListener("click", window.closeSpeargunInquiryModal);
 

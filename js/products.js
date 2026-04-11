@@ -155,14 +155,40 @@ const DEFAULT_PRODUCT_CATALOG = [
   {
     id: "speargun-wood",
     category: "Spearguns",
-    name: "Wood Speargun",
+    name: "Woodgun",
     price: "See pricing note",
-    image: "images/speargun/wood speargun.png",
-    details: "Traditional wood speargun style with a premium handcrafted look.",
+    image: "images/speargun/Woodgun_130cm.png",
+    details: "Traditional handcrafted woodgun collection. Open to choose your preferred variant.",
     allProductsVisible: false,
     comingSoon: false,
     isDisplayOnly: true,
-    priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
+    priceNote: "Starting price varies from ₱4,000 to ₱22,000+",
+    variants: [
+      {
+        id: "speargun-wood-100cm",
+        name: "Woodgun 100cm",
+        image: "images/speargun/Woodgun_100cm.png",
+        details: "Woodgun 100cm variant."
+      },
+      {
+        id: "speargun-wood-100cm-2",
+        name: "Woodgun 100cm 2",
+        image: "images/speargun/Woodgun_100cm_2.png",
+        details: "Alternate Woodgun 100cm variant."
+      },
+      {
+        id: "speargun-wood-130cm",
+        name: "Woodgun 130cm",
+        image: "images/speargun/Woodgun_130cm.png",
+        details: "Woodgun 130cm variant."
+      },
+      {
+        id: "speargun-wood-130cm-noreel",
+        name: "Woodgun 130cm No Reel",
+        image: "images/speargun/Woodgun_130cm_noreel.png",
+        details: "Woodgun 130cm without reel variant."
+      }
+    ]
   },
   {
     id: "misc-soon",

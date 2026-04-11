@@ -257,6 +257,63 @@
   margin-bottom: 20px;
 }
 
+.woodgun-variant-block {
+  border: 1px solid rgba(102, 224, 255, 0.22);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 18px;
+  background: rgba(5, 16, 24, 0.62);
+}
+
+.woodgun-variant-copy {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.woodgun-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.woodgun-variant-option {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(7, 18, 28, 0.95);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  min-height: 44px;
+  display: grid;
+  gap: 8px;
+}
+
+.woodgun-variant-option img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.woodgun-variant-name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.woodgun-variant-option.is-active {
+  border-color: rgba(64, 221, 255, 0.92);
+  box-shadow: 0 0 0 2px rgba(64, 221, 255, 0.2);
+}
+
+.woodgun-variant-selection {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #bcefff;
+}
+
 .modal-size-block {
   margin: 0 0 20px;
 }
@@ -365,6 +422,11 @@
   margin-top: 2px;
   border-color: rgba(102, 224, 255, 0.45);
   background: linear-gradient(120deg, rgba(10, 63, 96, 0.95), rgba(23, 124, 174, 0.9));
+}
+
+.inquiry-btn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
 }
 
 .add-cart-btn.is-added {
@@ -560,6 +622,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .woodgun-variant-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .cart-item {
     grid-template-columns: 78px 1fr;
   }
@@ -608,6 +674,10 @@
   }
 
   .size-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .woodgun-variant-grid {
     grid-template-columns: 1fr;
   }
 
