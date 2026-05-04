@@ -129,6 +129,20 @@ function openMessengerChatOnce() {
   window.open(window.MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 }
 
+function clearCartAfterCheckout() {
+  if (!window.AppState || !Array.isArray(window.AppState.shoppingList)) return;
+  if (window.AppState.shoppingList.length === 0) return;
+
+  window.AppState.shoppingList = [];
+  localStorage.setItem("mnj-cart-items", JSON.stringify([]));
+  window.renderShoppingList?.();
+
+  const checkoutButton = document.getElementById("checkoutButton");
+  if (checkoutButton) {
+    checkoutButton.textContent = "Checkout (Cart Empty)";
+  }
+}
+
 async function copyAndOpenMessengerChat() {
   const { manualCopyArea, copyOpenButton } = getCheckoutElements();
   if (window.CheckoutState.actionInProgress || !copyOpenButton || !manualCopyArea) return;
@@ -160,6 +174,10 @@ async function copyAndOpenMessengerChat() {
     copied = window.fallbackCopyWithTextarea(orderText);
   }
 
+  if (copied) {
+    clearCartAfterCheckout();
+  }
+
   if (!honeypot) {
     window.sendAdminNotification({
       type: "checkout",
@@ -174,7 +192,7 @@ async function copyAndOpenMessengerChat() {
   openMessengerChatOnce();
 
   if (copied) {
-    setCheckoutFeedback("Copied. Paste it into Messenger.", "success");
+    setCheckoutFeedback("Order copied. Cart cleared. Paste it into Messenger.", "success");
     manualCopyArea.classList.remove("active");
   } else {
     setCheckoutFeedback(
