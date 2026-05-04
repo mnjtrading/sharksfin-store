@@ -117,6 +117,26 @@ const DEFAULT_PRODUCT_CATALOG = [
     comingSoon: false
   },
   {
+    id: "wetsuit-apnea-brown",
+    category: "Wetsuit",
+    name: "Apnea Wetsuit (Brown)",
+    price: "₱6,500",
+    image: "images/wetsuit_apnea_brown.png",
+    details: "Apnea wetsuit designed for flexibility and comfort.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
+    id: "wetsuit-apnea-green",
+    category: "Wetsuit",
+    name: "Apnea Wetsuit (Green)",
+    price: "₱6,500",
+    image: "images/wetsuit_apnea_green.png",
+    details: "Apnea wetsuit designed for flexibility and comfort.",
+    allProductsVisible: true,
+    comingSoon: false
+  },
+  {
     id: "speargun-carbon",
     category: "Spearguns",
     name: "Carbon Speargun",
