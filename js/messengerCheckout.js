@@ -1,13 +1,15 @@
 // Unified checkout summary + copy-to-clipboard flow
 window.CheckoutState = {
   isOpen: false,
-  actionInProgress: false
+  actionInProgress: false,
+  cooldownMs: 30000
 };
 
 function getCheckoutElements() {
   return {
     modal: document.getElementById("messengerCheckoutModal"),
     form: document.getElementById("messengerCheckoutForm"),
+    contactInput: document.getElementById("checkoutContact"),
     nameInput: document.getElementById("checkoutName"),
     notesInput: document.getElementById("checkoutNotes"),
     summaryList: document.getElementById("orderSummaryItems"),
@@ -19,6 +21,10 @@ function getCheckoutElements() {
     backToCartButton: document.getElementById("backToCartButton"),
     closeButton: document.getElementById("closeCheckoutButton")
   };
+}
+
+function getCheckoutHoneypotValue() {
+  return document.getElementById("checkoutHoneypot")?.value || "";
 }
 
 function escapeHtml(text) {
@@ -52,7 +58,7 @@ function getItemLabel(item) {
 }
 
 function buildCheckoutMessage() {
-  const { nameInput, notesInput } = getCheckoutElements();
+  const { contactInput, nameInput, notesInput } = getCheckoutElements();
   const cart = window.AppState?.shoppingList || [];
 
   const itemLines = cart
@@ -69,16 +75,15 @@ function buildCheckoutMessage() {
     `Total: ${getCartTotalsBySymbol(cart)}`
   ];
 
+  const contactInfo = contactInput?.value.trim() || "";
   const customerName = nameInput?.value.trim();
   const notes = notesInput?.value.trim();
 
-  if (customerName) {
-    chunks.push("", `Name: ${customerName}`);
-  }
+  chunks.push("", "Contact Information:", contactInfo);
 
-  if (notes) {
-    chunks.push("", `Notes: ${notes}`);
-  }
+  if (customerName) chunks.push("", `Name: ${customerName}`);
+
+  if (notes) chunks.push("", `Notes: ${notes}`);
 
   chunks.push("", "Please let me know the availability. Thank you.");
   return chunks.join("\n");
@@ -124,19 +129,41 @@ function openMessengerChatOnce() {
   window.open(window.MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 }
 
+function clearCartAfterCheckout() {
+  if (!window.AppState || !Array.isArray(window.AppState.shoppingList)) return;
+  if (window.AppState.shoppingList.length === 0) return;
+
+  window.AppState.shoppingList = [];
+  localStorage.setItem("mnj-cart-items", JSON.stringify([]));
+  window.renderShoppingList?.();
+
+  const checkoutButton = document.getElementById("checkoutButton");
+  if (checkoutButton) {
+    checkoutButton.textContent = "Checkout (Cart Empty)";
+  }
+}
+
 async function copyAndOpenMessengerChat() {
-  const { manualCopyArea, copyOpenButton } = getCheckoutElements();
+  const { manualCopyArea, copyOpenButton, contactInput } = getCheckoutElements();
   if (window.CheckoutState.actionInProgress || !copyOpenButton || !manualCopyArea) return;
   const cart = window.AppState?.shoppingList || [];
   if (!cart.length) {
     setCheckoutFeedback("Your cart is empty.", "warning");
     return;
   }
+  if (!contactInput?.value.trim()) {
+    setCheckoutFeedback("Please enter your contact information before continuing.", "warning");
+    contactInput?.focus();
+    return;
+  }
 
   window.CheckoutState.actionInProgress = true;
   copyOpenButton.disabled = true;
+  const originalLabel = copyOpenButton.textContent;
+  copyOpenButton.textContent = "Opening Messenger...";
 
   const orderText = buildCheckoutMessage();
+  const honeypot = getCheckoutHoneypotValue();
   let copied = false;
 
   try {
@@ -152,10 +179,25 @@ async function copyAndOpenMessengerChat() {
     copied = window.fallbackCopyWithTextarea(orderText);
   }
 
+  if (copied) {
+    clearCartAfterCheckout();
+  }
+
+  if (!honeypot) {
+    window.sendAdminNotification({
+      type: "checkout",
+      message: orderText,
+      createdAt: new Date().toISOString(),
+      source: "mnj-store",
+      sessionId: window.getClientSessionId(),
+      honeypot
+    });
+  }
+
   openMessengerChatOnce();
 
   if (copied) {
-    setCheckoutFeedback("Copied. Paste it into Messenger.", "success");
+    setCheckoutFeedback("Order copied. Cart cleared. Paste it into Messenger.", "success");
     manualCopyArea.classList.remove("active");
   } else {
     setCheckoutFeedback(
@@ -168,8 +210,11 @@ async function copyAndOpenMessengerChat() {
     manualCopyArea.select();
   }
 
-  copyOpenButton.disabled = false;
-  window.CheckoutState.actionInProgress = false;
+  window.setTimeout(() => {
+    copyOpenButton.disabled = false;
+    copyOpenButton.textContent = originalLabel;
+    window.CheckoutState.actionInProgress = false;
+  }, window.CheckoutState.cooldownMs);
 }
 
 function focusCheckoutModal() {
