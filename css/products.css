@@ -6,6 +6,13 @@
   transition: 0.25s ease;
 }
 
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .category-notice {
   margin: 0 0 18px;
   padding: 12px 14px;

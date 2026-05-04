@@ -31,7 +31,8 @@ const imageViewerState = {
 window.SpeargunInquiryState = {
   isOpen: false,
   actionInProgress: false,
-  productName: ""
+  productName: "",
+  cooldownMs: 30000
 };
 
 function getWoodgunVariantElements() {
@@ -267,6 +268,10 @@ function getInquiryElements() {
   };
 }
 
+function getInquiryHoneypotValue() {
+  return document.getElementById("inquiryHoneypot")?.value || "";
+}
+
 function resetInquiryFeedback() {
   const { feedback, manualCopyArea } = getInquiryElements();
   if (!feedback || !manualCopyArea) return;
@@ -319,10 +324,13 @@ async function copyAndOpenSpeargunInquiryChat() {
   if (!copyOpenButton || !manualCopyArea || window.SpeargunInquiryState.actionInProgress) return;
 
   const inquiryText = buildSpeargunInquiryMessage();
+  const honeypot = getInquiryHoneypotValue();
   let copied = false;
 
   window.SpeargunInquiryState.actionInProgress = true;
   copyOpenButton.disabled = true;
+  const originalLabel = copyOpenButton.textContent;
+  copyOpenButton.textContent = "Opening Messenger...";
 
   try {
     if (navigator.clipboard?.writeText) {
@@ -335,6 +343,17 @@ async function copyAndOpenSpeargunInquiryChat() {
 
   if (!copied) {
     copied = window.fallbackCopyWithTextarea(inquiryText);
+  }
+
+  if (!honeypot) {
+    window.sendAdminNotification({
+      type: "speargun-inquiry",
+      message: inquiryText,
+      createdAt: new Date().toISOString(),
+      source: "mnj-store",
+      sessionId: window.getClientSessionId(),
+      honeypot
+    });
   }
 
   window.open(window.MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
@@ -353,8 +372,11 @@ async function copyAndOpenSpeargunInquiryChat() {
     manualCopyArea.select();
   }
 
-  copyOpenButton.disabled = false;
-  window.SpeargunInquiryState.actionInProgress = false;
+  window.setTimeout(() => {
+    copyOpenButton.disabled = false;
+    copyOpenButton.textContent = originalLabel;
+    window.SpeargunInquiryState.actionInProgress = false;
+  }, window.SpeargunInquiryState.cooldownMs);
 }
 
 window.openSpeargunInquiryModal = function openSpeargunInquiryModal() {

@@ -1,7 +1,8 @@
 // Unified checkout summary + copy-to-clipboard flow
 window.CheckoutState = {
   isOpen: false,
-  actionInProgress: false
+  actionInProgress: false,
+  cooldownMs: 30000
 };
 
 function getCheckoutElements() {
@@ -19,6 +20,10 @@ function getCheckoutElements() {
     backToCartButton: document.getElementById("backToCartButton"),
     closeButton: document.getElementById("closeCheckoutButton")
   };
+}
+
+function getCheckoutHoneypotValue() {
+  return document.getElementById("checkoutHoneypot")?.value || "";
 }
 
 function escapeHtml(text) {
@@ -135,8 +140,11 @@ async function copyAndOpenMessengerChat() {
 
   window.CheckoutState.actionInProgress = true;
   copyOpenButton.disabled = true;
+  const originalLabel = copyOpenButton.textContent;
+  copyOpenButton.textContent = "Opening Messenger...";
 
   const orderText = buildCheckoutMessage();
+  const honeypot = getCheckoutHoneypotValue();
   let copied = false;
 
   try {
@@ -150,6 +158,17 @@ async function copyAndOpenMessengerChat() {
 
   if (!copied) {
     copied = window.fallbackCopyWithTextarea(orderText);
+  }
+
+  if (!honeypot) {
+    window.sendAdminNotification({
+      type: "checkout",
+      message: orderText,
+      createdAt: new Date().toISOString(),
+      source: "mnj-store",
+      sessionId: window.getClientSessionId(),
+      honeypot
+    });
   }
 
   openMessengerChatOnce();
@@ -168,8 +187,11 @@ async function copyAndOpenMessengerChat() {
     manualCopyArea.select();
   }
 
-  copyOpenButton.disabled = false;
-  window.CheckoutState.actionInProgress = false;
+  window.setTimeout(() => {
+    copyOpenButton.disabled = false;
+    copyOpenButton.textContent = originalLabel;
+    window.CheckoutState.actionInProgress = false;
+  }, window.CheckoutState.cooldownMs);
 }
 
 function focusCheckoutModal() {
