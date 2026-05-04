@@ -12,8 +12,6 @@ const WETSUIT_SIZES = [
 ];
 
 const SPEARGUN_MODAL_NOTE = "Starting prices vary from ₱4,000 to ₱22,000+";
-const MESSENGER_CHAT_URL = "https://m.me/mnjdistributionsinc";
-
 const imageViewerState = {
   zoom: 1,
   panX: 0,
@@ -224,7 +222,7 @@ function renderSizeOptions(productCategory) {
   const sizeGrid = document.getElementById("sizeGrid");
   const sizeWarning = document.getElementById("sizeWarning");
 
-  const requiresSizeSelection = ["Wetsuit", "Gloves"].includes(productCategory);
+  const requiresSizeSelection = ["Wetsuit", "Gloves", "Fins"].includes(productCategory);
 
   if (!requiresSizeSelection) {
     sizeBlock.style.display = "none";
@@ -235,7 +233,13 @@ function renderSizeOptions(productCategory) {
 
   sizeBlock.style.display = "block";
   sizeWarning.classList.remove("active");
-  sizeGrid.innerHTML = WETSUIT_SIZES
+  const sizes = productCategory === "Gloves"
+    ? GLOVE_SIZES
+    : productCategory === "Fins"
+      ? FINS_SIZES
+      : WETSUIT_SIZES;
+
+  sizeGrid.innerHTML = sizes
     .map((size) => `<button type="button" class="size-option" data-size="${size}">${size}</button>`)
     .join("");
 }
@@ -276,28 +280,6 @@ function setInquiryFeedback(message, type) {
   feedback.textContent = message;
   feedback.classList.remove("success", "warning");
   feedback.classList.add(type);
-}
-
-function fallbackCopyWithTextarea(text) {
-  const helper = document.createElement("textarea");
-  helper.value = text;
-  helper.setAttribute("readonly", "readonly");
-  helper.style.position = "fixed";
-  helper.style.top = "-9999px";
-  helper.style.left = "-9999px";
-  document.body.appendChild(helper);
-  helper.select();
-  helper.setSelectionRange(0, helper.value.length);
-
-  let copied = false;
-  try {
-    copied = document.execCommand("copy");
-  } catch (error) {
-    copied = false;
-  }
-
-  document.body.removeChild(helper);
-  return copied;
 }
 
 function buildSpeargunInquiryMessage() {
@@ -348,10 +330,10 @@ async function copyAndOpenSpeargunInquiryChat() {
   }
 
   if (!copied) {
-    copied = fallbackCopyWithTextarea(inquiryText);
+    copied = window.fallbackCopyWithTextarea(inquiryText);
   }
 
-  window.open(MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
+  window.open(window.MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 
   if (copied) {
     setInquiryFeedback("Copied. Paste it into Messenger.", "success");
@@ -469,7 +451,9 @@ window.showProductModal = function showProductModal(card) {
     category: card.dataset.category,
     size: null,
     quantity: 1,
-    image: image.src,
+    image: card.dataset.id
+        ? (window.ProductCatalog.find((p) => p.id === card.dataset.id)?.image || image.src)
+        : image.src,
     isDisplayOnly,
     priceNote,
     baseName: card.dataset.name,
@@ -542,8 +526,7 @@ window.closeProductModal = function closeProductModal() {
 
   if (inquiryButton) {
     inquiryButton.hidden = true;
-    inquiryButton.disabled = false;
-    inquiryButton.textContent = "Ask for Availability / Price";
+      inquiryButton.textContent = "Ask for Availability / Price";
   }
 
   if (block) {
@@ -624,7 +607,7 @@ window.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      if (["Wetsuit", "Gloves"].includes(selected.category) && !selected.size) {
+      if (["Wetsuit", "Gloves", "Fins"].includes(selected.category) && !selected.size) {
         event.stopImmediatePropagation();
         event.preventDefault();
         document.getElementById("sizeWarning").classList.add("active");

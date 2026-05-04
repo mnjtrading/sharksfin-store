@@ -17,7 +17,6 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  window.initializeHeroSlideshow();
   window.renderShoppingList();
 
   const categoryToggle = document.getElementById("categoryMenuToggle");
@@ -37,6 +36,16 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!event.target.closest("button")) return;
       if (window.innerWidth > 768) return;
 
+      categoryButtons.classList.remove("open");
+      categoryToggle.setAttribute("aria-expanded", "false");
+      window.syncBodyScrollLock();
+    });
+
+
+    document.addEventListener("click", (event) => {
+      if (!categoryButtons || !categoryToggle) return;
+      if (!categoryButtons.classList.contains("open")) return;
+      if (categoryButtons.contains(event.target) || categoryToggle.contains(event.target)) return;
       categoryButtons.classList.remove("open");
       categoryToggle.setAttribute("aria-expanded", "false");
       window.syncBodyScrollLock();

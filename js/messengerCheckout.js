@@ -1,6 +1,4 @@
 // Unified checkout summary + copy-to-clipboard flow
-const MESSENGER_CHAT_URL = "https://m.me/mnjdistributionsinc";
-
 window.CheckoutState = {
   isOpen: false,
   actionInProgress: false
@@ -122,30 +120,8 @@ function setCheckoutFeedback(message, type) {
   feedback.classList.add(type);
 }
 
-function fallbackCopyWithTextarea(text) {
-  const helper = document.createElement("textarea");
-  helper.value = text;
-  helper.setAttribute("readonly", "readonly");
-  helper.style.position = "fixed";
-  helper.style.top = "-9999px";
-  helper.style.left = "-9999px";
-  document.body.appendChild(helper);
-  helper.select();
-  helper.setSelectionRange(0, helper.value.length);
-
-  let copied = false;
-  try {
-    copied = document.execCommand("copy");
-  } catch (error) {
-    copied = false;
-  }
-
-  document.body.removeChild(helper);
-  return copied;
-}
-
 function openMessengerChatOnce() {
-  window.open(MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
+  window.open(window.MESSENGER_CHAT_URL, "_blank", "noopener,noreferrer");
 }
 
 async function copyAndOpenMessengerChat() {
@@ -173,7 +149,7 @@ async function copyAndOpenMessengerChat() {
   }
 
   if (!copied) {
-    copied = fallbackCopyWithTextarea(orderText);
+    copied = window.fallbackCopyWithTextarea(orderText);
   }
 
   openMessengerChatOnce();

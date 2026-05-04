@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.mnjtrading.shop/">
+  <meta property="og:title" content="MNJ Distribution — Premium Freediving Equipment">
+  <meta property="og:description" content="Shop Hammerhead spearguns, fins, wetsuits, gloves, and snorkels. Order via Messenger.">
+  <meta property="og:image" content="https://www.mnjtrading.shop/images/mnj-logo.png">
+  <meta name="description" content="MNJ Distribution — Hammerhead freediving equipment. Spearguns, fins, wetsuits, gloves, and snorkels available for order via Messenger.">
   <title>MNJ Distribution</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -16,6 +22,17 @@
   <span id="cartToastMessage"></span>
   <button type="button" class="cart-toast-close" id="cartToastClose" aria-label="Dismiss notification">×</button>
 </div>
+
+<button
+  type="button"
+  class="floating-cart-btn"
+  id="floatingCartBtn"
+  aria-label="Open shopping cart"
+  onclick="toggleShoppingList()"
+  hidden
+>
+  🛒 <span id="floatingCartCount">0</span>
+</button>
 
 <section id="welcome" class="section-panel">
   <div class="welcome-card">
@@ -74,9 +91,11 @@
       <p class="category-notice" id="categoryNotice" hidden>Speargun starting prices vary from ₱4,000 to ₱22,000+</p>
     </div>
   </div>
-  <p class="category-notice" id="categoryNotice" hidden></p>
-
-  <div class="product-grid" id="products"></div>
+  <div class="product-grid" id="products">
+    <div class="products-loading" id="productsLoading" aria-live="polite" aria-label="Loading products">
+      Loading products…
+    </div>
+  </div>
 
 </section>
 
@@ -141,7 +160,7 @@
 
     <form id="speargunInquiryForm" class="messenger-checkout-form" novalidate>
       <label for="inquiryName">Name</label>
-      <input id="inquiryName" name="name" type="text" autocomplete="name" placeholder="Optional">
+      <input id="inquiryName" name="name" type="text" autocomplete="name" placeholder="Your name (helps us follow up)">
 
       <label for="inquiryNotes">Notes (optional)</label>
       <textarea id="inquiryNotes" name="notes" rows="2"></textarea>
@@ -189,7 +208,7 @@
 
     <form id="messengerCheckoutForm" class="messenger-checkout-form" novalidate>
       <label for="checkoutName">Name</label>
-      <input id="checkoutName" name="name" type="text" autocomplete="name" placeholder="Optional">
+      <input id="checkoutName" name="name" type="text" autocomplete="name" placeholder="Your name (helps us follow up)">
 
       <label for="checkoutNotes">Notes (optional)</label>
       <textarea id="checkoutNotes" name="notes" rows="2"></textarea>
@@ -206,6 +225,7 @@
   </div>
 </div>
 
+<script src="js/utils.js" defer></script>
 <script src="js/products.js" defer></script>
 <script src="js/slideshow.js" defer></script>
 <script src="js/modal.js" defer></script>
