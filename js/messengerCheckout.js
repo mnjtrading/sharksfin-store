@@ -9,6 +9,7 @@ function getCheckoutElements() {
   return {
     modal: document.getElementById("messengerCheckoutModal"),
     form: document.getElementById("messengerCheckoutForm"),
+    contactInput: document.getElementById("checkoutContact"),
     nameInput: document.getElementById("checkoutName"),
     notesInput: document.getElementById("checkoutNotes"),
     summaryList: document.getElementById("orderSummaryItems"),
@@ -57,7 +58,7 @@ function getItemLabel(item) {
 }
 
 function buildCheckoutMessage() {
-  const { nameInput, notesInput } = getCheckoutElements();
+  const { contactInput, nameInput, notesInput } = getCheckoutElements();
   const cart = window.AppState?.shoppingList || [];
 
   const itemLines = cart
@@ -74,16 +75,15 @@ function buildCheckoutMessage() {
     `Total: ${getCartTotalsBySymbol(cart)}`
   ];
 
+  const contactInfo = contactInput?.value.trim() || "";
   const customerName = nameInput?.value.trim();
   const notes = notesInput?.value.trim();
 
-  if (customerName) {
-    chunks.push("", `Name: ${customerName}`);
-  }
+  chunks.push("", "Contact Information:", contactInfo);
 
-  if (notes) {
-    chunks.push("", `Notes: ${notes}`);
-  }
+  if (customerName) chunks.push("", `Name: ${customerName}`);
+
+  if (notes) chunks.push("", `Notes: ${notes}`);
 
   chunks.push("", "Please let me know the availability. Thank you.");
   return chunks.join("\n");
@@ -144,11 +144,16 @@ function clearCartAfterCheckout() {
 }
 
 async function copyAndOpenMessengerChat() {
-  const { manualCopyArea, copyOpenButton } = getCheckoutElements();
+  const { manualCopyArea, copyOpenButton, contactInput } = getCheckoutElements();
   if (window.CheckoutState.actionInProgress || !copyOpenButton || !manualCopyArea) return;
   const cart = window.AppState?.shoppingList || [];
   if (!cart.length) {
     setCheckoutFeedback("Your cart is empty.", "warning");
+    return;
+  }
+  if (!contactInput?.value.trim()) {
+    setCheckoutFeedback("Please enter your contact information before continuing.", "warning");
+    contactInput?.focus();
     return;
   }
 

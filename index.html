@@ -208,6 +208,17 @@
     </div>
 
     <form id="messengerCheckoutForm" class="messenger-checkout-form" novalidate>
+      <label for="checkoutContact">Contact Information</label>
+      <input
+        id="checkoutContact"
+        name="contact"
+        type="text"
+        autocomplete="tel"
+        placeholder="Phone number, Facebook name, Messenger name, or email"
+        required
+      >
+      <small class="checkout-help-text">Required so we can contact you if Messenger does not go through.</small>
+
       <label for="checkoutName">Name</label>
       <input id="checkoutName" name="name" type="text" autocomplete="name" placeholder="Your name (helps us follow up)">
 
