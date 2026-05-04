@@ -143,7 +143,7 @@ const DEFAULT_PRODUCT_CATALOG = [
     price: "See pricing note",
     image: "images/speargun/carbon_speargun.png",
     details: "High-performance carbon speargun built for lightweight handling and power.",
-    allProductsVisible: false,
+    allProductsVisible: true,
     comingSoon: false,
     isDisplayOnly: true,
     priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
@@ -155,7 +155,7 @@ const DEFAULT_PRODUCT_CATALOG = [
     price: "See pricing note",
     image: "images/speargun/mini speargun.png",
     details: "Compact speargun option suited for smaller setups and maneuverability.",
-    allProductsVisible: false,
+    allProductsVisible: true,
     comingSoon: false,
     isDisplayOnly: true,
     priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
@@ -167,7 +167,7 @@ const DEFAULT_PRODUCT_CATALOG = [
     price: "See pricing note",
     image: "images/speargun/mini_speargun2.png",
     details: "Alternate compact speargun model with a clean, streamlined build.",
-    allProductsVisible: false,
+    allProductsVisible: true,
     comingSoon: false,
     isDisplayOnly: true,
     priceNote: "Starting price varies from ₱4,000 to ₱22,000+"
@@ -179,7 +179,7 @@ const DEFAULT_PRODUCT_CATALOG = [
     price: "See pricing note",
     image: "images/speargun/Woodgun_130cm.png",
     details: "Traditional handcrafted woodgun collection. Open to choose your preferred variant.",
-    allProductsVisible: false,
+    allProductsVisible: true,
     comingSoon: false,
     isDisplayOnly: true,
     priceNote: "Starting price varies from ₱4,000 to ₱22,000+",
@@ -223,15 +223,41 @@ const DEFAULT_PRODUCT_CATALOG = [
 
 window.ProductCatalog = [...DEFAULT_PRODUCT_CATALOG];
 
+function parseCsvRow(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === "\"") {
+      if (inQuotes && line[i + 1] === "\"") {
+        current += "\"";
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
 function parseCSV(text) {
   const lines = text.trim().split("\n");
-  const headers = lines[0].split(",");
+  const headers = parseCsvRow(lines[0]);
 
   return lines.slice(1).map((line) => {
-    const values = line.split(",");
+    const values = parseCsvRow(line);
     const obj = {};
     headers.forEach((h, i) => {
-      obj[h.trim()] = values[i]?.trim();
+      obj[h.trim()] = (values[i] ?? "").trim();
     });
     return obj;
   });
@@ -249,6 +275,9 @@ function formatPriceLabel(value) {
 }
 
 async function loadProductsFromSheet() {
+  const loadingEl = document.getElementById("productsLoading");
+  if (loadingEl) loadingEl.style.display = "block";
+
   try {
     const res = await fetch(SHEET_URL);
     if (!res.ok) {
@@ -713,6 +742,8 @@ window.addToCartFromModal = function addToCartFromModal() {
 };
 
 function initializeApp() {
+  window.initializeHeroSlideshow();
+
   if (window.AppState.hasInitialized) return;
   window.AppState.hasInitialized = true;
 
