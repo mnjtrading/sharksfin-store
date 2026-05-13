@@ -1,8 +1,12 @@
-/* Subtle transition effects and section entrance animation */
+/* Section transitions and scroll-reveal animations */
+
+/* ============================================================
+   SECTION PANEL TRANSITIONS
+   ============================================================ */
 .section-panel {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 280ms ease, transform 280ms ease;
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
 }
 
 .section-panel.hidden {
@@ -11,11 +15,50 @@
   pointer-events: none;
 }
 
+/* Welcome card entrance */
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .welcome-card {
-  animation: fadeSlideIn 320ms ease;
+  animation: fadeSlideIn 0.4s ease-out both;
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   Elements with .scroll-reveal start invisible and fade in
+   when IntersectionObserver adds .is-revealed
+   ============================================================ */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger helpers (applied inline via JS: style.transitionDelay) */
+.scroll-reveal-stagger > .scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .section-panel,
+  .welcome-card,
+  .scroll-reveal,
+  .scroll-reveal-stagger > .scroll-reveal {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

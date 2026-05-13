@@ -1,4 +1,40 @@
 // App bootstrap: initialize features after DOM is ready
+
+/* ----------------------------------------------------------
+   Scroll-reveal via IntersectionObserver.
+   Elements with class "scroll-reveal" fade + slide up when
+   they enter the viewport. Call setupScrollReveal() after
+   any dynamic content is inserted into the DOM.
+   ---------------------------------------------------------- */
+function setupScrollReveal() {
+  if (!window.IntersectionObserver) {
+    // Fallback: make all targets visible immediately
+    document.querySelectorAll('.scroll-reveal:not(.is-revealed)').forEach(el => {
+      el.classList.add('is-revealed');
+    });
+    return;
+  }
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-revealed');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+
+  document.querySelectorAll('.scroll-reveal:not(.is-revealed)').forEach((el, i) => {
+    if (prefersReduced) {
+      el.classList.add('is-revealed');
+    } else {
+      observer.observe(el);
+    }
+  });
+}
+
+window.setupScrollReveal = setupScrollReveal;
 function setBodyScrollLock(shouldLock) {
   document.body.classList.toggle("no-scroll", shouldLock);
 }
@@ -22,6 +58,7 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
 
 window.addEventListener("DOMContentLoaded", () => {
   window.renderShoppingList();
+  setupScrollReveal();
 
   const categoryToggle = document.getElementById("categoryMenuToggle");
   const categoryButtons = document.getElementById("categoryButtons");
