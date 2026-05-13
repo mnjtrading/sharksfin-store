@@ -14,6 +14,10 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
     document.getElementById("categoryButtons")?.classList.contains("open");
 
   setBodyScrollLock(Boolean(hasOpenOverlay));
+
+  if (typeof window.updateCheckoutButtonVisibility === "function") {
+    window.updateCheckoutButtonVisibility();
+  }
 };
 
 window.addEventListener("DOMContentLoaded", () => {
