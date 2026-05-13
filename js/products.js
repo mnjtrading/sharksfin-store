@@ -371,9 +371,17 @@ function renderCatalogCards() {
   const productsGrid = document.getElementById("products");
   if (!productsGrid) return;
 
-  productsGrid.innerHTML = window.ProductCatalog
-    .map((product) => buildProductCard(product))
-    .join("");
+  let lastCategory = null;
+  const html = window.ProductCatalog.map((product) => {
+    let header = "";
+    if (product.category !== lastCategory) {
+      header = `<div class="category-section-header" data-header-category="${product.category}">${product.category}</div>`;
+      lastCategory = product.category;
+    }
+    return header + buildProductCard(product);
+  }).join("");
+
+  productsGrid.innerHTML = html;
 }
 
 function setActiveCategoryButton(category) {
@@ -410,8 +418,11 @@ function animateVisibleProductCards() {
 
 function setVisibleProductsForCategory(category) {
   const title = document.getElementById("catTitle");
-  const categoryNotice = document.getElementById("categoryNotice");
   const products = document.querySelectorAll(".product-card");
+  const headers = document.querySelectorAll(".category-section-header");
+
+  // Hide all headers by default; revealed selectively for "All" below
+  headers.forEach((h) => { h.style.display = "none"; });
 
   if (category === "All") {
     title.textContent = "All Products";
@@ -420,10 +431,26 @@ function setVisibleProductsForCategory(category) {
       const isVisible = productCard.dataset.allVisible === "true";
       productCard.style.display = isVisible ? "flex" : "none";
     });
+
+    // Show a header only when it has at least one visible product after it
+    headers.forEach((header) => {
+      let sibling = header.nextElementSibling;
+      let hasVisible = false;
+      while (sibling && !sibling.classList.contains("category-section-header")) {
+        if (sibling.classList.contains("product-card") && sibling.style.display !== "none") {
+          hasVisible = true;
+          break;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+      if (hasVisible) header.style.display = "";
+    });
+
     animateVisibleProductCards();
     return;
   }
 
+  // Specific category — headers stay hidden
   title.textContent = category;
   updateCategoryNotice(category);
   products.forEach((productCard) => {
