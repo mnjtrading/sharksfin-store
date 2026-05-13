@@ -287,7 +287,6 @@ async function loadProductsFromSheet() {
     const text = await res.text();
     const data = parseCSV(text);
     const rows = data.filter((row) => row.id);
-    console.log("Loaded sheet rows:", rows);
     const sheetMap = new Map(rows.map((row) => [row.id, row]));
 
     window.ProductCatalog = DEFAULT_PRODUCT_CATALOG.map((product) => {
@@ -304,13 +303,9 @@ async function loadProductsFromSheet() {
       };
     });
 
-    console.log("Using sheet override fallback:", false);
-    console.log("Final ProductCatalog:", window.ProductCatalog);
   } catch (err) {
     console.error("Sheet load failed, fallback to local data", err);
     window.ProductCatalog = [...DEFAULT_PRODUCT_CATALOG];
-    console.log("Using sheet override fallback:", true);
-    console.log("Final ProductCatalog:", window.ProductCatalog);
   } finally {
     initializeApp();
   }
@@ -571,10 +566,17 @@ window.openCategory = function openCategory(category) {
   const welcome = document.getElementById("welcome");
   const catalogue = document.getElementById("catalogue");
 
+  // Fade welcome out, then remove from flow after transition completes
   welcome.classList.add("hidden");
-  welcome.style.display = "none";
+  window.setTimeout(() => {
+    welcome.style.display = "none";
+  }, 280);
+
+  // Make catalogue renderable, force a reflow so the transition can fire from opacity:0
   catalogue.style.display = "block";
+  void catalogue.offsetWidth;
   catalogue.classList.remove("hidden");
+
   window.scrollTo({ top: 0, behavior: "auto" });
 
   if (typeof window.closeProductModal === "function") {
@@ -597,12 +599,15 @@ window.goBack = function goBack() {
   window.closeCartModal();
   catalogue.classList.add("hidden");
 
+  // Wait for the full 280ms transition before swapping sections
   setTimeout(() => {
     catalogue.style.display = "none";
     welcome.style.display = "flex";
+    // Force reflow so removing .hidden triggers the CSS transition rather than jumping
+    void welcome.offsetWidth;
     welcome.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "auto" });
-  }, 220);
+  }, 280);
 };
 
 // Messenger checkout integrates through this button visibility helper to mirror cart state.
@@ -615,7 +620,12 @@ window.updateCheckoutButtonVisibility = function updateCheckoutButtonVisibility(
   const floatingCount = document.getElementById("floatingCartCount");
   if (floatingBtn && floatingCount) {
     const { itemCount } = getCartTotals();
-    floatingBtn.hidden = itemCount === 0;
+    const anyModalOpen =
+      document.getElementById("productModal")?.classList.contains("active") ||
+      document.getElementById("cartModal")?.classList.contains("active") ||
+      document.getElementById("messengerCheckoutModal")?.classList.contains("active") ||
+      document.getElementById("speargunInquiryModal")?.classList.contains("active");
+    floatingBtn.hidden = itemCount === 0 || Boolean(anyModalOpen);
     floatingCount.textContent = String(itemCount);
   }
 };
@@ -652,7 +662,7 @@ window.renderShoppingList = function renderShoppingList() {
             <p>Unit: ${formatPrice(item.symbol, item.unitPrice)}</p>
             <p class="item-total">Item Total: ${formatPrice(item.symbol, subtotal)}</p>
           </div>
-          <button type="button" class="remove-item-btn" data-remove-key="${item.key}">Remove</button>
+          <button type="button" class="remove-item-btn" data-remove-key="${item.key}" aria-label="Remove ${item.name} from cart">Remove</button>
         </article>
       `;
     })

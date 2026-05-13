@@ -16,7 +16,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.welcome-card,
-#catalogue {
+.welcome-card {
   animation: fadeSlideIn 320ms ease;
 }

@@ -245,7 +245,7 @@ function renderSizeOptions(productCategory) {
       : WETSUIT_SIZES;
 
   sizeGrid.innerHTML = sizes
-    .map((size) => `<button type="button" class="size-option" data-size="${size}">${size}</button>`)
+    .map((size) => `<button type="button" class="size-option" data-size="${size}" aria-pressed="false">${size}</button>`)
     .join("");
 }
 
@@ -430,7 +430,9 @@ window.handleSpeargunInquiryOverlayClick = function handleSpeargunInquiryOverlay
 window.selectProductSize = function selectProductSize(option) {
   const selectedSize = option.dataset.size;
   document.querySelectorAll(".size-option").forEach((sizeOption) => {
-    sizeOption.classList.toggle("selected", sizeOption === option);
+    const isSelected = sizeOption === option;
+    sizeOption.classList.toggle("selected", isSelected);
+    sizeOption.setAttribute("aria-pressed", String(isSelected));
   });
 
   document.getElementById("sizeWarning").classList.remove("active");
