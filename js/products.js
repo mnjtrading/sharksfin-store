@@ -385,11 +385,10 @@ function renderCatalogCards() {
 }
 
 function setActiveCategoryButton(category) {
-  const categoryButtons = document.querySelectorAll("#categoryButtons button");
-  categoryButtons.forEach((button) => {
-    const isActive = button.textContent.trim() === (category === "All" ? "View All" : category);
-    button.classList.toggle("is-active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
+  document.querySelectorAll(".cat-pill").forEach((pill) => {
+    const isActive = pill.textContent.trim() === category;
+    pill.classList.toggle("is-active", isActive);
+    pill.setAttribute("aria-pressed", String(isActive));
   });
 }
 
@@ -590,51 +589,19 @@ function animateAddButtonFeedback() {
 }
 
 window.openCategory = function openCategory(category) {
-  const welcome = document.getElementById("welcome");
-  const catalogue = document.getElementById("catalogue");
-
-  // Fade welcome out, then remove from flow after transition completes
-  welcome.classList.add("hidden");
-  window.setTimeout(() => {
-    welcome.style.display = "none";
-  }, 280);
-
-  // Make catalogue renderable, force a reflow so the transition can fire from opacity:0
-  catalogue.style.display = "block";
-  void catalogue.offsetWidth;
-  catalogue.classList.remove("hidden");
-
-  window.scrollTo({ top: 0, behavior: "auto" });
-
   if (typeof window.closeProductModal === "function") {
     window.closeProductModal();
   }
-
   window.closeCartModal();
+
   setVisibleProductsForCategory(category);
   setActiveCategoryButton(category);
-};
 
-window.goBack = function goBack() {
-  const welcome = document.getElementById("welcome");
+  // Scroll catalogue into view, respecting the sticky header + category bar offset
   const catalogue = document.getElementById("catalogue");
-
-  if (typeof window.closeProductModal === "function") {
-    window.closeProductModal();
+  if (catalogue) {
+    catalogue.scrollIntoView({ behavior: "smooth", block: "start" });
   }
-
-  window.closeCartModal();
-  catalogue.classList.add("hidden");
-
-  // Wait for the full 280ms transition before swapping sections
-  setTimeout(() => {
-    catalogue.style.display = "none";
-    welcome.style.display = "flex";
-    // Force reflow so removing .hidden triggers the CSS transition rather than jumping
-    void welcome.offsetWidth;
-    welcome.classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, 280);
 };
 
 // Messenger checkout integrates through this button visibility helper to mirror cart state.
@@ -643,10 +610,12 @@ window.updateCheckoutButtonVisibility = function updateCheckoutButtonVisibility(
   if (!checkoutButton) return;
   checkoutButton.hidden = window.AppState.shoppingList.length === 0;
 
-  const floatingBtn = document.getElementById("floatingCartBtn");
+  const { itemCount } = getCartTotals();
+
+  // Floating cart button (mobile backup)
+  const floatingBtn   = document.getElementById("floatingCartBtn");
   const floatingCount = document.getElementById("floatingCartCount");
   if (floatingBtn && floatingCount) {
-    const { itemCount } = getCartTotals();
     const anyModalOpen =
       document.getElementById("productModal")?.classList.contains("active") ||
       document.getElementById("cartModal")?.classList.contains("active") ||
@@ -654,6 +623,13 @@ window.updateCheckoutButtonVisibility = function updateCheckoutButtonVisibility(
       document.getElementById("speargunInquiryModal")?.classList.contains("active");
     floatingBtn.hidden = itemCount === 0 || Boolean(anyModalOpen);
     floatingCount.textContent = String(itemCount);
+  }
+
+  // Header cart badge
+  const headerBadge = document.getElementById("headerCartBadge");
+  if (headerBadge) {
+    headerBadge.hidden = itemCount === 0;
+    headerBadge.textContent = String(itemCount);
   }
 };
 
@@ -797,6 +773,11 @@ function initializeApp() {
   setActiveCategoryButton("All");
   loadCartState();
   window.renderShoppingList();
+
+  // Re-run scroll reveal after dynamic cards are in the DOM
+  if (typeof window.setupScrollReveal === "function") {
+    window.setupScrollReveal();
+  }
 
   const cartItems = document.getElementById("cartItems");
   if (cartItems) {
