@@ -525,19 +525,33 @@
 /* Add to cart / inquiry buttons */
 .add-cart-btn {
   width: 100%;
-  padding: 0 22px;
+  padding: 15px 22px;
   background: var(--brand-accent);
   color: var(--brand-bg);
   border: none;
+  border-radius: 999px;
   font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  transition: all 0.2s var(--ease-standard);
+  box-shadow: 0 6px 24px rgba(0, 200, 212, 0.30);
+  will-change: transform;
+  transition:
+    background  0.35s var(--ease-premium),
+    box-shadow  0.35s var(--ease-premium),
+    transform   0.35s var(--ease-premium);
 }
 
-.add-cart-btn:hover { background: var(--brand-accent-hover); }
-.add-cart-btn:active { transform: scale(0.97); }
+.add-cart-btn:hover {
+  background: var(--brand-accent-hover);
+  box-shadow: 0 10px 32px rgba(0, 200, 212, 0.44);
+  transform: translateY(-2px);
+}
+
+.add-cart-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 4px 14px rgba(0, 200, 212, 0.22);
+}
 
 .inquiry-btn {
   margin-top: var(--space-2);
@@ -560,7 +574,8 @@
   background: rgba(42, 185, 130, 0.95);
   border-color: transparent;
   color: #031a0c;
-  box-shadow: 0 6px 20px rgba(42, 185, 130, 0.25);
+  box-shadow: 0 8px 28px rgba(42, 185, 130, 0.38);
+  transform: translateY(-1px);
 }
 
 .cart-feedback {
