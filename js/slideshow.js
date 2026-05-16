@@ -1,9 +1,8 @@
-// Hero slideshow — full-screen background rotation
+// Hero slideshow — two-div crossfade background rotation
 window.HeroSlideshow = {
   slides: [],
   index: 0,
-  timer: null,
-  navigationInProgress: false
+  timer: null
 };
 
 function getFallbackSlides() {
@@ -13,45 +12,39 @@ function getFallbackSlides() {
       title: "Hammerhead Blue Dive Gloves",
       subtitle: "Durable dive gloves built for comfort and grip.",
       category: "Gloves"
+    },
+    {
+      image: "images/gloves/hh_gloves_red.png",
+      title: "Hammerhead Red Dive Gloves",
+      subtitle: "High-visibility red finish for long dive sessions.",
+      category: "Gloves"
     }
   ];
 }
 
 window.renderHeroSlide = function renderHeroSlide() {
-  const imageEl  = document.getElementById("slideImage");
-  const slide    = window.HeroSlideshow.slides[window.HeroSlideshow.index];
+  const slideA = document.getElementById("slideImageA");
+  const slideB = document.getElementById("slideImageB");
+  const slide  = window.HeroSlideshow.slides[window.HeroSlideshow.index];
 
-  // Only the background element is required in the new hero layout
-  if (!imageEl || !slide) return;
+  if (!slideA || !slideB || !slide) return;
 
-  imageEl.classList.remove("active");
-  void imageEl.offsetWidth; // force reflow so the CSS transition re-fires
-  imageEl.style.backgroundImage = `url('${slide.image}')`;
-  imageEl.classList.add("active");
+  // Determine which panel is currently visible
+  const current = slideA.classList.contains("active") ? slideA : slideB;
+  const next    = current === slideA ? slideB : slideA;
 
-  // Update optional legacy elements if they still exist in the DOM
-  const titleEl    = document.getElementById("slideTitle");
-  const subtitleEl = document.getElementById("slideSubtitle");
-  const visualCopy = document.querySelector(".visual-copy");
-
-  if (titleEl)    titleEl.textContent    = slide.title;
-  if (subtitleEl) subtitleEl.textContent = slide.subtitle;
-
-  if (visualCopy) {
-    visualCopy.classList.remove("is-visible");
-    window.requestAnimationFrame(() => {
-      visualCopy.classList.add("is-visible");
-    });
-  }
+  // Load the new image on the hidden panel, then crossfade
+  next.style.backgroundImage = `url('${slide.image}')`;
+  void next.offsetWidth; // force reflow so the transition fires from opacity 0
+  next.classList.add("active");
+  current.classList.remove("active");
 };
 
 window.restartHeroTimer = function restartHeroTimer() {
   clearInterval(window.HeroSlideshow.timer);
 
   if (window.HeroSlideshow.slides.length < 2) return;
-
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (prefersReducedMotion) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   window.HeroSlideshow.timer = setInterval(() => {
     window.HeroSlideshow.index =
@@ -61,7 +54,7 @@ window.restartHeroTimer = function restartHeroTimer() {
 };
 
 window.nextHeroSlide = function nextHeroSlide() {
-  if (window.HeroSlideshow.slides.length === 0) return;
+  if (!window.HeroSlideshow.slides.length) return;
   window.HeroSlideshow.index =
     (window.HeroSlideshow.index + 1) % window.HeroSlideshow.slides.length;
   window.renderHeroSlide();
@@ -69,7 +62,7 @@ window.nextHeroSlide = function nextHeroSlide() {
 };
 
 window.prevHeroSlide = function prevHeroSlide() {
-  if (window.HeroSlideshow.slides.length === 0) return;
+  if (!window.HeroSlideshow.slides.length) return;
   window.HeroSlideshow.index =
     (window.HeroSlideshow.index - 1 + window.HeroSlideshow.slides.length) %
     window.HeroSlideshow.slides.length;
@@ -77,22 +70,25 @@ window.prevHeroSlide = function prevHeroSlide() {
   window.restartHeroTimer();
 };
 
-window.addEventListener("resize", () => {
-  window.restartHeroTimer();
-});
+window.addEventListener("resize", () => window.restartHeroTimer());
 
 window.initializeHeroSlideshow = function initializeHeroSlideshow() {
-  const derivedSlides =
+  const derived =
     typeof window.getHeroSlidesFromCatalog === "function"
       ? window.getHeroSlidesFromCatalog()
       : [];
 
   window.HeroSlideshow.slides =
-    derivedSlides.length > 0 ? derivedSlides : getFallbackSlides();
+    derived.length > 0 ? derived : getFallbackSlides();
   window.HeroSlideshow.index = 0;
 
-  window.renderHeroSlide();
+  // Seed the first slide onto panel A and make it visible immediately
+  const slideA = document.getElementById("slideImageA");
+  if (slideA && window.HeroSlideshow.slides[0]) {
+    slideA.style.backgroundImage =
+      `url('${window.HeroSlideshow.slides[0].image}')`;
+    slideA.classList.add("active");
+  }
+
   window.restartHeroTimer();
-  // Navigation is now handled by the hero CTA button and category pill bar —
-  // no click handler needed on the hero section itself.
 };
