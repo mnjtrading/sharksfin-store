@@ -1,4 +1,4 @@
-// Homepage hero slideshow controls and timer logic
+// Hero slideshow — full-screen background rotation
 window.HeroSlideshow = {
   slides: [],
   index: 0,
@@ -18,31 +18,24 @@ function getFallbackSlides() {
 }
 
 window.renderHeroSlide = function renderHeroSlide() {
-  const imageEl = document.getElementById("slideImage");
-  const titleEl = document.getElementById("slideTitle");
-  const subtitleEl = document.getElementById("slideSubtitle");
-  const visualCopy = document.querySelector(".visual-copy");
-  const visualHero = document.getElementById("visualHero");
-  const visualHint = document.getElementById("slideHint");
-  const slide = window.HeroSlideshow.slides[window.HeroSlideshow.index];
+  const imageEl  = document.getElementById("slideImage");
+  const slide    = window.HeroSlideshow.slides[window.HeroSlideshow.index];
 
-  if (!imageEl || !titleEl || !subtitleEl || !slide) return;
+  // Only the background element is required in the new hero layout
+  if (!imageEl || !slide) return;
 
   imageEl.classList.remove("active");
-  void imageEl.offsetWidth;
+  void imageEl.offsetWidth; // force reflow so the CSS transition re-fires
   imageEl.style.backgroundImage = `url('${slide.image}')`;
   imageEl.classList.add("active");
-  titleEl.textContent = slide.title;
-  subtitleEl.textContent = slide.subtitle;
-  if (visualHero) {
-    const categoryLabel = slide.category || "category";
-    visualHero.setAttribute("aria-label", `View ${categoryLabel} products`);
-    visualHero.dataset.category = categoryLabel;
-  }
-  if (visualHint) {
-    const verb = window.matchMedia("(max-width: 860px)").matches ? "Tap" : "Click";
-    visualHint.textContent = `${verb} to view ${slide.category || "category"}`;
-  }
+
+  // Update optional legacy elements if they still exist in the DOM
+  const titleEl    = document.getElementById("slideTitle");
+  const subtitleEl = document.getElementById("slideSubtitle");
+  const visualCopy = document.querySelector(".visual-copy");
+
+  if (titleEl)    titleEl.textContent    = slide.title;
+  if (subtitleEl) subtitleEl.textContent = slide.subtitle;
 
   if (visualCopy) {
     visualCopy.classList.remove("is-visible");
@@ -58,40 +51,30 @@ window.restartHeroTimer = function restartHeroTimer() {
   if (window.HeroSlideshow.slides.length < 2) return;
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const isMobile = window.innerWidth <= 768;
-  if (prefersReducedMotion || isMobile) return;
+  if (prefersReducedMotion) return;
 
   window.HeroSlideshow.timer = setInterval(() => {
-    window.HeroSlideshow.index = (window.HeroSlideshow.index + 1) % window.HeroSlideshow.slides.length;
+    window.HeroSlideshow.index =
+      (window.HeroSlideshow.index + 1) % window.HeroSlideshow.slides.length;
     window.renderHeroSlide();
-  }, 4500);
+  }, 5000);
 };
 
 window.nextHeroSlide = function nextHeroSlide() {
   if (window.HeroSlideshow.slides.length === 0) return;
-  window.HeroSlideshow.index = (window.HeroSlideshow.index + 1) % window.HeroSlideshow.slides.length;
+  window.HeroSlideshow.index =
+    (window.HeroSlideshow.index + 1) % window.HeroSlideshow.slides.length;
   window.renderHeroSlide();
   window.restartHeroTimer();
 };
 
 window.prevHeroSlide = function prevHeroSlide() {
   if (window.HeroSlideshow.slides.length === 0) return;
-  window.HeroSlideshow.index = (window.HeroSlideshow.index - 1 + window.HeroSlideshow.slides.length) % window.HeroSlideshow.slides.length;
+  window.HeroSlideshow.index =
+    (window.HeroSlideshow.index - 1 + window.HeroSlideshow.slides.length) %
+    window.HeroSlideshow.slides.length;
   window.renderHeroSlide();
   window.restartHeroTimer();
-};
-
-window.openHeroSlideCategory = function openHeroSlideCategory() {
-  const currentSlide = window.HeroSlideshow.slides[window.HeroSlideshow.index];
-  const category = currentSlide?.category;
-  if (!category || typeof window.openCategory !== "function") return;
-  if (window.HeroSlideshow.navigationInProgress) return;
-
-  window.HeroSlideshow.navigationInProgress = true;
-  window.openCategory(category);
-  window.setTimeout(() => {
-    window.HeroSlideshow.navigationInProgress = false;
-  }, 220);
 };
 
 window.addEventListener("resize", () => {
@@ -99,33 +82,17 @@ window.addEventListener("resize", () => {
 });
 
 window.initializeHeroSlideshow = function initializeHeroSlideshow() {
-  const visualHero = document.getElementById("visualHero");
-  const derivedSlides = typeof window.getHeroSlidesFromCatalog === "function"
-    ? window.getHeroSlidesFromCatalog()
-    : [];
+  const derivedSlides =
+    typeof window.getHeroSlidesFromCatalog === "function"
+      ? window.getHeroSlidesFromCatalog()
+      : [];
 
-  window.HeroSlideshow.slides = derivedSlides.length > 0 ? derivedSlides : getFallbackSlides();
+  window.HeroSlideshow.slides =
+    derivedSlides.length > 0 ? derivedSlides : getFallbackSlides();
   window.HeroSlideshow.index = 0;
 
   window.renderHeroSlide();
   window.restartHeroTimer();
-
-  if (visualHero && !visualHero.dataset.bound) {
-    visualHero.classList.add("is-interactive");
-    visualHero.setAttribute("role", "button");
-    visualHero.setAttribute("tabindex", "0");
-
-    visualHero.addEventListener("click", (event) => {
-      if (event.target.closest(".visual-controls")) return;
-      window.openHeroSlideCategory();
-    });
-
-    visualHero.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      window.openHeroSlideCategory();
-    });
-
-    visualHero.dataset.bound = "true";
-  }
+  // Navigation is now handled by the hero CTA button and category pill bar —
+  // no click handler needed on the hero section itself.
 };

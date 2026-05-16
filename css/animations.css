@@ -1,39 +1,57 @@
-/* Section transitions and scroll-reveal animations */
-
 /* ============================================================
-   SECTION PANEL TRANSITIONS
+   HERO ENTRANCE — staggered fade + lift on page load
    ============================================================ */
-.section-panel {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 280ms ease-out, transform 280ms ease-out;
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.section-panel.hidden {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
+@keyframes scrollLinePulse {
+  0%, 100% { opacity: 0.35; transform: scaleY(1.0); }
+  50%       { opacity: 0.9;  transform: scaleY(0.75); }
 }
 
-/* Welcome card entrance */
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+.hero-eyebrow {
+  animation: heroFadeUp 0.75s 0.20s var(--ease-premium) both;
 }
 
-.welcome-card {
-  animation: fadeSlideIn 0.4s ease-out both;
+.hero-title {
+  animation: heroFadeUp 0.75s 0.36s var(--ease-premium) both;
+}
+
+.hero-sub {
+  animation: heroFadeUp 0.75s 0.50s var(--ease-premium) both;
+}
+
+.hero-cta {
+  animation: heroFadeUp 0.75s 0.64s var(--ease-premium) both;
+}
+
+.hero-scroll-hint {
+  animation: heroFadeUp 0.75s 1.0s var(--ease-premium) both;
+}
+
+.hero-scroll-line {
+  animation: scrollLinePulse 2.2s 1.8s ease-in-out infinite;
 }
 
 /* ============================================================
    SCROLL REVEAL
-   Elements with .scroll-reveal start invisible and fade in
+   Elements with .scroll-reveal start hidden and transition in
    when IntersectionObserver adds .is-revealed
    ============================================================ */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  transform: translateY(24px);
+  transition:
+    opacity  0.65s var(--ease-premium),
+    transform 0.65s var(--ease-premium);
 }
 
 .scroll-reveal.is-revealed {
@@ -41,21 +59,42 @@
   transform: translateY(0);
 }
 
-/* Stagger helpers (applied inline via JS: style.transitionDelay) */
-.scroll-reveal-stagger > .scroll-reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+/* ============================================================
+   PRODUCT CARD ENTRANCE (category filter + initial load)
+   ============================================================ */
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-grid.is-animating .product-card.is-entering {
+  animation: cardReveal 0.45s ease-out both;
+  animation-delay: var(--stagger-delay, 0ms);
+}
+
+@keyframes buttonEntrance {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ============================================================
    REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .section-panel,
-  .welcome-card,
+  .hero-eyebrow,
+  .hero-title,
+  .hero-sub,
+  .hero-cta,
+  .hero-scroll-hint,
+  .hero-scroll-line,
   .scroll-reveal,
-  .scroll-reveal-stagger > .scroll-reveal {
+  .product-grid.is-animating .product-card.is-entering {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;

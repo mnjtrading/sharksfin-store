@@ -1,33 +1,35 @@
-// App bootstrap: initialize features after DOM is ready
+// App bootstrap: scroll behavior, scroll-reveal, body-lock helpers
 
 /* ----------------------------------------------------------
-   Scroll-reveal via IntersectionObserver.
+   Scroll reveal via IntersectionObserver.
    Elements with class "scroll-reveal" fade + slide up when
-   they enter the viewport. Call setupScrollReveal() after
-   any dynamic content is inserted into the DOM.
+   they enter the viewport. Called on DOMContentLoaded and
+   again after async product cards are injected.
    ---------------------------------------------------------- */
 function setupScrollReveal() {
   if (!window.IntersectionObserver) {
-    // Fallback: make all targets visible immediately
-    document.querySelectorAll('.scroll-reveal:not(.is-revealed)').forEach(el => {
-      el.classList.add('is-revealed');
+    document.querySelectorAll(".scroll-reveal:not(.is-revealed)").forEach((el) => {
+      el.classList.add("is-revealed");
     });
     return;
   }
 
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-revealed');
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.08, rootMargin: "0px 0px -28px 0px" }
+  );
 
-  document.querySelectorAll('.scroll-reveal:not(.is-revealed)').forEach((el, i) => {
+  document.querySelectorAll(".scroll-reveal:not(.is-revealed)").forEach((el) => {
     if (prefersReduced) {
-      el.classList.add('is-revealed');
+      el.classList.add("is-revealed");
     } else {
       observer.observe(el);
     }
@@ -35,6 +37,10 @@ function setupScrollReveal() {
 }
 
 window.setupScrollReveal = setupScrollReveal;
+
+/* ----------------------------------------------------------
+   Body scroll lock (used by modals)
+   ---------------------------------------------------------- */
 function setBodyScrollLock(shouldLock) {
   document.body.classList.toggle("no-scroll", shouldLock);
 }
@@ -46,8 +52,7 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
     document.getElementById("productModal")?.classList.contains("active") ||
     document.getElementById("cartModal")?.classList.contains("active") ||
     document.getElementById("messengerCheckoutModal")?.classList.contains("active") ||
-    document.getElementById("speargunInquiryModal")?.classList.contains("active") ||
-    document.getElementById("categoryButtons")?.classList.contains("open");
+    document.getElementById("speargunInquiryModal")?.classList.contains("active");
 
   setBodyScrollLock(Boolean(hasOpenOverlay));
 
@@ -56,48 +61,30 @@ window.syncBodyScrollLock = function syncBodyScrollLock() {
   }
 };
 
+/* ----------------------------------------------------------
+   Scroll to catalogue (used by the hero "Shop Now" button)
+   ---------------------------------------------------------- */
+window.scrollToCatalogue = function scrollToCatalogue() {
+  const catalogue = document.getElementById("catalogue");
+  if (catalogue) {
+    catalogue.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
+
+/* ----------------------------------------------------------
+   DOMContentLoaded bootstrap
+   ---------------------------------------------------------- */
 window.addEventListener("DOMContentLoaded", () => {
   window.renderShoppingList();
   setupScrollReveal();
 
-  const categoryToggle = document.getElementById("categoryMenuToggle");
-  const categoryButtons = document.getElementById("categoryButtons");
-
-  if (categoryToggle && categoryButtons) {
-    categoryToggle.addEventListener("click", () => {
-      const nextOpenState = !categoryButtons.classList.contains("open");
-      categoryButtons.classList.toggle("open", nextOpenState);
-      categoryToggle.setAttribute("aria-expanded", String(nextOpenState));
-      if (window.innerWidth <= 768) {
-        window.syncBodyScrollLock();
-      }
-    });
-
-    categoryButtons.addEventListener("click", (event) => {
-      if (!event.target.closest("button")) return;
-      if (window.innerWidth > 768) return;
-
-      categoryButtons.classList.remove("open");
-      categoryToggle.setAttribute("aria-expanded", "false");
-      window.syncBodyScrollLock();
-    });
-
-
-    document.addEventListener("click", (event) => {
-      if (!categoryButtons || !categoryToggle) return;
-      if (!categoryButtons.classList.contains("open")) return;
-      if (categoryButtons.contains(event.target) || categoryToggle.contains(event.target)) return;
-      categoryButtons.classList.remove("open");
-      categoryToggle.setAttribute("aria-expanded", "false");
-      window.syncBodyScrollLock();
-    });
-
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > 768) {
-        categoryButtons.classList.remove("open");
-        categoryToggle.setAttribute("aria-expanded", "false");
-        window.syncBodyScrollLock();
-      }
-    });
+  // Header: switch from transparent to frosted glass once user scrolls past the hero
+  const header = document.getElementById("siteHeader");
+  if (header) {
+    const onScroll = () => {
+      header.classList.toggle("is-scrolled", window.scrollY > 40);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // run once on load in case page is already scrolled
   }
 });

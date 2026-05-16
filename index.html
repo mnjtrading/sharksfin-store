@@ -18,11 +18,14 @@
   <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
+
+<!-- Cart toast notification -->
 <div class="cart-toast" id="cartToast" role="status" aria-live="polite" aria-atomic="true">
   <span id="cartToastMessage"></span>
   <button type="button" class="cart-toast-close" id="cartToastClose" aria-label="Dismiss notification">×</button>
 </div>
 
+<!-- Floating cart button (mobile fallback, appears when cart has items) -->
 <button
   type="button"
   class="floating-cart-btn"
@@ -34,72 +37,75 @@
   🛒 <span id="floatingCartCount">0</span>
 </button>
 
-<main>
-<section id="welcome" class="section-panel">
-  <div class="welcome-card">
-    <div class="welcome-copy">
-      <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
-      <h1>Welcome. How may we assist you today?</h1>
-      <p class="subtitle">Select a category below to explore our curated distribution catalogue.</p>
+<!-- Fixed site header: transparent over hero, frosted when scrolled -->
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <img src="images/mnj-logo.png" class="logo" alt="MNJ Logo">
+    <button
+      type="button"
+      class="header-cart-btn"
+      onclick="toggleShoppingList()"
+      aria-label="Open shopping cart"
+    >
+      <span class="header-cart-icon">🛒</span>
+      <span class="header-cart-label">Cart</span>
+      <span class="header-cart-badge" id="headerCartBadge" hidden>0</span>
+    </button>
+  </div>
+</header>
 
-      <button
-        type="button"
-        class="category-menu-toggle"
-        id="categoryMenuToggle"
-        aria-expanded="false"
-        aria-controls="categoryButtons"
-      >☰ Categories</button>
+<!-- Full-screen hero with slideshow background -->
+<section class="hero" id="visualHero" aria-label="Featured products">
+  <!-- JS sets background-image on this element -->
+  <div class="visual-slide" id="slideImage"></div>
+  <div class="hero-gradient"></div>
 
-      <div class="category-buttons" id="categoryButtons">
-        <button onclick="openCategory('Spearguns')">Spearguns</button>
-        <button onclick="openCategory('Gloves')">Gloves</button>
-        <button onclick="openCategory('Snorkels')">Snorkels</button>
-        <button onclick="openCategory('Fins')">Fins</button>
-        <button onclick="openCategory('Wetsuit')">Wetsuit</button>
-        <button onclick="openCategory('Misc')">Misc</button>
-        <button onclick="openCategory('All')">View All</button>
-      </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Hammerhead Freediving Equipment</p>
+    <h1 class="hero-title">Gear built<br>for the deep.</h1>
+    <p class="hero-sub">Spearguns, fins, wetsuits &amp; accessories —<br>order direct via Messenger.</p>
+    <button type="button" class="hero-cta" onclick="scrollToCatalogue()">Shop Now</button>
+  </div>
 
-      <button class="skip-btn" onclick="openCategory('All')">Skip & View Full Catalogue</button>
-    </div>
+  <!-- Slideshow prev / next -->
+  <div class="visual-controls hero-controls">
+    <button type="button" aria-label="Previous slide" onclick="prevHeroSlide()">‹</button>
+    <button type="button" aria-label="Next slide" onclick="nextHeroSlide()">›</button>
+  </div>
 
-    <div class="visual" id="visualHero">
-      <div class="visual-slide active" id="slideImage"></div>
-      <div class="visual-overlay">
-        <div class="visual-copy">
-          <div class="visual-kicker">Featured Product</div>
-          <div class="visual-title" id="slideTitle">Featured Product</div>
-          <div class="visual-subtitle" id="slideSubtitle">Explore premium diving essentials by category.</div>
-          <div class="visual-hint" id="slideHint">Tap to view category</div>
-        </div>
-        <div class="visual-controls">
-          <button type="button" aria-label="Previous slide" onclick="prevHeroSlide()">‹</button>
-          <button type="button" aria-label="Next slide" onclick="nextHeroSlide()">›</button>
-        </div>
-      </div>
-    </div>
+  <!-- Animated scroll indicator -->
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
   </div>
 </section>
 
-<section id="catalogue" class="section-panel hidden">
-  <div class="catalogue-header">
-    <div class="catalogue-actions">
-      <button class="back-btn" onclick="goBack()">← Back</button>
-      <button class="toolbar-btn" onclick="toggleShoppingList()">Shopping List</button>
-    </div>
-    <div class="catalogue-meta">
-      <div class="catalogue-title" id="catTitle">All Products</div>
-      <p class="category-notice" id="categoryNotice" hidden>Speargun starting prices vary from ₱4,000 to ₱22,000+</p>
-    </div>
+<!-- Sticky category filter bar -->
+<nav class="category-bar" id="categoryBar" aria-label="Product categories">
+  <div class="category-bar-inner" id="categoryButtons">
+    <button class="cat-pill is-active" onclick="openCategory('All')" aria-pressed="true">All</button>
+    <button class="cat-pill" onclick="openCategory('Spearguns')" aria-pressed="false">Spearguns</button>
+    <button class="cat-pill" onclick="openCategory('Gloves')" aria-pressed="false">Gloves</button>
+    <button class="cat-pill" onclick="openCategory('Snorkels')" aria-pressed="false">Snorkels</button>
+    <button class="cat-pill" onclick="openCategory('Fins')" aria-pressed="false">Fins</button>
+    <button class="cat-pill" onclick="openCategory('Wetsuit')" aria-pressed="false">Wetsuit</button>
+    <button class="cat-pill" onclick="openCategory('Misc')" aria-pressed="false">Misc</button>
+  </div>
+</nav>
+
+<!-- Product catalogue — always in flow, no section switching -->
+<main id="catalogue" class="catalogue">
+  <div class="catalogue-header scroll-reveal">
+    <h2 class="catalogue-title" id="catTitle">All Products</h2>
+    <p class="category-notice" id="categoryNotice" hidden>Speargun starting prices vary from ₱4,000 to ₱22,000+</p>
   </div>
   <div class="product-grid" id="products">
     <div class="products-loading" id="productsLoading" aria-live="polite" aria-label="Loading products">
       Loading products…
     </div>
   </div>
-
-</section>
 </main>
+
+<!-- ── Modals (unchanged) ─────────────────────────────────── -->
 
 <div class="product-modal" id="productModal" onclick="handleOverlayClick(event)">
   <div class="product-modal-content">
@@ -155,23 +161,18 @@
       <h3>Speargun Inquiry</h3>
       <p>Copy a ready-to-send inquiry and continue in Messenger chat.</p>
     </div>
-
     <ul class="order-summary-items">
       <li><span>Product</span><strong id="inquiryProductName">-</strong></li>
     </ul>
-
     <form id="speargunInquiryForm" class="messenger-checkout-form" novalidate>
       <label for="inquiryName">Name</label>
       <input id="inquiryName" name="name" type="text" autocomplete="name" placeholder="Your name (helps us follow up)">
-
       <label for="inquiryNotes">Notes (optional)</label>
       <textarea id="inquiryNotes" name="notes" rows="2"></textarea>
       <input type="text" id="inquiryHoneypot" name="website" autocomplete="off" tabindex="-1" class="honeypot-field" aria-hidden="true">
     </form>
-
     <p class="checkout-feedback" id="inquiryFeedback" role="status" aria-live="polite"></p>
     <textarea class="manual-copy-area" id="inquiryManualCopyArea" readonly aria-label="Manual inquiry copy fallback"></textarea>
-
     <div class="checkout-action-grid">
       <button type="button" class="checkout-btn checkout-btn-primary" id="copyOpenInquiryButton">Copy &amp; Open Messenger Chat</button>
       <button type="button" class="checkout-btn" id="closeInquiryButton">Close</button>
@@ -202,13 +203,11 @@
       <h3>Checkout Summary</h3>
       <p>Tap the button below to copy your order and open Messenger chat. Then just paste and send.</p>
     </div>
-
     <ul class="order-summary-items" id="orderSummaryItems"></ul>
     <div class="cart-total-row">
       <span id="orderSummaryCount">Total Items: 0</span>
       <strong id="orderSummaryTotal">₱0</strong>
     </div>
-
     <form id="messengerCheckoutForm" class="messenger-checkout-form" novalidate>
       <label for="checkoutContact">Contact Information</label>
       <input
@@ -220,18 +219,14 @@
         required
       >
       <small class="checkout-help-text">Required so we can contact you if Messenger does not go through.</small>
-
       <label for="checkoutName">Name</label>
       <input id="checkoutName" name="name" type="text" autocomplete="name" placeholder="Your name (helps us follow up)">
-
       <label for="checkoutNotes">Notes (optional)</label>
       <textarea id="checkoutNotes" name="notes" rows="2"></textarea>
       <input type="text" id="checkoutHoneypot" name="website" autocomplete="off" tabindex="-1" class="honeypot-field" aria-hidden="true">
     </form>
-
     <p class="checkout-feedback" id="checkoutFeedback" role="status" aria-live="polite"></p>
     <textarea class="manual-copy-area" id="manualCopyArea" readonly aria-label="Manual copy fallback"></textarea>
-
     <div class="checkout-action-grid">
       <button type="button" class="checkout-btn checkout-btn-primary" id="copyOpenChatButton">Copy &amp; Open Messenger Chat</button>
       <button type="button" class="checkout-btn" id="backToCartButton">Back to Cart</button>
