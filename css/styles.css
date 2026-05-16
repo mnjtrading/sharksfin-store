@@ -150,13 +150,14 @@ img { max-width: 100%; height: auto; }
     background     0.4s var(--ease-standard),
     border-color   0.4s var(--ease-standard),
     backdrop-filter 0.4s var(--ease-standard),
-    transform      0.45s var(--ease-premium);
+    opacity        0.35s var(--ease-standard);
   border-bottom: 1px solid transparent;
 }
 
-/* Slides up out of view when user scrolls down past the hero */
+/* Fades out once user scrolls past the hero */
 .site-header.is-hidden {
-  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .site-header.is-scrolled {
@@ -448,6 +449,9 @@ img { max-width: 100%; height: auto; }
   line-height: 1.5;
   display: inline-block;
 }
+
+/* Ensure HTML hidden attribute is respected even when display is set in CSS */
+[hidden] { display: none !important; }
 
 /* ============================================================
    FLOATING CART BUTTON

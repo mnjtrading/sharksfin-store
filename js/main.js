@@ -78,28 +78,14 @@ window.addEventListener("DOMContentLoaded", () => {
   window.renderShoppingList();
   setupScrollReveal();
 
-  // Header: frosted glass when scrolled + hide on scroll-down / reveal on scroll-up
+  // Header: frosted glass when scrolled; fade out once past the hero
   const header = document.getElementById("siteHeader");
   if (header) {
-    let lastY = window.scrollY;
-
     const onScroll = () => {
-      const currentY = window.scrollY;
       const heroHeight = document.getElementById("visualHero")?.offsetHeight ?? 400;
-
-      // Frosted glass once past the hero
-      header.classList.toggle("is-scrolled", currentY > 40);
-
-      // Only hide/reveal after the user has scrolled past the hero
-      if (currentY > heroHeight) {
-        const scrollingDown = currentY > lastY;
-        header.classList.toggle("is-hidden", scrollingDown);
-      } else {
-        // Always visible while still on the hero
-        header.classList.remove("is-hidden");
-      }
-
-      lastY = currentY;
+      const pastHero = window.scrollY > heroHeight * 0.85;
+      header.classList.toggle("is-scrolled", window.scrollY > 40);
+      header.classList.toggle("is-hidden", pastHero);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
